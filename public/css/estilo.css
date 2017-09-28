@@ -1,0 +1,63 @@
+body{
+	background: #E8EBDA;
+	font-family: 'Roboto', sans-serif;
+}
+
+.navbar-prin{
+	background: #FFF;
+	border: 1px solid #EEEEEE;
+	box-shadow: 0 0 4px rgba(0,0,0,0.2);
+	margin: 10px auto 5px auto;
+}
+
+.navbar-poli{
+	background: #FFF;
+	border: 1px solid #EEEEEE;
+	box-shadow: 0 0 4px rgba(0,0,0,0.2);
+	width: 98%;
+	margin: 10px auto 5px auto;
+}
+
+.panel > .panel-heading{
+	background: #4E714A;
+	border: 1px solid #4E714A;
+	color : #FFF;
+}
+
+.panel-poli{
+	width: 98%;
+	margin: 10px auto 20px auto;
+}
+
+label{
+	font-weight: 300;
+}
+/*    ---  SOLICITUDES  ---   */
+table{
+	font-size: 12px;
+}
+table tr:hover{
+	background: #EDEDED;
+}
+
+.tbl-th{
+	font-weight: 400;
+	background:#E5EBEE;
+}
+
+.bita-lista{
+	background: #FAFAFA;
+}
+.bita-deta{
+	color: #555;
+	font-size: 13px;
+}
+.titbar th {
+	background: #E5EBEE;
+}
+.pretitulo{
+	display: block;
+}
+.restitulo{
+	color:#4288C3;
+}
