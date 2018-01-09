@@ -1,44 +1,82 @@
-<?php 
+<?php
 class Crearpoliza_model extends CI_Model {
-	
-	protected $duaid;
+	public $duar;
 
-	function set_iddua($iddua){
-		$this->duaid = $iddua;
+	function __construct($ars=''){
+		if (verDato($ars, 'file')) {
+			$this->verpoliza($ars);
+		}
+
+		return false;
 	}
 
-	function obteneridpoliza($id='') {
-		if (!empty($id)) {
-			return $this->db->where('duaduana', $id)
-							->or_where('c807_file', $id)
-							->get('encabezado')
-							->row();
-		} else {
-			return false;
+	# verifica si la poliza ya esta iniciada
+	function verpoliza($ars=''){
+		if (verDato($ars, 'file')) {
+			$this->duar = $this->db->select('a.*, b.nombre, b.direccion')
+									->where('c807_file', $ars['file'])
+									->join('gacela.cliente_hijo b','a.nit = b.no_identificacion','left')
+									->get('encabezado a')
+									->row();
 		}
 	}
 
-	function actualizaHead($args){
-		if (verDato($args, 'duaduana')) {
-			
-			$this->db->where('duaduana', $this->duaid)
-			 		->update('encabezado',  $args);
-
-			return $this->duaid;
+	function modelos($mod="") {
+		if (!empty($mod)) {
+			return $this->db
+						->where('codigo', $mod)
+						->get('modelo')
+						->row();
 		} else {
-
-			return false;
-
+			return $this->db
+						->get('modelo')
+						->result();
 		}
 	}
 
-	function guardarHead($args){
-		if (verDato($args, 'c807_file')) {
+	function ver_regimenes($ars){
+		if (verDato($ars, 'opc')) {
+			switch ($ars['opc']) {
+				case 1:
+					return $this->db->select("*")
+									->from("reg_extendido")
+									->where("modelo", $ars['codigo'])
+									->get()
+									->result();
 
-			$this->db->insert('encabezado', $args);
-			return $this->db->insert_id();
+					break;
+				case 2:
+					return $this->db->select("*")
+									->from("reg_adicional")
+									->where("reg_ext", $ars['codigo'])
+									->get()
+									->result();
+				break;
+				default:
+					return false;
+					break;
+			}
+		}
+	}
+
+	function nitempresa($ars){
+		return $this->db->where("no_identificacion", $ars['nit'])
+						->get("gacela.cliente_hijo")
+						->row();
+	}
+
+	function guardarhead ($ars) {
+		if ($ars['duaduana']) {
+
+			return $this->db->where('duaduana', $ars['duaduana'])
+					 		->update('encabezado', $ars);
 		} else {
-			return false;
+			$xdato = array('status' => 2);
+			$this->db->where('c807_file', $ars['c807_file'])
+					 ->update('solicitud', $xdato);
+
+			$ars['anio']  = date('Y');
+			return $this->db->insert('encabezado', $ars);
 		}
 	}
 

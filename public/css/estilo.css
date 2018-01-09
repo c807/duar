@@ -1,6 +1,10 @@
 body{
-	background: #E8EBDA;
+	background:#E8EBDA; /*#E8EBDA;*/
 	font-family: 'Roboto', sans-serif;
+	padding-top:70px;
+}
+.sombra{
+	box-shadow: 0 0 2px rgba(0,0,0,0.5);
 }
 
 .navbar-prin{
@@ -60,4 +64,12 @@ table tr:hover{
 }
 .restitulo{
 	color:#4288C3;
+}
+.m1{
+	width: 45px;
+	display: inline-block;
+}
+.m2{
+	width: 35px;
+	display: inline-block;
 }

@@ -59,16 +59,16 @@ if ( ! function_exists('formatoFecha')) {
 }
 
 if ( ! function_exists('opcionesSelect')) {
-	function opcionesSelect($datos, $indice, $campo, $valor = array())
+	function opcionesSelect($datos, $indice, $campo1, $campo2, $valor = array())
 	{
 		$arreglo = array('' => '-');
 
 		foreach ($datos as $row) {
 			if (empty($valor)) {
-				$arreglo[$row->$indice] = $row->$campo;
+				$arreglo[$row->$indice] = $row->$campo1. ' - ' . $row->$campo2;
 			} else {
 				if (is_array($valor) && in_array($row->$indice, $valor)) {
-					$arreglo[$row->$indice] = $row->$campo;
+					$arreglo[$row->$indice] = $row->$campo1. ' - ' . $row->$campo2 ;
 				}
 			}
 		}
@@ -95,8 +95,18 @@ if (! function_exists('verDatovalor')) {
 	}
 }
 
-if (!function_exists('limite')) {
-	function limite() {
-		return 10;
+
+if ( ! function_exists('enviarJson'))
+{
+	/**
+	 * Recibe un arreglo de datos y devuelve un archivo de cabecera json, 
+	 * ideal para retornar en peticiones ajax
+	 * @param  array $args arreglo de datos
+	 * @return json
+	 */
+	function enviarJson($datos)
+	{
+		header('Content-type: application/json');
+		echo json_encode($datos);
 	}
 }

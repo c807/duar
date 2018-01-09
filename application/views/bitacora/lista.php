@@ -1,25 +1,28 @@
 <ul class="list-group">
 	<?php 
-	if ($bitacora){
-		foreach ($bitacora as $row){
-			$real = $this->conf->obetenerDatosUsuario($row->realizo); ?>
+	if (isset($bitacora) && ($bitacora)){
+		foreach ($bitacora as $row){ ?>
 			<li class="list-group-item bita-lista">
-				<button type="button" class="close" style="outline: none;" onclick="eliminabitacora(<?php echo $row->bitacora ?>,'<?php echo $row->c807_file ?>'); ">
+				<button type="button" class="close" onclick="eliminabitacora(<?php echo $row->bitacora ?>); ">
 					<span>&times;</span>
 				</button>
-				<span class="bita-deta"><b>
-					<i class="glyphicon glyphicon-user"></i> 
-					<?php echo $real->NOMBRE; ?></b>
+				<span class="bita-deta"><b><i class="glyphicon glyphicon-user"></i></b>
+					<?php echo $row->nombre ?>
 				</span><br>
-				<span class="bita-deta"><b>
-					<i class="glyphicon glyphicon-calendar"></i> <?php echo formatoFecha($row->fecha,2).' - '.$row->hora; ?></b>
-				</span><br><br>
+				<span class="bita-deta"><b><i class="glyphicon glyphicon-calendar"></i></b>
+					<?php echo formatoFecha($row->fecha,2).' - '.$row->hora; ?>
+				</span><br>
+				<span class="bita-deta"><b><i class="glyphicon glyphicon-comment"></i></b>
+				Comentario:
+				</span>
 				<p><?php echo $row->descripcion; ?></p>
 			</li>
 		<?php
 		}
 	} else {
+		echo '<li class="list-group-item bita-lista">';
 		echo "<p class='text-center'>No tiene registros para mostrar</p>";
+		echo '</li>';
 	}
 	?>
 </ul>

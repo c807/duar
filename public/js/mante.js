@@ -36,11 +36,6 @@ $(document).on('submit', '#formEmpresa', function(event){
 	})
 })
 
-function cerrar(ids){
-	$('#'+ids).hide('blind');
-}
-
-
 function vermas(inicio) {
 	$("#textocargar").html('Cargando...');
   

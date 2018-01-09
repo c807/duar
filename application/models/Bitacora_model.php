@@ -7,39 +7,34 @@ class Bitacora_model extends CI_Model {
 	# 4	Comentario
 
 
-	function verdatosBitacora($file){
-		if (!empty($file)) {
-			return $this->db->where('c807_file', $file)
-							->where('eliminar', 0)
-							->order_by('bitacora','desc')
-							->get('bitacora')
-							->result();
-		} else {
-			return false;
-		}
+	function verdatosBitacora($ars){
+		return $this->db->select('
+							a.*,
+							b.nombre ')
+						->join('csd.usuario b','a.realizo = b.usuario', 'left')
+						->where('c807_file', $ars['file'])
+						->where('eliminar', 0)
+						->order_by('bitacora','desc')
+						->get('bitacora a')
+						->result();
 	}
 
 
-	function bitacora_guardar(){
-		$datos = array(
-				'c807_file'   => $this->input->post('inp-file'),
-				'descripcion' => $this->input->post('descripcion'),
-				'hora'        => date('H:i:s'),
-				'fecha'       => date('Y-m-d'),
-				'status'      => 4,
-				'realizo'     => $_SESSION['UserID']
-		);
-		return $this->db->insert('bitacora',$datos);
+	function set_bitacora_duar($ars){
+		return $this->db
+				->set("c807_file", $ars['file'])
+				->set("descripcion", $ars['msj'])
+				->set('fecha', 'curdate()', false)
+				->set('hora', 'CURRENT_TIME()', false)
+				->set("status", 4)
+				->set("realizo",$_SESSION['UserID'])
+				->insert('bitacora');
 	}
 
-	function bitacoraeliminar($id){
-		if (!empty($id)) {
-			$edita = array('eliminar' => 1 );
-			return $this->db->where('bitacora',$id)
-							->update('bitacora',$edita);
-		} else {
-			return false;
-		}
+	function set_bitacora_eliminar($bit){
+		return $this->db->set('eliminar', 1)
+						->where('bitacora', $bit)
+						->delete('bitacora');
 	}
 }
 ?>

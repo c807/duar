@@ -1,36 +1,52 @@
 <?php 
 class Solicitud_model extends CI_Model {
 	
-# 1	Solicitud
-# 2	Aceptado
-# 3	Terminado
-# 4	Comentario
+	# 1	Solicitud
+	# 2	Aceptado
+	# 3	Terminado
+	# 4	Comentario
 
-	function verSolicitudes($ver=''){
-		if (isset($_SESSION['UserID'])) {
-			if (!empty($ver)) {
-				$this->db->where('b.status', 2);
-			}
+	function verSolicitudes($ars){
+		if (verDato($ars, 'id')) {
+			$this->db->where('a.solicitud', $ars['id']); 
+		} 
 
-			return $this->db->where('marginador',$_SESSION['UserID'])
-							->join('status b','b.status = a.status','inner')
-							//->order_by('a.status','asc')
-							->get('solicitud a')
-							->result();
+		if (verDato($ars, 'margi')) {
+			$this->db->where("a.marginador", $ars['margi']);
 		}
-	}
 
+		if (VerDato($ars, 'file')) {
+			$this->db->where("a.c807_file", $ars['file']);
+		}
 
-	function acciones_solicitudes($id,$datos){
-		if (!empty($id)) {
-			return $this->db->where('solicitud', $id)
-							->update('solicitud', $datos);
+		$soli = $this->db->select("
+							a.*,
+							b.nombre as nomejecutivo,
+							c.nombre as nomstatus
+							")
+						->from("solicitud a")
+						->join("csd.usuario b","a.ejecutivo = b.usuario","left")
+						->join("status c","a.status = c.status")
+						//->where("a.status",1)
+						->get();
+
+		if (verDato($ars, 'id') || verDato($ars, 'file')) {
+			return $soli->row();
 		} else {
-			return false;
+			return $soli->result();
 		}
-
 	}
-	
+
+	function set_status($ars){
+		if (verDato($ars, 'id')) {
+			return $this->db->set('status', $ars['status'])
+							->where('solicitud', $ars['id'])
+							->update('solicitud');
+		}
+		
+		return FALSE;
+	}
+
 	function insertabitacora($file, $coment){
 		if (!empty($file)) {
 			$datos = array(
@@ -41,8 +57,7 @@ class Solicitud_model extends CI_Model {
 					'c807_file'   => $file,
 					'descripcion' => $coment
 				);
-
-			return $this->db->insert('bitacora', $datos);
+				return $this->db->insert('bitacora', $datos);
 		} else {
 			return false;
 		}

@@ -1,17 +1,59 @@
-function actualizalista(){
-	var url = base_url('index.php/solicitud/solicitudes/actualizalista');
+function base_url(url) {
+	return window.location.origin + "/grupo_c807/duar/" + url; 
+}
+
+function chosenselect(){
+	$('.chosen').chosen({width:'100%'});	
+}
+
+$(document).ready(function(){
+	chosenselect();
+})
+
+function cargando(id){
+	document.getElementById(id).innerHTML = '';
+	var dir = base_url("public/img/cargando.gif");
+	var img = document.createElement('p');
+	img.className  = "text-center";
+	img.innerHTML = "<img src='"+ dir + "' alt=''>";
+
+	return document.getElementById(id).appendChild(img);
+}
+
+function cargalistaSol(){
+	var url = base_url('index.php/solicitud/solicitud/act_lista');
+	cargando('contenidosolicitud');
 	
 	$.post(url,function(data){
-		$('#contenidosolicitud').html(data);	
+		document.getElementById("contenidosolicitud").innerHTML = data;	
 	})
 }
 
-function accionesduar(id, tipo, file){
-	var url = base_url('index.php/solicitud/solicitudes/acciones_solicitudes/' + id);
-	var datos = {'tipo':tipo, 'file':file };
+function cargar_bitacora(file){
+	var url   = base_url('index.php/bitacora/bitacora/verbitacora');
+	var datos = {'file':file};
+	cargando("contenidobitacora");
+	document.getElementById("valorfile").value = file;
+
+	$.post(url, datos, function(data) {
+		document.getElementById("contenidobitacora"). innerHTML = data;
+	})
+
+}
+
+function poliza(sts,id) {
+	var url   = base_url('index.php/solicitud/solicitud/cambiar_status');
+	var datos = { status:sts, id:id } ;
 
 	$.post(url, datos, function(data){
-		actualizalista();
-		cargarbitacora(file);
+		cargalistaSol();
+		cargar_bitacora(data);
+		if (sts == 2) {
+			window.location.href = base_url('index.php/poliza/crear/headerduar/' + data)
+		}
 	})
+}
+
+function cerrar(id) {
+	$("#"+id).hide('blind');
 }
