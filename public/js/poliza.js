@@ -138,6 +138,7 @@ function prorrateo(inp){
 		$("#seguro").val(data.seguro);
 		$("#otros").val(data.otros);
 		$("#cif").val(data.cif);
+		$("#bulto").val(data.bulto);
 	})
 	
 }
@@ -179,5 +180,16 @@ function verproducto(inp){
 		$("#tipbulto option[value="+ data.tipo_bulto +"]").attr("selected",true);
 		$("#origen option[value="+ data.paisorigen +"]").attr("selected",true);
 		$("select").trigger("chosen:updated");
+	})
+}
+
+function verdescription(inp) {
+	var url    = base_url("index.php/poliza/detalle/setdescripcion_sac");
+	var comple = $("#comple").val();
+
+	var datos = {'codigo': inp.value+comple};
+
+	$.getJSON(url, datos, function(data) {
+		$("#sac").val(data.descripcion);
 	})
 }

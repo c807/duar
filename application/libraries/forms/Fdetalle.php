@@ -6,6 +6,7 @@ class Fdetalle {
 	protected $ori;
 	protected $deta;
 	protected $item;
+	protected $doc;
 
 	public function __construct(){
 		$this->procs    = & get_instance();
@@ -44,6 +45,10 @@ class Fdetalle {
 
 	public function set_quota($quo){
 		$this->quota = $quo;
+	}
+
+	public function set_documentos($rs) {
+		$this->doc = $rs;
 	}
 
 	private function Openform(){
@@ -198,6 +203,7 @@ class Fdetalle {
 				'id'    => 'part',
 				'name'  => 'partida',
 				'class' => $this->clase,
+				'onblur' => 'verdescription(this)',
 				'value' => (($this->deta) ? $this->deta->partida : '')
 			)
 		);
@@ -230,7 +236,7 @@ class Fdetalle {
 				'id'    => 'comple',
 				'name'  => 'comple',
 				'class' => $this->clase,
-				'value' => (($this->deta) ? $this->deta->comple : '')
+				'value' => (($this->deta) ? $this->deta->comple : '00')
 			)
 		);
 
@@ -353,7 +359,7 @@ class Fdetalle {
 				'id'    => 'doctran',
 				'name'  => 'doc_transp',
 				'class' => $this->clase,
-				'value' => (($this->deta) ? $this->deta->doc_transp : '')
+				'value' => (($this->deta) ? $this->deta->doc_transp : $this->doc[0]->doc_transp)
 			)
 		);
 	}
@@ -387,7 +393,6 @@ class Fdetalle {
 			array(
 				'id'    => 'flete',
 				'name'  => 'flete',
-				'readonly' => 'readonly',
 				'class' => $this->clase,
 				'value' => (($this->deta) ? $this->deta->flete : '')
 			)
@@ -404,7 +409,6 @@ class Fdetalle {
 			array(
 				'id'    => 'seguro',
 				'name'  => 'seguro',
-				'readonly' => 'readonly',
 				'class' => $this->clase,
 				'value' => (($this->deta) ? $this->deta->seguro : '')
 			)
@@ -421,7 +425,6 @@ class Fdetalle {
 			array(
 				'id'    => 'otros',
 				'name'  => 'otros',
-				'readonly' => 'readonly',
 				'class' => $this->clase,
 				'value' => (($this->deta) ? $this->deta->otros : '')
 			)
@@ -437,7 +440,6 @@ class Fdetalle {
 		$this->datos['cif'] = form_input(
 			array(
 				'id'    => 'cif',
-				'readonly' => 'readonly',
 				'name'  => 'cif',
 				'class' => $this->clase,
 				'value' => (($this->deta) ? $this->deta->cif : '')
@@ -457,7 +459,7 @@ class Fdetalle {
 				'id'    => 'contenedor1',
 				'name'  => 'contenedor1',
 				'class' => $this->clase,
-				'value' => (($this->deta) ? $this->deta->contenedor1 : '')
+				'value' => (($this->deta) ? $this->deta->contenedor1 : $this->doc[0]->contenedor1)
 			)
 		);
 
@@ -472,7 +474,7 @@ class Fdetalle {
 				'id'    => 'contenedor2',
 				'name'  => 'contenedor2',
 				'class' => $this->clase,
-				'value' => (($this->deta) ? $this->deta->contenedor2 : '')
+				'value' => (($this->deta) ? $this->deta->contenedor2 : $this->doc[0]->contenedor2)
 			)
 		);
 
@@ -487,7 +489,7 @@ class Fdetalle {
 				'id'    => 'contenedor3',
 				'name'  => 'contenedor3',
 				'class' => $this->clase,
-				'value' => (($this->deta) ? $this->deta->contenedor3 : '')
+				'value' => (($this->deta) ? $this->deta->contenedor3 : $this->doc[0]->contenedor3)
 			)
 		);
 
@@ -502,7 +504,7 @@ class Fdetalle {
 				'id'    => 'contenedor4',
 				'name'  => 'contenedor4',
 				'class' => $this->clase,
-				'value' => (($this->deta) ? $this->deta->contenedor4 : '')
+				'value' => (($this->deta) ? $this->deta->contenedor4 : $this->doc[0]->contenedor4)
 			)
 		);
 	}

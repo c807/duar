@@ -44,6 +44,11 @@ class Detalle extends CI_Controller {
 			$this->datos['contenedor'] = true;
 		}
 
+		$registros = $det->verdetalleduar();
+		if ($registros) {
+			$fde->set_documentos($registros);
+		}
+
 		$this->load->view('detallepoliza/cuerpo', array_merge($this->datos,$fde->mostrar()));
 	}
 
@@ -99,12 +104,14 @@ class Detalle extends CI_Controller {
 		$otros  = ($crea->duar->otros / $crea->duar->fob) * $itemfob;
 		$cif    = ($flete + $seguro + $otros + $itemfob);
 
+		$bulto  = ($crea->duar->bultos / $crea->duar->fob) * $itemfob; 
 		$datos = array(
-					"flete"  => $flete,
-					"seguro" => $seguro,
-					"otros"  => $otros,
-					"cif"    => $cif
-					);
+					"flete"  => round($flete,2),
+					"seguro" => round($seguro,2),
+					"otros"  => round($otros,2),
+					"cif"    => round($cif,2),
+					"bulto"  => round($bulto,2)
+ 					);
 		echo json_encode($datos);
 	}
 
@@ -147,6 +154,21 @@ class Detalle extends CI_Controller {
 		if ($prod) {
 			echo json_encode($prod);
 		}
+
+		return false;
+	}
+
+	function setdescripcion_sac(){
+		$dato = array();
+
+		if (verDato($_GET, 'codigo')) {
+			$desc = $this->Detalle_model->sac_descripcion($_GET);
+			if ($desc) {
+				$dato['descripcion'] = $desc->DESCRIPCION;
+			}
+
+			echo json_encode($dato);
+		} 
 
 		return false;
 	}

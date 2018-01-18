@@ -44,7 +44,8 @@
 							<!-- Cuando se termina la poliza -->
 					  		<?php if ($row->status == 3): ?>
 					  			<!-- <li><a href="javascript:;">Descargar</a></li> -->
-					  			<li><a href='<?php echo base_url("index.php/formato/reportes/mobrk/{$row->c807_file}") ?>'>Formato</a></li>
+					  			<!--<li><a href='<?php //echo base_url("index.php/formato/reportes/mobrk/{$row->c807_file}") ?>'>Formato</a></li>-->
+					  			<li><a target="_blank" href='<?php echo base_url("index.php/formato/reportes/archivosad/{$row->c807_file}") ?>'>Formato</a></li>
 					  		<?php endif ?>
 
 							<?php if ($row->status <> 1): ?>

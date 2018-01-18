@@ -207,5 +207,9 @@ class Reporte extends CI_Controller {
 			 
 			exit;
 	}
+
+	function archivosad($file) {
+		echo $file;
+	}
 }
 ?>

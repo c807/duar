@@ -91,5 +91,11 @@ class Detalle_model extends Crearpoliza_model {
 
 		return false;
 	}
+
+	function sac_descripcion($ars) {
+		return $this->db->where('codigo', $ars['codigo'])
+						->get('dua.sac_6ta')
+						->row();
+	}
 }
 ?>

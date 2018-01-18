@@ -168,10 +168,11 @@
 						<?php echo $fechapago; ?>	
 					</div>
 					
-					<label class="col-md-2"></label>
-					<div class="checkbox col-md-2">
-					  <label><?php echo $contenedor; ?> Contenedores</label>
-					</div>					
+					<?php echo $lab_bulto; ?>
+					<div class="col-md-4">
+						<?php echo $bulto; ?>
+					</div>
+								
 				</div>
 
 				<div class="form-group form-group-sm">
@@ -181,7 +182,10 @@
 					</div>
 
 					<label class="col-md-2 control-label"></label>
-					<div class="col-md-4">
+					<div class="checkbox col-md-2">
+					  <label><?php echo $contenedor; ?> Contenedores</label>
+					</div>		
+					<div class="col-md-2">
 						<button class="btn btn-success btn-xs"><i class="glyphicon glyphicon-ok"></i> Guardar</button>
 					</div>
 				</div>

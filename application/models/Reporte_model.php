@@ -34,7 +34,8 @@ class Reporte_model extends CI_Model {
 		if ($this->duar->duaduana) {
 			return $this->db->where('duaduana', $this->duar->duaduana)
 							->where('eliminar', 0)
-							->get('documento')
+							->join('tipo_documento b','a.tipodocumento = b.codigo')
+							->get('documento a')
 							->result();
 		}
 	}

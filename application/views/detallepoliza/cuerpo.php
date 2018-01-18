@@ -63,9 +63,9 @@
 			<?php echo $comple; ?>
 		</div>
 
-		<?php echo $lab_numbulto; ?>
+		<?php echo $lab_doctrans; ?>
 		<div class="col-md-4">
-			<?php echo $bulto; ?>
+			<?php echo $doctrans;?>
 		</div>
 	</div>
 
@@ -99,40 +99,41 @@
 			<?php echo $cuantia;?>
 		</div>
 
-		<?php echo $lab_doctrans; ?>
-		<div class="col-md-4">
-			<?php echo $doctrans;?>
-		</div>
-	</div>
-
-	<div class="form-group form-group-sm">
 		<?php echo $lab_fob; ?>
 		<div class="col-md-4">
 			<?php echo $fob;?>
 		</div>
+	</div>
 
+	<div class="form-group form-group-sm">
 		<?php echo $lab_flete; ?>
 		<div class="col-md-4">
 			<?php echo $flete;?>
 		</div>
-	</div>
 
-	<div class="form-group form-group-sm">
 		<?php echo $lab_seguro; ?>
 		<div class="col-md-4">
 			<?php echo $seguro;?>
 		</div>
+	</div>
+
+	<div class="form-group form-group-sm">
 
 		<?php echo $lab_otros; ?>
 		<div class="col-md-4">
 			<?php echo $otros;?>
 		</div>
-	</div>
 
-	<div class="form-group form-group-sm">
 		<?php echo $lab_cif; ?>
 		<div class="col-md-4">
 			<?php echo $cif;?>
+		</div>
+	</div>
+
+	<div class="form-group form-group-sm">
+		<?php echo $lab_numbulto; ?>
+		<div class="col-md-4">
+			<?php echo $bulto; ?>
 		</div>
 
 		<?php echo $lab_descripcion; ?>

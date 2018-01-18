@@ -11,106 +11,104 @@ class Reportes extends CI_Controller
 
 	function index() {}
 
-	function mobrk($id) {
-		$rep = new Reporte_model(array('file' => $id));
+	function archivosad($file) {
+		include "application/libraries/sad/lib/Sad_gen.php";
+		include "application/libraries/sad/lib/sad_item.php";
+		include "application/libraries/sad/lib/sad_doc.php";
+		/*$this->load->library("sad/lib/sad_item");
+		$this->load->library("sad/lib/sad_doc");*/
 
-		require_once(APPPATH.'libraries/PHPEXCEL/PHPExcel.php');
-    	require_once(APPPATH.'libraries/PHPEXCEL/PHPExcel/IOFactory.php');
-    	$objPHPExcel = PHPExcel_IOFactory::load(APPPATH."../public/fls/formato_poliza.xls");
+		$rep = new Reporte_model(array('file' => $file));
 
-    	if($rep->duar){
-			$objPHPExcel->setActiveSheetIndex(0)
-			## ENCABEZADO DEL DUA
-						->setCellValue("A2", $rep->duar->anio)
-						->setCellValue("B2", $rep->duar->aduana_entrada_salida)
-						->setCellValue("C2", $rep->duar->declarante)
-						->setCellValue("D2", $rep->duar->referencia)
-						->setCellValue("E2", $rep->duar->cero)
-						->setCellValue("F2", $rep->duar->modelo)
-						->setCellValue("G2", $rep->duar->cant_arti)
-						->setCellValue("H2", $rep->duar->nit)
-						->setCellValue("I2", $rep->duar->bultos)
-						->setCellValue("J2", $rep->duar->pais_proc)
-						->setCellValue("K2", $rep->duar->pais_export)
-						->setCellValue("L2", $rep->duar->pais_destino)
-						->setCellValue("M2", $rep->duar->registro_transportista)
-						->setCellValue("N2", $rep->duar->pais_origen)
-						->setCellValue("O2", $rep->duar->incoterm)
-						->setCellValue("P2", $rep->duar->total_facturar)
-						->setCellValue("Q2", $rep->duar->mod_transp)
-						->setCellValue("R2", $rep->duar->lugar_carga)
-						->setCellValue("S2", $rep->duar->pais_trasporte)
-						->setCellValue("T2", $rep->duar->localizacion_mercancia)
-						->setCellValue("U2", $rep->duar->destinatario)
-						->setCellValue("V2", $rep->duar->manifiesto)
-						->setCellValue("W2", $rep->duar->fob)
-						->setCellValue("X2", $rep->duar->flete)
-						->setCellValue("Y2", $rep->duar->seguro)
-						->setCellValue("Z2", $rep->duar->otros)
-						->setCellValue("AA2", $rep->duar->tasas)
-						->setCellValue("AB2", $rep->duar->fechapago)
-						->setCellValue("AC2", $rep->duar->c807_file)
-						->setCellValue("AD2", $rep->duar->reg_extendido)
-						->setCellValue("AE2", $rep->duar->reg_adicional)
-						->setCellValue("AF2", $rep->duar->presentacion)
-						->setCellValue("AG2", $rep->duar->banco)
-						->setCellValue("AH2", $rep->duar->agencia)
-						->setCellValue("AI2", $rep->duar->contenedor)
-						;
+		
+		$generales = new General;
+		
+		$generales->año          = $rep->duar->anio;
+		$generales->aduana       = $rep->duar->aduana_entrada_salida; 
+		$generales->agente       = '040';
+		$generales->narch        = $rep->duar->referencia;
+		$generales->NRO_REG      = $rep->duar->referencia;
+		$generales->imodelod     = $rep->duar->modelo;
+		$generales->manifiesto   = $rep->duar->manifiesto;
+		$generales->cant_art     = $rep->duar->cant_arti;
+		$generales->t_bultos     = $rep->duar->bultos;
+		$generales->nit_emp      = $rep->duar->nit;
+		$generales->pais_proc    = $rep->duar->pais_proc;
+		$generales->paisdestproc = $rep->duar->pais_destino;
+		$generales->ipaise       = $rep->duar->pais_export;
+		$generales->idenp        = $rep->duar->registro_transportista;
+		$generales->ipaism       = $rep->duar->pais_trasporte;
+		$generales->idfurg       = $rep->duar->contenedor;
+		$generales->icond_e      = $rep->duar->incoterm; 
+		$generales->t_fob        = $rep->duar->fob;
+		$generales->mod_tra      = $rep->duar->mod_transp;
+		$generales->ildescarg    = $rep->duar->lugar_carga;
+		$generales->tipo_liq     = $rep->duar->presentacion;
+		$generales->adu_fro      = $rep->duar->aduana_entrada_salida;
+		$generales->ilocalm      = $rep->duar->localizacion_mercancia;
+		$generales->t_flete      = $rep->duar->flete;
+		$generales->t_seguro     = $rep->duar->seguro;
+		$generales->t_otros      = ($rep->duar->otros == 0) ? '' : $rep->duar->otros;
+		$generales->iconsign     = $rep->duar->nombre;
+		$generales->dir1         = substr($rep->duar->direccion, 0,35); 
+		$generales->dir2         = substr($rep->duar->direccion, 36,35);
+		$generales->dir3         = substr($rep->duar->direccion, 71,35);
+		$generales->fecha_reg    = date("d/m/Y");
+		$encabezado = $generales->crear();
+
+		$detalles = $rep->verdetallepoliza();
+		$item     = new Item;
+		foreach ($detalles as $row) {
 			
-			$cell = 2;
-			foreach ($rep->verdetallepoliza() as $row) {
-				$objPHPExcel->setActiveSheetIndex(1)
-							->setCellValue("A{$cell}", $row->item)
-							->setCellValue("B{$cell}", $row->marcas)
-							->setCellValue("C{$cell}", $row->numeros)
-							->setCellValue("D{$cell}", $row->partida)
-							->setCellValue("E{$cell}", $row->comple)
-							->setCellValue("F{$cell}", $row->desc_sac)
-							->setCellValue("G{$cell}", $row->descripcion)
-							->setCellValue("H{$cell}", $row->no_bultos)
-							->setCellValue("I{$cell}", $row->tipo_bulto)
-							->setCellValue("J{$cell}", $row->origen)
-							->setCellValue("K{$cell}", $row->peso_bruto)
-							->setCellValue("L{$cell}", $row->codigo_producto)
-							->setCellValue("M{$cell}", $row->contenedor1)
-							->setCellValue("N{$cell}", $row->contenedor2)
-							->setCellValue("O{$cell}", $row->contenedor3)
-							->setCellValue("P{$cell}", $row->contenedor4)
-							->setCellValue("Q{$cell}", $row->peso_neto)
-							->setCellValue("R{$cell}", $row->doc_transp)
-							->setCellValue("S{$cell}", $row->cuantia)
-							->setCellValue("T{$cell}", $row->fob)
-							->setCellValue("U{$cell}", $row->flete)
-							->setCellValue("V{$cell}", $row->seguro)
-							->setCellValue("W{$cell}", $row->otros)
-							->setCellValue("X{$cell}", $row->cif)
-							->setCellValue("Y{$cell}", $row->tlc)
-							->setCellValue("Z{$cell}", $row->acuerdo)
-							->setCellValue("AA{$cell}", $row->quota)
-							;
-				$cell++;
-			}
+			$item->imodelod    = $rep->duar->modelo;
+			$item->cont01      = $row->contenedor1;
+			$item->cont02      = $row->contenedor2;
+			$item->cont03      = $row->contenedor3;
+			$item->cont04      = $row->contenedor4;
+			$item->quo_lic     = ($row->tlc == 1) ? 1 : "      ";
+			$item->art         = $row->item;
+			$item->partida     = $row->partida;
+			$item->ptdadi      = $row->comple;
+			$item->pais_orig   = $row->origen;
+			$item->peso_bruto  = $row->peso_bruto;
+			$item->bultos      = $row->no_bultos; 
+			$item->cod_bultos  = $row->tipo_bulto;
+			$item->marca       = $row->marcas;
+			$item->numero      = $row->numeros; 
+			$item->desc_ptda   = $row->descripcion;
+			$item->regimen     = $rep->duar->reg_extendido;
+			$item->sub_reg     = $rep->duar->reg_adicional;
+			$item->peso_neto   = $row->peso_neto;
+			$item->doct        = $row->doc_transp;
+			$item->unidad_supl = $row->cuantia;
+			$item->fob_item    = $row->fob;
+			$item->agregar();
 
-			$xcell = 2;
-			foreach ($rep->verdocumentos() as $row) {
-				$objPHPExcel->setActiveSheetIndex(2)
-							->setCellValue("A{$xcell}", $row->tipodocumento)
-							->setCellValue("B{$xcell}", $row->numero)
-							->setCellValue("C{$xcell}", $row->fecha);
-				$xcell++;
-			}
-			$objPHPExcel->setActiveSheetIndex(0);
-			$nombre="Formato-Prepoliza#".$rep->duar->duaduana.".xls"; 
-			header('Content-Type: application/vnd.ms-excel');
-			header('Content-Disposition: attachment;filename="'.$nombre.'"');
-			header('Cache-Control: max-age=0');
-			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5'); 
-			$objWriter->save('php://output');		 
-			exit;
 		}
+		$xitems = $item->retitems();
+		
+		$documentos = $rep->verdocumentos();
 
-		return false;
+		$doc = new Documento;
+
+		$total = count($documentos);
+		$doc->tot_docs = $total;
+		foreach ($documentos as $row) {
+			$doc->correlativo = $row->documento;
+			$doc->codigo      = $row->tipo_documento;
+			$doc->descrip     = $row->descripcion;
+			$doc->numero_doc  = $row->numero;
+			$doc->zfec        = formatofecha($row->fecha,2);
+			$doc->agregar();
+		}
+		$xdoc = $doc->retdocs();
+
+		echo $encabezado.$xitems.$xdoc;
+
+		$filename = $generales->narch . "-formato.SAD";
+
+		header("Content-type: application/txt");
+		header("Content-Disposition: attachment; filename='$filename'");
 	}
 }
 ?>

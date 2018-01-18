@@ -598,6 +598,24 @@ class Fencabezado {
 		);
 	}
 
+	private function bultos() {
+		$this->datos['lab_bulto'] = form_label(
+			'Total Bultos',
+			'totbulto',
+			$this->labclas
+		);
+
+		$this->datos['bulto'] = form_input(
+			array(
+				'id' => 'totbulto',
+				'name' => 'bultos',
+				'class' => $this->clase,
+				'type' => 'number',
+				'steep' => '0.01',
+				'value' => (($this->datodua) ? $this->datodua->bultos : '')
+			)
+		);
+	}
 	private function Closeform(){
 		$this->datos['cierraform'] = form_close();
 	}
@@ -623,6 +641,7 @@ class Fencabezado {
     	$this->banco();
     	$this->fechapago();
     	$this->contenedor();
+    	$this->bultos();
     	$this->Closeform();
     	$this->agencia();
     	return $this->datos;
