@@ -21,14 +21,14 @@
 				</div>
 
 				<div class="form-group form-group-sm">
-					<?php echo $direccion; ?>
-					<div class="col-md-4">
-						<?php echo $nitdirec; ?>
-					</div>
-
 					<?php echo $lab_modelo; ?>
 					<div class="col-md-4">
 						<?php echo $modelo; ?>
+					</div>
+
+					<?php echo $direccion; ?>
+					<div class="col-md-4">
+						<?php echo $nitdirec; ?>
 					</div>
 				</div>
 
@@ -98,9 +98,9 @@
 						<?php echo $incoterms; ?>
 					</div>
 
-					<?php echo $lab_cantart; ?>
+					<?php echo $lab_doctrans; ?>
 					<div class="col-md-4">
-						<?php echo $cantidadarticulo; ?>
+						<?php echo $doctrans; ?>
 					</div>
 				</div>
 
@@ -181,9 +181,16 @@
 						<?php echo $referencia; ?>
 					</div>
 
+					<?php echo $lab_agente; ?>
+					<div class="col-md-4">
+						<?php echo $agente; ?>
+					</div>
+				</div>
+				
+				<div class="form-group form-group-sm">
 					<label class="col-md-2 control-label"></label>
 					<div class="checkbox col-md-2">
-					  <label><?php echo $contenedor; ?> Contenedores</label>
+					 	<label><?php echo $contenedor; ?> Contenedores</label>
 					</div>		
 					<div class="col-md-2">
 						<button class="btn btn-success btn-xs"><i class="glyphicon glyphicon-ok"></i> Guardar</button>

@@ -46,9 +46,9 @@ class Principal_model extends CI_Model {
 		return $cl;
 	}
 
-	function setbitacorag(){
+	function setbitacorag($mail){
 		if ($this->dtfile->master_id) {
-			$msj = 'Se envió la solicitud para crear la pre póliza';
+			$msj = 'Se envió la solicitud para crear la declaración';
 
 			$this->db
 				->set('master_id', $this->dtfile->master_id)
@@ -57,7 +57,7 @@ class Principal_model extends CI_Model {
 				->set('estatus_disponible_id', 119)
 				->set('proceso_id', 1)
 				->set('ecorreo', 1)
-				->set('epara', 'kelvynmagzul@stguatemala.com')
+				->set('epara', $mail)
 				->set('comentario', $msj)
 				->set('fecha', 'now()', false)
 				->set('usuario_id', $_SESSION['UserID'])

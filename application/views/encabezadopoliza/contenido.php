@@ -52,3 +52,9 @@ $verenc = ($vermod == 1) ? 'display:block' : 'display:none';
     </div>
   </div>
 </div>
+
+<script>
+	$(document).on("blur", "#fob", function(){
+		$("#totfac").val($(this).val());
+	})
+</script>

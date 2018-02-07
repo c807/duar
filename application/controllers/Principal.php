@@ -14,8 +14,6 @@ class Principal extends CI_Controller {
 	function crearpoliza($proceso){
 		$gac = new Principal_model($proceso);
 
-
-		$gac->setbitacorag();
 		$gac->setsolicitud_dua();
 
 		$msj = "Se apertura el proceso para crear la prepóliza";
@@ -26,9 +24,11 @@ class Principal extends CI_Controller {
 		## El correo debe enviarse al analista
 		$gac->filegacela(); #Viene en formato arreglo
 		$ejecutivo   = $gac->ver_ejecutivo();
-		//$datorealiza = $this->Conf_model->dtusuario($_SESSION['UserID']);
+		$datorealiza = $this->Conf_model->dtusuario($_SESSION['UserID']);
+		$gac->setbitacorag($datorealiza->mail);
+		
 		correo(); # Carga la libreria de correo
-
+		
 		$cuerpo = "Buen día, <br><br>";
 		$cuerpo.= "Se le ha asignado el proceso de creación para la prepóliza con file # {$gac->dtfile->c807_file}";
 		$cuerpo.= ", por favor de iniciarlo. <br><br>";
@@ -41,7 +41,7 @@ class Principal extends CI_Controller {
 
 		$correo = array(
 				'de'     => array($ejecutivo->mail, $ejecutivo->nombre),
-				'para'   => array('desarrollo2@c807.com'),
+				'para'   => array($datorealiza->mail),
 				'asunto' => "Solicitud de prepóliza para file # {$gac->dtfile->c807_file}",
 				'texto'  => $cuerpo
 			);

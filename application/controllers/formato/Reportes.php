@@ -19,20 +19,21 @@ class Reportes extends CI_Controller
 		$this->load->library("sad/lib/sad_doc");*/
 
 		$rep = new Reporte_model(array('file' => $file));
-
+		$detalles   = $rep->verdetallepoliza();
+		$documentos = $rep->verdocumentos();
 		
 		$generales = new General;
 		
 		$generales->año          = $rep->duar->anio;
 		$generales->aduana       = $rep->duar->aduana_entrada_salida; 
-		$generales->agente       = '040';
+		$generales->agente       = $rep->duar->agenteaduanal;
 		$generales->narch        = $rep->duar->referencia;
 		$generales->NRO_REG      = $rep->duar->referencia;
 		$generales->imodelod     = $rep->duar->modelo;
 		$generales->manifiesto   = $rep->duar->manifiesto;
-		$generales->cant_art     = $rep->duar->cant_arti;
+		$generales->cant_art     = count($detalles);
 		$generales->t_bultos     = $rep->duar->bultos;
-		$generales->nit_emp      = $rep->duar->nit;
+		$generales->nit_emp      = str_replace("-","",$rep->duar->nit);
 		$generales->pais_proc    = $rep->duar->pais_proc;
 		$generales->paisdestproc = $rep->duar->pais_destino;
 		$generales->ipaise       = $rep->duar->pais_export;
@@ -56,7 +57,7 @@ class Reportes extends CI_Controller
 		$generales->fecha_reg    = date("d/m/Y");
 		$encabezado = $generales->crear();
 
-		$detalles = $rep->verdetallepoliza();
+		
 		$item     = new Item;
 		foreach ($detalles as $row) {
 			
@@ -87,15 +88,13 @@ class Reportes extends CI_Controller
 		}
 		$xitems = $item->retitems();
 		
-		$documentos = $rep->verdocumentos();
-
 		$doc = new Documento;
 
 		$total = count($documentos);
 		$doc->tot_docs = $total;
 		foreach ($documentos as $row) {
 			$doc->correlativo = $row->documento;
-			$doc->codigo      = $row->tipo_documento;
+			$doc->codigo      = $row->codigo;
 			$doc->descrip     = $row->descripcion;
 			$doc->numero_doc  = $row->numero;
 			$doc->zfec        = formatofecha($row->fecha,2);
@@ -105,7 +104,7 @@ class Reportes extends CI_Controller
 
 		echo $encabezado.$xitems.$xdoc;
 
-		$filename = $generales->narch . "-formato.SAD";
+		$filename = $generales->narch . ".SAD";
 
 		header("Content-type: application/txt");
 		header("Content-Disposition: attachment; filename='$filename'");

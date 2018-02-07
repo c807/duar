@@ -187,7 +187,7 @@ function verdescription(inp) {
 	var url    = base_url("index.php/poliza/detalle/setdescripcion_sac");
 	var comple = $("#comple").val();
 
-	var datos = {'codigo': inp.value+comple};
+	var datos = {'codigo': inp.value};
 
 	$.getJSON(url, datos, function(data) {
 		$("#sac").val(data.descripcion);

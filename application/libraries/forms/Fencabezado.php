@@ -486,11 +486,10 @@ class Fencabezado {
 			'referencia',
 			$this->labclas
 		);
-		$this->datos['referencia'] = form_textarea(
+		$this->datos['referencia'] = form_input(
 			array(
 				'id'   => 'referencia',
 				'name' => 'referencia',
-				'rows' => '3',
 				'class' => $this->clase,
 				'value' => (($this->datodua) ? $this->datodua->referencia:'')
 				)
@@ -616,8 +615,43 @@ class Fencabezado {
 			)
 		);
 	}
+
+	private function doctransporte(){
+		$this->datos["lab_doctrans"] = form_label(
+			"Documento Transporte",
+			"doctrans",
+			$this->labclas
+		);
+
+		$this->datos["doctrans"] = form_input(
+			array(
+				'id' => 'doctrans',
+				'name' => 'doc_transporte',
+				'class' => $this->clase,
+				'value' => (($this->datodua) ? $this->datodua->doc_transporte : '')
+			)
+		);
+	}
 	private function Closeform(){
 		$this->datos['cierraform'] = form_close();
+	}
+
+	private function agente(){
+		$this->datos['lab_agente'] = form_label(
+			'Agente Aduanal',
+			'agente',
+			$this->labclas
+		);
+
+		$this->datos['agente'] = form_dropdown(
+			array(
+				'id'    => 'agente',
+				'name'  => 'agenteaduanal',
+				'class' => 'form-control'
+			),
+			opcionesSelect($this->combo['agentes'], 'codigo', 'codigo', 'nombre'),
+			(($this->datodua) ? $this->datodua->agenteaduanal : '')
+		);
 	}
 
 	public function mostrar(){
@@ -635,6 +669,7 @@ class Fencabezado {
     	$this->cantidadarticulo();
     	$this->montos();
     	$this->montodos();
+    	$this->doctransporte();
     	$this->referencia();
     	$this->manifiesto();
     	$this->presentacion();
@@ -642,6 +677,7 @@ class Fencabezado {
     	$this->fechapago();
     	$this->contenedor();
     	$this->bultos();
+    	$this->agente();
     	$this->Closeform();
     	$this->agencia();
     	return $this->datos;

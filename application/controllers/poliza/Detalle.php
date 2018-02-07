@@ -22,6 +22,7 @@ class Detalle extends CI_Controller {
 		$det->set_duaduana($crea->duar->duaduana);
 
 		$fde  = new Fdetalle();
+		$fde->set_doctransporte($crea->duar->doc_transporte);
 		# Setear el iddua de la duar en el input
 		$fde->set_iddua($crea->duar->duaduana);
 
@@ -162,7 +163,8 @@ class Detalle extends CI_Controller {
 		$dato = array();
 
 		if (verDato($_GET, 'codigo')) {
-			$desc = $this->Detalle_model->sac_descripcion($_GET);
+			$cod["codigo"] = $_GET["codigo"]."00"; 
+			$desc = $this->Detalle_model->sac_descripcion($cod);
 			if ($desc) {
 				$dato['descripcion'] = $desc->DESCRIPCION;
 			}

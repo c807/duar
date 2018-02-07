@@ -7,6 +7,7 @@ class Fdetalle {
 	protected $deta;
 	protected $item;
 	protected $doc;
+	protected $trans;
 
 	public function __construct(){
 		$this->procs    = & get_instance();
@@ -49,6 +50,10 @@ class Fdetalle {
 
 	public function set_documentos($rs) {
 		$this->doc = $rs;
+	}
+	
+	public function set_doctransporte($doc){
+		$this->trans = $doc;
 	}
 
 	private function Openform(){
@@ -236,7 +241,7 @@ class Fdetalle {
 				'id'    => 'comple',
 				'name'  => 'comple',
 				'class' => $this->clase,
-				'value' => (($this->deta) ? $this->deta->comple : '00')
+				'value' => (($this->deta) ? $this->deta->comple : '000')
 			)
 		);
 
@@ -359,7 +364,7 @@ class Fdetalle {
 				'id'    => 'doctran',
 				'name'  => 'doc_transp',
 				'class' => $this->clase,
-				'value' => (($this->deta) ? $this->deta->doc_transp : $this->doc[0]->doc_transp)
+				'value' => (($this->deta) ? $this->deta->doc_transp : $this->trans)
 			)
 		);
 	}

@@ -184,5 +184,11 @@ class Conf_model extends CI_Model {
 						->get('tipo_documento')
 						->result();
 	}
+
+	function agentes(){
+		return $this->db->where("pais_empresa", $this->pais)
+						->get("agente_aduanal")
+						->result();
+	}
 }
 ?>

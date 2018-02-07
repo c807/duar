@@ -89,6 +89,7 @@ class Crear extends CI_Controller {
 				'presenta' => $conf->presentacion(),
 				'bancos'   => $conf->bancos(),
 				'paises'   => $conf->paises(),
+				'agentes'  => $conf->agentes(),
 				'agencia'  => $agencia
 				)
 			);
