@@ -13,9 +13,8 @@ class Crearpoliza_model extends CI_Model {
 	# verifica si la poliza ya esta iniciada
 	function verpoliza($ars=''){
 		if (verDato($ars, 'file')) {
-			$this->duar = $this->db->select('a.*, b.nombre, b.direccion')
+			$this->duar = $this->db->select('a.*')
 									->where('c807_file', $ars['file'])
-									->join('gacela.cliente_hijo b','a.nit = b.no_identificacion','left')
 									->get('encabezado a')
 									->row();
 		}
@@ -60,8 +59,8 @@ class Crearpoliza_model extends CI_Model {
 	}
 
 	function nitempresa($ars){
-		return $this->db->where("no_identificacion", $ars['nit'])
-						->get("gacela.cliente_hijo")
+		return $this->db->where("empresa", $ars['nit'])
+						->get("empresa")
 						->row();
 	}
 

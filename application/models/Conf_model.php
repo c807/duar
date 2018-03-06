@@ -1,4 +1,4 @@
-<?php 
+<?php
 class Conf_model extends CI_Model {
 	function __construct(){
 		parent :: __construct();
@@ -24,7 +24,7 @@ class Conf_model extends CI_Model {
 						->where('usuario', $id)
 						->get('csd.usuario')
 						->row();
-						
+
 		return $user;
 	}
 
@@ -33,7 +33,7 @@ class Conf_model extends CI_Model {
 		if (!empty($aduana)) {
 			return $this->db->where('aduana', $aduana)
 							->get('aduana')
-							->row();	
+							->row();
 		} else {
 			return $this->db->get('aduana')
 							->result();
@@ -53,7 +53,7 @@ class Conf_model extends CI_Model {
 
 	function empresas($nit=''){
 
-		if (!empty($nit)) {
+		/*if (!empty($nit)) {
 			$query = $this->db->where("no_identificacion",$nit)
 							  ->get('gacela.cliente_hijo')
 							  ->row();
@@ -63,8 +63,20 @@ class Conf_model extends CI_Model {
 							  ->result();
 		}
 
+		return $query;*/
+
+		if (!empty($nit)) {
+			$query = $this->db->where("cod_empresa",$nit)
+							  ->get('empresa')
+							  ->row();
+		} else {
+
+			$query = $this->db->get('empresa')
+							  ->result();
+		}
+
 		return $query;
-		
+
 	}
 
 	function paises($pais=''){
@@ -99,10 +111,10 @@ class Conf_model extends CI_Model {
 							  ->row()
 							  ->descripcion;
 		} else {
-		
+
 			return  $this->db->get('tipo_bulto')
 					          ->result();
-		} 
+		}
 	}
 
 	function documento($doc=''){
@@ -122,8 +134,8 @@ class Conf_model extends CI_Model {
 							->get('solicitud')->row();
 
 			$return = (isset($sql->status) && $sql->status == 3) ? 1 : 0;
-			
-			return $return; 
+
+			return $return;
 		}
 	}
 

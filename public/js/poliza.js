@@ -48,14 +48,14 @@ function cargarvistas(ptn,opc=''){
 }
 
 function empresanit(ars){
-	var url = base_url('index.php/poliza/crear/empresanit/');
+	/*var url = base_url('index.php/poliza/crear/empresanit/');
 	var datos = {nit:ars.value};
 
 	$.getJSON(url, datos, function(data) {
-		document.getElementById("direc").value   = data.direccion;
-		document.getElementById("nombre").value  = data.nombre;
-		document.getElementById("declara").value = data.id;
-	})
+		//document.getElementById("direc").value   = data.direccion;
+		//document.getElementById("nombre").value  = data.nombre;
+		document.getElementById("declara").value = data.empresa;
+	})*/
 }
 
 /* Para guardar el encabezado de la poliza */
@@ -140,7 +140,7 @@ function prorrateo(inp){
 		$("#cif").val(data.cif);
 		$("#bulto").val(data.bulto);
 	})
-	
+
 }
 
 function eliminarfila(ars){

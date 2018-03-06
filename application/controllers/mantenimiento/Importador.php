@@ -1,7 +1,7 @@
-<?php 
+<?php
 class Importador extends CI_Controller
 {
-	
+
 	function __construct()
 	{
 		parent:: __construct();
@@ -70,6 +70,10 @@ class Importador extends CI_Controller
 		}
 
 		enviarJson($res);
+	}
+
+	function empresas(){
+
 	}
 }
 ?>

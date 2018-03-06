@@ -92,7 +92,7 @@ class Fencabezado {
 				'name'  => 'nit',
 				'onchange' => 'empresanit(this)'
 			),
-			opcionesSelect($this->combo['empresas'], 'no_identificacion', 'no_identificacion','nombre'),
+			opcionesSelect($this->combo['empresas'], 'cod_empresa', 'cod_empresa','nombre'),
 			(($this->datodua) ? $this->datodua->nit:'')
 		);
 
@@ -106,8 +106,9 @@ class Fencabezado {
 		$this->datos['nitnombre'] = form_input(
 			array(
         		'id'    => 'nombre',
+        		'name'  => 'importador_exportador',
         		'class' => $this->clase,
-        		'value' => (($this->datodua) ? $this->datodua->nombre:'')
+        		'value' => (($this->datodua) ? $this->datodua->importador_exportador:'')
         		)
 		);
 
@@ -122,6 +123,7 @@ class Fencabezado {
 			array(
         		'id'    => 'direc',
         		'class' => $this->clase,
+        		'name'  => "direccion",
         		'value' => (($this->datodua) ? $this->datodua->direccion:'')
         		)
 		);

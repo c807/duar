@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 class Reporte_model extends CI_Model {
 	public $duar;
@@ -32,9 +32,14 @@ class Reporte_model extends CI_Model {
 
 	function verdocumentos() {
 		if ($this->duar->duaduana) {
-			return $this->db->where('duaduana', $this->duar->duaduana)
+			return $this->db->select("
+								*,
+								IF(tipodocumento = 049, 1, 2) AS orden
+								")
+							->where('duaduana', $this->duar->duaduana)
 							->where('eliminar', 0)
 							->join('tipo_documento b','a.tipodocumento = b.codigo')
+							->order_by("orden, tipodocumento","DESC")
 							->get('documento a')
 							->result();
 		}
