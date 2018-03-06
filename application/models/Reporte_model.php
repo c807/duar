@@ -11,9 +11,10 @@ class Reporte_model extends CI_Model {
 
 	function verpoliza($ars='') {
 		if (verDato($ars, 'file')) {
-			$this->duar = $this->db->select('a.*, b.nombre, b.direccion')
+			$this->duar = $this->db->select('a.*, b.nombre, c.codigo as codigoaduana')
 									->where('c807_file', $ars['file'])
-									->join('gacela.cliente_hijo b','a.nit = b.no_identificacion','left')
+									->join('empresa b','a.nit = b.cod_empresa','left')
+									->join('aduana c','a.aduana_entrada_salida = c.aduana','left')
 									->get('encabezado a')
 									->row();
 		}

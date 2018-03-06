@@ -25,7 +25,7 @@ class Reportes extends CI_Controller
 		$generales = new General;
 
 		$generales->año          = $rep->duar->anio;
-		$generales->aduana       = $rep->duar->aduana_entrada_salida;
+		$generales->aduana       = $rep->duar->codigoaduana;
 		$generales->agente       = $rep->duar->agenteaduanal;
 		$generales->narch        = $rep->duar->referencia;
 		$generales->NRO_REG      = $rep->duar->referencia;
@@ -45,7 +45,7 @@ class Reportes extends CI_Controller
 		$generales->mod_tra      = $rep->duar->mod_transp;
 		$generales->ildescarg    = $rep->duar->lugar_carga;
 		$generales->tipo_liq     = $rep->duar->presentacion;
-		$generales->adu_fro      = $rep->duar->aduana_entrada_salida;
+		$generales->adu_fro      = $rep->duar->codigoaduana;
 		$generales->ilocalm      = $rep->duar->localizacion_mercancia;
 		$generales->t_flete      = $rep->duar->flete;
 		$generales->t_seguro     = $rep->duar->seguro;
