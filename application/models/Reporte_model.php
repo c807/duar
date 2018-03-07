@@ -40,7 +40,7 @@ class Reporte_model extends CI_Model {
 							->where('duaduana', $this->duar->duaduana)
 							->where('eliminar', 0)
 							->join('tipo_documento b','a.tipodocumento = b.codigo')
-							->order_by("orden, tipodocumento","DESC")
+							->order_by("orden, tipodocumento","ASC")
 							->get('documento a')
 							->result();
 		}

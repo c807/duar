@@ -5,7 +5,7 @@
 class Documento
 {
 	public $documentos = '';
-	public $tot_docs   = '';
+	public $tot_docs   = 1;
 
 	public function Documento(){
 		$this->correlativo = "";
@@ -35,7 +35,7 @@ class Documento
 	}
 
 	public function adddoc($doc){
-		#$GLOBALS["documentos"] = $GLOBALS["documentos"] . $doc;		
+		#$GLOBALS["documentos"] = $GLOBALS["documentos"] . $doc;
 		$this->documentos .= $doc;
 	}
 

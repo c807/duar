@@ -93,8 +93,8 @@ class Reportes extends CI_Controller
 
 		$total = count($documentos);
 		$doc->tot_docs = $total;
-		foreach ($documentos as $row) {
-			$doc->correlativo = $row->documento;
+		foreach ($documentos as $key => $row) {
+			$doc->correlativo = $key + 1;
 			$doc->codigo      = $row->codigo;
 			$doc->descrip     = $row->descripcion;
 			$doc->numero_doc  = $row->numero;
