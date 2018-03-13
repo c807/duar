@@ -1,9 +1,9 @@
-<?php 
+<?php
 class Solicitud extends CI_Controller {
-	
+
 	function __construct() {
 		parent:: __construct();
-		if (login()) {    
+		if (login()) {
 			$modelos = array(
 							'Solicitud_model',
 							'Bitacora_model'
@@ -36,7 +36,7 @@ class Solicitud extends CI_Controller {
 
 	function act_lista(){
 		$cf = new Conf_model();
-		
+
 		$res = $cf->dtusuario($this->user);
 		$aforador = '';
 		if ($res) {
@@ -51,13 +51,13 @@ class Solicitud extends CI_Controller {
 
 	function cambiar_status() {
 		if (verDato($_POST, 'status')) {
-		
+
 			$sol = new Solicitud_model();
 			if ($sol->set_status($_POST)) {
 
 				$idres = $sol->verSolicitudes($_POST);
 				$bit = new Bitacora_model();
-				
+
 				if ($_POST['status'] == 2) {
 					$msj = "Inicio de la creciación de la prepoliza";
 				}
@@ -66,13 +66,17 @@ class Solicitud extends CI_Controller {
 					$msj = "Se ha terminado la creciación de la prepoliza";
 				}
 
+				if ($_POST['status'] == 5) {
+					$msj = "Se anulo la poliza del file {$idres->c807_file}";
+				}
+
 				$bit->set_bitacora_duar(
 						array(
-							'file' => $idres->c807_file, 
+							'file' => $idres->c807_file,
 							'msj'  => $msj )
 						);
 				echo $idres->c807_file;
-			}		
+			}
 		}
 	}
 }

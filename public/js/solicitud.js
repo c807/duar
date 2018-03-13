@@ -1,9 +1,9 @@
 function base_url(url) {
-	return window.location.origin + "/grupo_c807/duar/" + url; 
+	return window.location.origin + "/grupo_c807/duar/" + url;
 }
 
 function chosenselect(){
-	$('.chosen').chosen({width:'100%'});	
+	$('.chosen').chosen({width:'100%'});
 }
 
 $(document).ready(function(){
@@ -23,9 +23,9 @@ function cargando(id){
 function cargalistaSol(){
 	var url = base_url('index.php/solicitud/solicitud/act_lista');
 	cargando('contenidosolicitud');
-	
+
 	$.post(url,function(data){
-		document.getElementById("contenidosolicitud").innerHTML = data;	
+		document.getElementById("contenidosolicitud").innerHTML = data;
 	})
 }
 
@@ -44,14 +44,20 @@ function cargar_bitacora(file){
 function poliza(sts,id) {
 	var url   = base_url('index.php/solicitud/solicitud/cambiar_status');
 	var datos = { status:sts, id:id } ;
+	var valido = true;
+	if (sts == 5 ){
+		valido = confirm("¿Está seguro de anular esta declaración?");
+	}
 
-	$.post(url, datos, function(data){
-		cargalistaSol();
-		cargar_bitacora(data);
-		if (sts == 2) {
-			window.location.href = base_url('index.php/poliza/crear/headerduar/' + data)
-		}
-	})
+	if (valido) {
+		$.post(url, datos, function(data){
+			cargalistaSol();
+			cargar_bitacora(data);
+			if (sts == 2) {
+				window.location.href = base_url('index.php/poliza/crear/headerduar/' + data)
+			}
+		})
+	}
 }
 
 function cerrar(id) {

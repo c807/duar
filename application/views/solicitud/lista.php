@@ -41,6 +41,9 @@
 					  			<li><a href="javascript:;" onclick="poliza(3, <?php echo $row->solicitud; ?>)">Terminar</a></li>
 					  		<?php endif ?>
 
+							<?php if ($row->status == 1 or $row->status ==2): ?>
+								<li><a href='javascript:;' onclick="poliza(5, <?php echo $row->solicitud; ?>)">Anular</a></li>
+							<?php endif ?>
 							<!-- Cuando se termina la poliza -->
 					  		<?php if ($row->status == 3): ?>
 					  			<!-- <li><a href="javascript:;">Descargar</a></li> -->
