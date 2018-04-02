@@ -193,3 +193,39 @@ function verdescription(inp) {
 		$("#sac").val(data.descripcion);
 	})
 }
+
+function SubirXLS(){
+	var declaracion = $("input[name=duaduana]").val();
+	var url = base_url("index.php/poliza/detalle/form_xls_detalle/")+declaracion;
+	cargando("contenidodetalle");
+
+	$.post(url, function(data) {
+		document.getElementById("contenidodetalle").innerHTML = data;
+	})
+
+	$("#md-detalle").modal();
+}
+
+function enviarXls(form){
+	var conf = confirm("¿Está seguro de realizar esta acción?")
+	if (conf) {
+		cargando("carga")
+
+		  var data = new FormData($(form)[0])
+		  var xhr = new XMLHttpRequest()
+		  xhr.open('POST', form.action, true)
+
+		  xhr.onload = function () {
+		  	var res = JSON.parse(this.response)
+		  		if (res.exito) {
+		    		document.getElementById('respuesta').innerHTML = res.mensaje
+		    		$("#contenidoxls").hide("blind")
+		    		cargarvistas(2)
+		    	} else {
+		    		document.getElementById("carga").innerHTML = '';
+		    	}
+		  }
+
+		  xhr.send(data)
+	}
+}

@@ -169,13 +169,16 @@
 	<?php endif ?>
 
 	<div class="form-group form-group-sm">
-		
+
 
 		<label class="col-md-2 control-label"></label>
 		<div class="col-md-4">
 			<button class="btn btn-xs btn-success"><i class="glyphicon glyphicon-ok"></i> Guardar</button>
 			<button type="button" class="btn btn-xs btn-default" onclick="cargarvistas(2)"><i class="glyphicon glyphicon-plus"></i> Nuevo</button>
 			<button type="button" class="btn btn-xs btn-default" onclick="verlista(1)"><i class="glyphicon glyphicon-list"></i> Lista</button>
+			<button type="button" class="btn btn-xs btn-primary" onclick="SubirXLS()">
+				<i class="glyphicon glyphicon-file"></i> Subir Xls
+			</button>
 		</div>
 	</div>
 	<?php echo $cierraform; ?>

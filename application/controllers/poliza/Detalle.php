@@ -99,13 +99,13 @@ class Detalle extends CI_Controller {
 		$dt = new Detalle_model();
 		$dt->set_duaduana($crea->duar->duaduana);
 		$itemfob = $this->input->get('itemfob');
-		
+
 		$flete  = ($crea->duar->flete / $crea->duar->fob) * $itemfob;
 		$seguro = ($crea->duar->seguro / $crea->duar->fob) * $itemfob;
 		$otros  = ($crea->duar->otros / $crea->duar->fob) * $itemfob;
 		$cif    = ($flete + $seguro + $otros + $itemfob);
 
-		$bulto  = ($crea->duar->bultos / $crea->duar->fob) * $itemfob; 
+		$bulto  = ($crea->duar->bultos / $crea->duar->fob) * $itemfob;
 		$datos = array(
 					"flete"  => round($flete,2),
 					"seguro" => round($seguro,2),
@@ -163,16 +163,87 @@ class Detalle extends CI_Controller {
 		$dato = array();
 
 		if (verDato($_GET, 'codigo')) {
-			$cod["codigo"] = $_GET["codigo"]."00"; 
+			$cod["codigo"] = $_GET["codigo"]."00";
 			$desc = $this->Detalle_model->sac_descripcion($cod);
 			if ($desc) {
 				$dato['descripcion'] = $desc->DESCRIPCION;
 			}
 
 			echo json_encode($dato);
-		} 
+		}
 
 		return false;
+	}
+
+	function form_xls_detalle($duaduana) {
+		$this->datos['accion'] = base_url("index.php/poliza/detalle/guardar_xls_detalle/{$duaduana}");
+		$this->load->view("detallepoliza/form_xls", $this->datos);
+	}
+
+	function guardar_xls_detalle($duaduana) {
+		$det = new Detalle_model();
+		$det->set_duaduana($duaduana);
+
+		$this->load->library('PHPExcel/PHPExcel.php');
+		$exito = 0;
+
+		$cargar    = PHPExcel_IOFactory::identify($_FILES['archivo']['tmp_name']);
+		$objReader = PHPExcel_IOFactory::createReader($cargar);
+		$objReader->setLoadSheetsOnly('Hoja1');
+
+		$objPHPExcel   = $objReader->load($_FILES['archivo']['tmp_name']);
+		$hoja          = $objPHPExcel->getSheet(0);
+		$highestRow    = $hoja->getHighestRow();
+		$highestColumn = $hoja->getHighestColumn();
+
+		for ($row = 2; $row <= $highestRow; $row++) {
+			$linea['detalle']		  = '';
+			$linea['codigo_producto'] = $hoja->getCell("A".$row)->getValue();
+			$linea['item']			  = $det->numitem();
+			$linea["tlc"]             = ($hoja->getCell("B".$row)->getValue()) ? $hoja->getCell("B".$row)->getValue() : 0;
+			$linea["acuerdo"]         = $hoja->getCell("C".$row)->getValue();
+			$linea["quota"]           = $hoja->getCell("D".$row)->getValue();
+			$linea["marcas"]          = $hoja->getCell("E".$row)->getValue();
+			$linea["numeros"]         = $hoja->getCell("F".$row)->getValue();
+			$linea["partida"]         = $hoja->getCell("G".$row)->getValue();
+			$linea["doc_transp"]      = $hoja->getCell("H".$row)->getValue();
+			$linea["tipo_bulto"]      = $hoja->getCell("I".$row)->getValue();
+			$linea["origen"]          = $hoja->getCell("J".$row)->getValue();
+			$linea["peso_bruto"]      = $hoja->getCell("K".$row)->getValue();
+			$linea["peso_neto"]       = $hoja->getCell("L".$row)->getValue();
+			$linea["cuantia"]         = $hoja->getCell("M".$row)->getValue();
+			$linea["fob"]             = $hoja->getCell("N".$row)->getValue();
+			$linea["flete"]           = $hoja->getCell("O".$row)->getValue();
+			$linea["seguro"]          = $hoja->getCell("P".$row)->getValue();
+			$linea["otros"]           = $hoja->getCell("Q".$row)->getValue();
+			$linea["cif"]             = $hoja->getCell("R".$row)->getValue();
+			$linea["no_bultos"]       = $hoja->getCell("S".$row)->getValue();
+			$linea["descripcion"]     = $hoja->getCell("T".$row)->getValue();
+			$linea["contenedor1"]     = $hoja->getCell("U".$row)->getValue();
+			$linea["contenedor2"]     = $hoja->getCell("V".$row)->getValue();
+			$linea["contenedor3"]     = $hoja->getCell("W".$row)->getValue();
+			$linea["contenedor4"]     = $hoja->getCell("X".$row)->getValue();
+			$linea["comple"]          = '000';
+			$partida = $hoja->getCell("G".$row)->getValue()."00";
+			$desc = $this->Detalle_model->sac_descripcion(array("codigo" => $partida));
+			$linea["desc_sac"]        = ($desc) ? $desc->DESCRIPCION : '';
+			$linea["duaduana"]        = $duaduana;
+
+			if ($this->Detalle_model->guardardet($linea)) {
+				$exito = 1;
+			}
+		}
+
+		if ($exito) {
+			$mensaje = "El detalle se agregó con éxito";
+		} else {
+			$mensaje = "No se puede agregar el detalle, intentelo nuevamente";
+		}
+
+		$dato['exito']   = $exito;
+		$dato['mensaje'] = $mensaje;
+
+		echo json_encode($dato);
 	}
 }
 ?>
