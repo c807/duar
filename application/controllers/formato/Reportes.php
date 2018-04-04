@@ -109,6 +109,7 @@ class Reportes extends CI_Controller
 
 		header("Content-type: application/txt");
 		header("Content-Disposition: attachment; filename='$filename'");
+		header('Content-Transfer-Encoding: binary');
 	}
 }
 ?>
