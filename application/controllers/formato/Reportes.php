@@ -67,7 +67,7 @@ class Reportes extends CI_Controller
 			$item->cont03      = $row->contenedor3;
 			$item->cont04      = $row->contenedor4;
 			$item->quo_lic     = ($row->tlc == 1) ? $row->quota : "      ";
-			$item->acuerdo 	   = ($row->tlc == 1) ? $row->acuerdo : '';
+			$item->acuerdo     = ($row->tlc == 1) ? $row->acuerdo :"        ";
 			$item->art         = $row->item;
 			$item->partida     = $row->partida;
 			$item->ptdadi      = $row->comple;
@@ -103,13 +103,32 @@ class Reportes extends CI_Controller
 		}
 		$xdoc = $doc->retdocs();
 
-		echo $encabezado.$xitems.$xdoc;
+		$texto = $encabezado.$xitems.$xdoc;
 
 		$filename = $generales->narch . ".SAD";
 
-		header("Content-type: application/txt");
-		header("Content-Disposition: attachment; filename='$filename'");
-		header('Content-Transfer-Encoding: binary');
+		$archivo = fopen("public/fls/sad/{$filename}", 'a');
+		fputs($archivo, $texto);
+		fclose($archivo);
+
+		redirect("formato/reportes/descargar/{$generales->narch}");
+	}
+
+	function descargar($nombre) {
+		$nombre_fichero = getcwd()."/public/fls/sad/{$nombre}.SAD";
+
+		if (file_exists($nombre_fichero)) {
+
+		    $url = base_url("public/fls/sad/{$nombre}.SAD");
+
+			header("Content-disposition: attachment; filename={$nombre}.SAD");
+			header("Content-type: application/octet-stream");
+			readfile($url);
+
+			unlink($nombre_fichero);
+		} else {
+			echo "No se ha generado el archivo";
+		}
 	}
 }
 ?>

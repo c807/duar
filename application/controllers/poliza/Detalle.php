@@ -181,65 +181,151 @@ class Detalle extends CI_Controller {
 	}
 
 	function guardar_xls_detalle($duaduana) {
-		$det = new Detalle_model();
-		$det->set_duaduana($duaduana);
 
-		$this->load->library('PHPExcel/PHPExcel.php');
-		$exito = 0;
+		$destino = getcwd()."/public/fls/duarxls/";
+		if (!is_dir($destino)) {
+			mkdir($destino, 0777, true);
+		}
 
-		$cargar    = PHPExcel_IOFactory::identify($_FILES['archivo']['tmp_name']);
-		$objReader = PHPExcel_IOFactory::createReader($cargar);
-		$objReader->setLoadSheetsOnly('Hoja1');
+		if (file_exists((string)$_FILES['archivo']['tmp_name'])) {
+			$extension = explode(".", $_FILES["archivo"]["name"]);
+			$nombre = time()."-detallexls.".$extension[1];
 
-		$objPHPExcel   = $objReader->load($_FILES['archivo']['tmp_name']);
-		$hoja          = $objPHPExcel->getSheet(0);
-		$highestRow    = $hoja->getHighestRow();
-		$highestColumn = $hoja->getHighestColumn();
-
-		for ($row = 2; $row <= $highestRow; $row++) {
-			$linea['detalle']		  = '';
-			$linea['codigo_producto'] = $hoja->getCell("A".$row)->getValue();
-			$linea['item']			  = $det->numitem();
-			$linea["tlc"]             = ($hoja->getCell("B".$row)->getValue()) ? $hoja->getCell("B".$row)->getValue() : 0;
-			$linea["acuerdo"]         = $hoja->getCell("C".$row)->getValue();
-			$linea["quota"]           = $hoja->getCell("D".$row)->getValue();
-			$linea["marcas"]          = $hoja->getCell("E".$row)->getValue();
-			$linea["numeros"]         = $hoja->getCell("F".$row)->getValue();
-			$linea["partida"]         = $hoja->getCell("G".$row)->getValue();
-			$linea["doc_transp"]      = $hoja->getCell("H".$row)->getValue();
-			$linea["tipo_bulto"]      = $hoja->getCell("I".$row)->getValue();
-			$linea["origen"]          = $hoja->getCell("J".$row)->getValue();
-			$linea["peso_bruto"]      = $hoja->getCell("K".$row)->getValue();
-			$linea["peso_neto"]       = $hoja->getCell("L".$row)->getValue();
-			$linea["cuantia"]         = $hoja->getCell("M".$row)->getValue();
-			$linea["fob"]             = $hoja->getCell("N".$row)->getValue();
-			$linea["flete"]           = $hoja->getCell("O".$row)->getValue();
-			$linea["seguro"]          = $hoja->getCell("P".$row)->getValue();
-			$linea["otros"]           = $hoja->getCell("Q".$row)->getValue();
-			$linea["cif"]             = $hoja->getCell("R".$row)->getValue();
-			$linea["no_bultos"]       = $hoja->getCell("S".$row)->getValue();
-			$linea["descripcion"]     = $hoja->getCell("T".$row)->getValue();
-			$linea["contenedor1"]     = $hoja->getCell("U".$row)->getValue();
-			$linea["contenedor2"]     = $hoja->getCell("V".$row)->getValue();
-			$linea["contenedor3"]     = $hoja->getCell("W".$row)->getValue();
-			$linea["contenedor4"]     = $hoja->getCell("X".$row)->getValue();
-			$linea["comple"]          = '000';
-			$partida = $hoja->getCell("G".$row)->getValue()."00";
-			$desc = $this->Detalle_model->sac_descripcion(array("codigo" => $partida));
-			$linea["desc_sac"]        = ($desc) ? $desc->DESCRIPCION : '';
-			$linea["duaduana"]        = $duaduana;
-
-			if ($this->Detalle_model->guardardet($linea)) {
-				$exito = 1;
+			if (move_uploaded_file($_FILES['archivo']['tmp_name'], $destino."/".$nombre)) {
+				$link = $destino."/".$nombre;
 			}
 		}
 
+
+		$det = new Detalle_model();
+		$det->set_duaduana($duaduana);
+
+		$this->load->library('PHPEXCEL/PHPExcel.php');
+		#require_once(getcwd().'/../dua/dua/application/libraries/PHPExcel/PHPExcel.php');
+    	#require_once(getcwd().'/../dua/dua/application/libraries/PHPExcel/PHPExcel/IOFactory.php');
+		$exito = 0;
+
+		$cargar    = PHPExcel_IOFactory::identify($link);
+		$objReader = PHPExcel_IOFactory::createReader($cargar);
+		$objReader->setLoadSheetsOnly('Hoja1');
+
+		$objPHPExcel = $objReader->load($link);
+		$hoja        = $objPHPExcel->getSheet(0);
+		$filas       = $hoja->getHighestRow();
+		$colum       = $hoja->getHighestColumn();
+
+		if (verDato($_POST, "agrupar")) {
+			$enca = $this->db
+				 		 ->where("duaduana", $duaduana)
+				 		 ->get("encabezado")
+				 		 ->row();
+
+			$partidas    = $linea = array();
+
+			for ($row = 2; $row <= $filas; $row++) {
+				$partidas[] = $hoja->getCell("G".$row)->getValue();
+			}
+
+			$partidas = array_values(array_unique($partidas));
+
+			foreach ($partidas as $par) {
+				$flete = $seguro = $otros = $cif = 0;
+
+				for ($row = 2; $row < $filas; $row++) {
+					if ($par == $hoja->getCell("G".$row)->getValue()) {
+
+						$flete  += ($enca->flete  / $enca->fob) * $hoja->getCell("N{$row}")->getValue();
+						$seguro += ($enca->seguro / $enca->fob) * $hoja->getCell("N{$row}")->getValue();
+						$otros  += ($enca->otros  / $enca->fob) * $hoja->getCell("N{$row}")->getValue();
+						$cif    += ($flete + $seguro + $otros);
+
+						$dato["detalle"]         = '';
+						$dato["codigo_producto"] = $hoja->getCell("A{$row}")->getValue();
+						$dato["item"]            = $det->numitem();
+						$dato["tlc"]             = ($hoja->getCell("B{$row}")->getValue()) ? $hoja->getCell("B{$row}")->getValue() : 0;
+						$dato["acuerdo"]         = $hoja->getCell("C{$row}")->getValue();
+						$dato["quota"]           = $hoja->getCell("D{$row}")->getValue();
+						$dato["marcas"]          = $hoja->getCell("E{$row}")->getValue();
+						$dato["numeros"]         = $hoja->getCell("F{$row}")->getValue();
+						$dato["partida"]         = $hoja->getCell("G{$row}")->getValue();
+						$dato["doc_transp"]      = $hoja->getCell("H{$row}")->getValue();
+						$dato["tipo_bulto"]      = $hoja->getCell("I{$row}")->getValue();
+						$dato["origen"]          = $hoja->getCell("J{$row}")->getValue();
+						$dato["peso_bruto"]      = $hoja->getCell("K{$row}")->getValue();
+						$dato["peso_neto"]       = $hoja->getCell("L{$row}")->getValue();
+						$dato["cuantia"]         = $hoja->getCell("M{$row}")->getValue();
+						$dato["fob"]             = $hoja->getCell("N{$row}")->getValue();
+						$dato["no_bultos"]       = $hoja->getCell("S{$row}")->getValue();
+						$dato["descripcion"]     = $hoja->getCell("T{$row}")->getValue();
+						$dato["contenedor1"]     = $hoja->getCell("U{$row}")->getValue();
+						$dato["contenedor2"]     = $hoja->getCell("V{$row}")->getValue();
+						$dato["contenedor3"]     = $hoja->getCell("W{$row}")->getValue();
+						$dato["contenedor4"]     = $hoja->getCell("X{$row}")->getValue();
+					}
+				}
+
+				$dato["flete"]  = $flete;
+				$dato["seguro"] = $seguro;
+				$dato["otros"]  = $otros;
+				$dato["cif"]    = $cif;
+				$partida        = "{$par}00";
+
+				$desc = $this->Detalle_model->sac_descripcion(array("codigo" => $partida));
+				$dato["desc_sac"]        = ($desc) ? $desc->DESCRIPCION : '';
+				$dato["duaduana"]        = $duaduana;
+
+				if ($this->Detalle_model->guardardet($dato)) {
+					$exito = 1;
+				}
+			}
+		} else {
+			for ($row = 2; $row <= $filas; $row++) {
+				$linea['detalle']		  = '';
+				$linea['codigo_producto'] = $hoja->getCell("A".$row)->getValue();
+				$linea['item']			  = $det->numitem();
+				$linea["tlc"]             = ($hoja->getCell("B".$row)->getValue()) ? $hoja->getCell("B".$row)->getValue() : 0;
+				$linea["acuerdo"]         = $hoja->getCell("C".$row)->getValue();
+				$linea["quota"]           = $hoja->getCell("D".$row)->getValue();
+				$linea["marcas"]          = $hoja->getCell("E".$row)->getValue();
+				$linea["numeros"]         = $hoja->getCell("F".$row)->getValue();
+				$linea["partida"]         = $hoja->getCell("G".$row)->getValue();
+				$linea["doc_transp"]      = $hoja->getCell("H".$row)->getValue();
+				$linea["tipo_bulto"]      = $hoja->getCell("I".$row)->getValue();
+				$linea["origen"]          = $hoja->getCell("J".$row)->getValue();
+				$linea["peso_bruto"]      = $hoja->getCell("K".$row)->getValue();
+				$linea["peso_neto"]       = $hoja->getCell("L".$row)->getValue();
+				$linea["cuantia"]         = $hoja->getCell("M".$row)->getValue();
+				$linea["fob"]             = $hoja->getCell("N".$row)->getValue();
+				$linea["flete"]           = $hoja->getCell("O".$row)->getValue();
+				$linea["seguro"]          = $hoja->getCell("P".$row)->getValue();
+				$linea["otros"]           = $hoja->getCell("Q".$row)->getValue();
+				$linea["cif"]             = $hoja->getCell("R".$row)->getValue();
+				$linea["no_bultos"]       = $hoja->getCell("S".$row)->getValue();
+				$linea["descripcion"]     = $hoja->getCell("T".$row)->getValue();
+				$linea["contenedor1"]     = $hoja->getCell("U".$row)->getValue();
+				$linea["contenedor2"]     = $hoja->getCell("V".$row)->getValue();
+				$linea["contenedor3"]     = $hoja->getCell("W".$row)->getValue();
+				$linea["contenedor4"]     = $hoja->getCell("X".$row)->getValue();
+				$linea["comple"]          = '000';
+				$partida = $hoja->getCell("G".$row)->getValue()."00";
+				$desc = $this->Detalle_model->sac_descripcion(array("codigo" => $partida));
+				$linea["desc_sac"]        = ($desc) ? $desc->DESCRIPCION : '';
+				$linea["duaduana"]        = $duaduana;
+
+				if ($this->Detalle_model->guardardet($linea)) {
+					$exito = 1;
+				}
+			}
+		}
+
+		$exito = 1;
 		if ($exito) {
 			$mensaje = "El detalle se agregó con éxito";
 		} else {
 			$mensaje = "No se puede agregar el detalle, intentelo nuevamente";
 		}
 
+		unlink($link);
 		$dato['exito']   = $exito;
 		$dato['mensaje'] = $mensaje;
 

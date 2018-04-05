@@ -5,12 +5,12 @@
 		<div class="form-group form-group-sm">
 			<input type="file" name="archivo" class="form-control">
 		</div>
-		<!-- <div class="form-group form-group-sm">
-			<p>Agrupar por:</p>
-			<div class="radio">
-				<label class="radio-inline"><input type="radio" name="agrupar" value="1"> Partida Arancelaria</label>
-			</div>
-			<div class="radio">
+		<div class="form-group form-group-sm">
+		<p>Agrupar por:</p>
+		<div class="checkbox">
+			<label><input type="checkbox" name="agrupar" value="1"> Partida Arancelaria</label>
+		</div>
+		<!--	<div class="radio">
 				<label class="radio-inline"><input type="radio" name="agrupar" value="2"> Descripción</label>
 			</div>
 		</div> -->
@@ -22,3 +22,4 @@
 		</div>
 	</form>
 </div>
+

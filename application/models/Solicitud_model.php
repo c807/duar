@@ -11,9 +11,14 @@ class Solicitud_model extends CI_Model {
 			$this->db->where('a.solicitud', $ars['id']);
 		}
 
-		if (verDato($ars, 'margi')) {
-			$this->db->where("a.marginador", $ars['margi']);
+		$permite = array(1725, 1211, 9, 1196, 1676);
+		if (! in_array($_SESSION['UserID'],$permite)) {
+
+			if (verDato($ars, 'margi')) {
+				$this->db->where("a.marginador", $ars['margi']);
+			}
 		}
+
 
 		if (VerDato($ars, 'file')) {
 			$this->db->where("a.c807_file", $ars['file']);
