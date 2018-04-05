@@ -103,13 +103,32 @@ class Reportes extends CI_Controller
 		}
 		$xdoc = $doc->retdocs();
 
-		echo $encabezado.$xitems.$xdoc;
+		$texto = $encabezado.$xitems.$xdoc;
 
 		$filename = $generales->narch . ".SAD";
 
-		header("Content-type: application/txt");
-		header("Content-Disposition: attachment; filename='$filename'");
-		header('Content-Transfer-Encoding: binary');
+		$archivo = fopen("public/fls/sad/{$filename}", 'a');
+		fputs($archivo, $texto);
+		fclose($archivo);
+
+		redirect("formato/reportes/descargar/{$generales->narch}");
+	}
+
+	function descargar($nombre) {
+		$nombre_fichero = getcwd()."/public/fls/sad/{$nombre}.SAD";
+
+		if (file_exists($nombre_fichero)) {
+
+		    $url = base_url("public/fls/sad/{$nombre}.SAD");
+
+			header("Content-disposition: attachment; filename={$nombre}.SAD");
+			header("Content-type: application/octet-stream");
+			readfile($url);
+
+			unlink($nombre_fichero);
+		} else {
+			echo "No se ha generado el archivo";
+		}
 	}
 }
 ?>
