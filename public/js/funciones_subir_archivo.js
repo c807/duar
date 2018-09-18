@@ -3,8 +3,8 @@
 //Esto es para subir archivos.
 
       function base_url_erp(url) {
-        return base_url(url)
-        //return window.location.origin + "/gaceladrp/" + url;
+        //return base_url(url)
+        return window.location.origin + "/grupo_c807/duar/" + url;
       }
 
 
@@ -31,7 +31,7 @@
       function mostrar_partida($id_Reg, $cod_importador) {
 
           $("#id_reg").val($id_Reg);
-          $("#actualizar_partida").show("fade");
+          $("#actualizar_partida").show("blind");
 
           var url = base_url_erp("index.php/subir_Archivo/traer_informacion_producto/" + $id_Reg + "/" + $cod_importador);
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<link rel="stylesheet" type="text/css" href="<?php echo base_url('public/bootstrap/css/bootstrap.min.css') ?>">	
+	<link rel="stylesheet" type="text/css" href="<?php echo base_url('public/bootstrap/css/bootstrap.min.css') ?>">
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url('public/css/estilo.css') ?>">
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url('public/chosen/chosen.min.css');?>">
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url('public/confirm/jquery-confirm.min.css'); ?>">
@@ -15,6 +15,7 @@
 	<script type="text/javascript" src="<?php echo base_url('public/js/solicitud.js') ?>"></script>
 	<script type="text/javascript" src="<?php echo base_url('public/js/modelo.js') ?>"></script>
 	<script type="text/javascript" src="<?php echo base_url('public/js/poliza.js') ?>"></script>
+  <script type="text/javascript" src="<?php echo base_url('public/js/funciones_subir_archivo.js') ?>"></script>
 	<title>DuaR</title>
 </head>
 <body>
@@ -46,12 +47,12 @@
     <?php endif ?>
   </div>
 </nav>
-<?php 
+<?php
 if (isset($vista)) {
 	$this->load->view($vista);
 }
 ?>
 	<script type="text/javascript" src="<?php echo base_url('public/js/bitacora.js') ?>"></script>
-	
+
 </body>
 </html>
