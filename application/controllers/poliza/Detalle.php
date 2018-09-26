@@ -223,7 +223,7 @@ class Detalle extends CI_Controller {
 			$partidas    = $linea = array();
 
 			for ($row = 2; $row <= $filas; $row++) {
-				$partidas[] = $hoja->getCell("G".$row)->getValue();
+				$partidas[] = $hoja->getCell("H".$row)->getValue();
 			}
 
 			$partidas = array_values(array_unique($partidas));
@@ -232,7 +232,7 @@ class Detalle extends CI_Controller {
 				$flete = $seguro = $otros = $cif = 0;
 
 				for ($row = 2; $row < $filas; $row++) {
-					if ($par == $hoja->getCell("G".$row)->getValue()) {
+					if ($par == $hoja->getCell("H".$row)->getValue()) {
 
 						$flete  += ($enca->flete  / $enca->fob) * $hoja->getCell("N{$row}")->getValue();
 						$seguro += ($enca->seguro / $enca->fob) * $hoja->getCell("N{$row}")->getValue();
@@ -240,27 +240,27 @@ class Detalle extends CI_Controller {
 						$cif    += ($flete + $seguro + $otros);
 
 						$dato["detalle"]         = '';
-						$dato["codigo_producto"] = $hoja->getCell("A{$row}")->getValue();
+						$dato["codigo_producto"] = $hoja->getCell("B{$row}")->getValue();
 						$dato["item"]            = $det->numitem();
-						$dato["tlc"]             = ($hoja->getCell("B{$row}")->getValue()) ? $hoja->getCell("B{$row}")->getValue() : 0;
-						$dato["acuerdo"]         = $hoja->getCell("C{$row}")->getValue();
-						$dato["quota"]           = $hoja->getCell("D{$row}")->getValue();
-						$dato["marcas"]          = $hoja->getCell("E{$row}")->getValue();
-						$dato["numeros"]         = $hoja->getCell("F{$row}")->getValue();
-						$dato["partida"]         = $hoja->getCell("G{$row}")->getValue();
-						$dato["doc_transp"]      = $hoja->getCell("H{$row}")->getValue();
-						$dato["tipo_bulto"]      = $hoja->getCell("I{$row}")->getValue();
-						$dato["origen"]          = $hoja->getCell("J{$row}")->getValue();
-						$dato["peso_bruto"]      = $hoja->getCell("K{$row}")->getValue();
-						$dato["peso_neto"]       = $hoja->getCell("L{$row}")->getValue();
-						$dato["cuantia"]         = $hoja->getCell("M{$row}")->getValue();
-						$dato["fob"]             = $hoja->getCell("N{$row}")->getValue();
-						$dato["no_bultos"]       = $hoja->getCell("S{$row}")->getValue();
-						$dato["descripcion"]     = $hoja->getCell("T{$row}")->getValue();
-						$dato["contenedor1"]     = $hoja->getCell("U{$row}")->getValue();
-						$dato["contenedor2"]     = $hoja->getCell("V{$row}")->getValue();
-						$dato["contenedor3"]     = $hoja->getCell("W{$row}")->getValue();
-						$dato["contenedor4"]     = $hoja->getCell("X{$row}")->getValue();
+						$dato["tlc"]             = ($hoja->getCell("C{$row}")->getValue()) ? $hoja->getCell("C{$row}")->getValue() : 0;
+						$dato["acuerdo"]         = $hoja->getCell("D{$row}")->getValue();
+						$dato["quota"]           = $hoja->getCell("E{$row}")->getValue();
+						$dato["marcas"]          = $hoja->getCell("F{$row}")->getValue();
+						$dato["numeros"]         = $hoja->getCell("G{$row}")->getValue();
+						$dato["partida"]         = $hoja->getCell("H{$row}")->getValue();
+						$dato["doc_transp"]      = $hoja->getCell("I{$row}")->getValue();
+						$dato["tipo_bulto"]      = $hoja->getCell("J{$row}")->getValue();
+						$dato["origen"]          = $hoja->getCell("K{$row}")->getValue();
+						$dato["peso_bruto"]      = $hoja->getCell("L{$row}")->getValue();
+						$dato["peso_neto"]       = $hoja->getCell("M{$row}")->getValue();
+						$dato["cuantia"]         = $hoja->getCell("N{$row}")->getValue();
+						$dato["fob"]             = $hoja->getCell("S{$row}")->getValue();
+						$dato["no_bultos"]       = $hoja->getCell("T{$row}")->getValue();
+						$dato["descripcion"]     = $hoja->getCell("U{$row}")->getValue();
+						$dato["contenedor1"]     = $hoja->getCell("V{$row}")->getValue();
+						$dato["contenedor2"]     = $hoja->getCell("W{$row}")->getValue();
+						$dato["contenedor3"]     = $hoja->getCell("X{$row}")->getValue();
+						$dato["contenedor4"]     = $hoja->getCell("Y{$row}")->getValue();
 					}
 				}
 
@@ -281,33 +281,33 @@ class Detalle extends CI_Controller {
 		} else {
 			for ($row = 2; $row <= $filas; $row++) {
 				$linea['detalle']		  = '';
-				$linea['codigo_producto'] = $hoja->getCell("A".$row)->getValue();
+				$linea['codigo_producto'] = $hoja->getCell("B".$row)->getValue();
 				$linea['item']			  = $det->numitem();
-				$linea["tlc"]             = ($hoja->getCell("B".$row)->getValue()) ? $hoja->getCell("B".$row)->getValue() : 0;
-				$linea["acuerdo"]         = $hoja->getCell("C".$row)->getValue();
-				$linea["quota"]           = $hoja->getCell("D".$row)->getValue();
-				$linea["marcas"]          = $hoja->getCell("E".$row)->getValue();
-				$linea["numeros"]         = $hoja->getCell("F".$row)->getValue();
-				$linea["partida"]         = $hoja->getCell("G".$row)->getValue();
-				$linea["doc_transp"]      = $hoja->getCell("H".$row)->getValue();
-				$linea["tipo_bulto"]      = $hoja->getCell("I".$row)->getValue();
-				$linea["origen"]          = $hoja->getCell("J".$row)->getValue();
-				$linea["peso_bruto"]      = $hoja->getCell("K".$row)->getValue();
-				$linea["peso_neto"]       = $hoja->getCell("L".$row)->getValue();
-				$linea["cuantia"]         = $hoja->getCell("M".$row)->getValue();
-				$linea["fob"]             = $hoja->getCell("N".$row)->getValue();
-				$linea["flete"]           = $hoja->getCell("O".$row)->getValue();
-				$linea["seguro"]          = $hoja->getCell("P".$row)->getValue();
-				$linea["otros"]           = $hoja->getCell("Q".$row)->getValue();
-				$linea["cif"]             = $hoja->getCell("R".$row)->getValue();
-				$linea["no_bultos"]       = $hoja->getCell("S".$row)->getValue();
-				$linea["descripcion"]     = $hoja->getCell("T".$row)->getValue();
-				$linea["contenedor1"]     = $hoja->getCell("U".$row)->getValue();
-				$linea["contenedor2"]     = $hoja->getCell("V".$row)->getValue();
-				$linea["contenedor3"]     = $hoja->getCell("W".$row)->getValue();
-				$linea["contenedor4"]     = $hoja->getCell("X".$row)->getValue();
+				$linea["tlc"]             = ($hoja->getCell("C".$row)->getValue()) ? $hoja->getCell("C".$row)->getValue() : 0;
+				$linea["acuerdo"]         = $hoja->getCell("D".$row)->getValue();
+				$linea["quota"]           = $hoja->getCell("E".$row)->getValue();
+				$linea["marcas"]          = $hoja->getCell("F".$row)->getValue();
+				$linea["numeros"]         = $hoja->getCell("G".$row)->getValue();
+				$linea["partida"]         = $hoja->getCell("H".$row)->getValue();
+				$linea["doc_transp"]      = $hoja->getCell("I".$row)->getValue();
+				$linea["tipo_bulto"]      = $hoja->getCell("J".$row)->getValue();
+				$linea["origen"]          = $hoja->getCell("K".$row)->getValue();
+				$linea["peso_bruto"]      = $hoja->getCell("L".$row)->getValue();
+				$linea["peso_neto"]       = $hoja->getCell("M".$row)->getValue();
+				$linea["cuantia"]         = $hoja->getCell("N".$row)->getValue();
+				$linea["fob"]             = $hoja->getCell("O".$row)->getValue();
+				$linea["flete"]           = $hoja->getCell("P".$row)->getValue();
+				$linea["seguro"]          = $hoja->getCell("Q".$row)->getValue();
+				$linea["otros"]           = $hoja->getCell("R".$row)->getValue();
+				$linea["cif"]             = $hoja->getCell("S".$row)->getValue();
+				$linea["no_bultos"]       = $hoja->getCell("T".$row)->getValue();
+				$linea["descripcion"]     = $hoja->getCell("U".$row)->getValue();
+				$linea["contenedor1"]     = $hoja->getCell("V".$row)->getValue();
+				$linea["contenedor2"]     = $hoja->getCell("W".$row)->getValue();
+				$linea["contenedor3"]     = $hoja->getCell("X".$row)->getValue();
+				$linea["contenedor4"]     = $hoja->getCell("Y".$row)->getValue();
 				$linea["comple"]          = '000';
-				$partida = $hoja->getCell("G".$row)->getValue()."00";
+				$partida = $hoja->getCell("H".$row)->getValue()."00";
 				$desc = $this->Detalle_model->sac_descripcion(array("codigo" => $partida));
 				$linea["desc_sac"]        = ($desc) ? $desc->DESCRIPCION : '';
 				$linea["duaduana"]        = $duaduana;

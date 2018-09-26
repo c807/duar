@@ -4,7 +4,7 @@
                 <h3 class="panel-title">Generar Archivo Clasificado</h3>
           </div>
           <div class="panel-body">
-                <?php  echo form_open_multipart("subir_archivo/generar_excel",array("name"=>"form"));?>
+                <?php  echo form_open_multipart("subir_archivo/generar_excel",array("name"=>"form" , "method"=>"GET"));?>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <tbody>
@@ -38,13 +38,14 @@
                                 <tr>
                                     <td><label for="otros" class="col-sm-2"></label>Otros</td>
                                     <td><input type="number" name="otros" id="otros" class="form-control" step="0.01"></td>
+                                    <td colspan="2"></td>
                                 </tr>
                                 <tr>
-                                    <td></td>
-                                    <td>
-                                        <button type="submit" class="btn btn-primary pull-right">Generar</button>
-                                        <!-- <button type="submit" class="btn btn-primary" onclick="generar_excel()">Generar sin sumatoria</button> -->
-                                        <!--<a href="<?php echo base_url(); ?>index.php/subir_Archivo/generar_excel">Descargar excel</a>-->
+                                 
+                                    <td colspan="2"> <button type="button" class="btn btn-primary pull-right" onclick="generar_excel()">Generar Excel</button></td>
+                                    
+                                    <td colspan="2">
+                                        <button type="button" class="btn btn-primary pull-left" onclick="generar_rayado()" >Generar PDF</button>
                                     </td>
                                 </tr>
                                 <tr>

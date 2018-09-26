@@ -12,11 +12,15 @@ if (isset($_SESSION["no_clasificado"])) {?>
         </div>
         <br>
     <?php } ?>
-    <div card="card-body">
+    <div card="card-body ">
         <div class="table-responsive">
             <table class="table table-hover">
-
-                <?php if (isset($registros)) { ?>
+                <?php if (isset($registros)) { 
+                    if (count($registros) == 0) { ?>     
+                        <div class="text-center">
+                            <button type="button" class="btn btn-sm btn-primary" onclick="enviar_correo()">Enviar Correo Aforador</button>
+                        </div>
+                    <?php }?>    
                     <?php for ($x = 0; $x < count($registros); $x++) { ?>
                         <tr>
                             <?php if ( $x == 0) { #solo imprime los encabezados
@@ -32,6 +36,15 @@ if (isset($_SESSION["no_clasificado"])) {?>
                                             <a href="javascript:;"  onclick="mostrar_partida(<?php echo $field?> , '<?php echo $num_file ?>')">
                                                  <i class="glyphicon glyphicon-edit"></i>
                                             </a>
+                                            <div id="crear_partida">
+
+                                                <?php
+                                                    $this->data = array(
+                                                        'id_reg' => $field);
+                                                    $this->datos['id'] = $this->data;
+                                                    $this->load->view("subir_archivos/crear_partida",$this->datos )
+                                                 ?>
+                                            </div>
                                         </td>
                                 <?php } else { ?>
                                     <td><?php echo $field?></td>
@@ -46,3 +59,4 @@ if (isset($_SESSION["no_clasificado"])) {?>
                 </div>
             </div>
 </div>
+

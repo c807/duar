@@ -8,6 +8,7 @@ class Subir_Archivo extends CI_Controller {
     {
 		parent::__construct();
 		$this->load->library('PHPEXCEL/PHPExcel.php');
+		//$this->load->library('fpdf/fpdf.php');
 		$this->load->model(array('subir_archivos/Subir_archivos_model'));
 		$this->datos = array();
 		$this->datos["navtext"] = "DPR";
@@ -17,10 +18,15 @@ class Subir_Archivo extends CI_Controller {
     {
 
     	if (isset($_GET["file"])) {
-    		$this->datos['contador'] = $_GET["contador"];
-    		$this->datos['registros'] = $this->Subir_archivos_model->consulta($_GET["file"]);
+			$id_file = $this->Subir_archivos_model->obtener_datos_file($_GET['c807_file']);
+
+			$this->datos['contador']           = $_GET["contador"];
+			$this->datos['file']               = $_GET["c807_file"];
+			$this->datos['cantidad_productos'] = $this->Subir_archivos_model->consulta($_GET["file"], str_replace('-','',$id_file->no_identificacion), 3);
+			$this->datos['registros']          = $this->Subir_archivos_model->consulta($_GET["file"], str_replace('-','',$id_file->no_identificacion), 2);
     	}
 
+		$this->datos["mensaje"]	= "";
     	$this->datos["vista"] = "subir_archivos/subir_archivo";
         $this->load->view('principal', $this->datos);
     }
@@ -91,6 +97,12 @@ class Subir_Archivo extends CI_Controller {
 							$unidades        = $worksheet->getCellByColumnAndRow(4, $row)->getValue();
 							$precio_unitario = $worksheet->getCellByColumnAndRow(5, $row)->getValue();
 							$total           = $worksheet->getCellByColumnAndRow(6, $row)->getValue();
+							$tlc             = $worksheet->getCellByColumnAndRow(7, $row)->getValue();
+
+							if ($tlc == null )
+							{
+								$tlc = '0';
+							}
 
 							$data = array(
 									'num_factura'     => $num_factura,
@@ -100,16 +112,21 @@ class Subir_Archivo extends CI_Controller {
 									'pais_origen'     => $pais_origen,
 									'cuantia'         => $unidades,
 									'precio_unitario' => $precio_unitario,
-									'total'           => $total);
+									'total'           => $total,
+									'tlc'             => $tlc
+							);
 
 							$this->Subir_archivos_model->insert($data);
 							$contador += 1;
 						}
 					}
 
+					$data = array('id_file' => $id_file->id);
+					$this->Subir_archivos_model->crear_listado_polizas($data);
+
 					$_SESSION["no_clasificado"] = 'Datos Procesados al file '. $_POST['c807_file'];
 					unlink($link);
-					redirect("subir_archivo?file={$id_file->id}&contador={$contador}");
+					redirect("subir_archivo?file={$id_file->id}&contador={$contador}&c807_file={$_POST['c807_file']}");
 				}
 			}
 		}
@@ -118,22 +135,37 @@ class Subir_Archivo extends CI_Controller {
 
 	public function clasificar_productos()
 	{
+
+		$id_file = $this->Subir_archivos_model->obtener_datos_file($_GET['c807_file']);
+		$data = array('id_file' => $id_file->id, 'id_usuario_clasificador' => 2);
+		$this->Subir_archivos_model->crear_listado_polizas($data);
+
+
+
+		$this->datos["c807_file"] = $_GET['c807_file'];
 		$this->datos["vista"] = 'subir_archivos/clasificar_productos';
 		$this->load->view("principal", $this->datos);
 	}
 
-	public function no_clasificados()
+	public function no_clasificados($opcion)
 	{
 		$id_file = $this->Subir_archivos_model->obtener_datos_file($_POST['c807_file']);
 		if (!isset($id_file)) {
 			$_SESSION["no_clasificado"] = 'Número de file: ' . $_POST['c807_file'] . ' no existe';
 			$this->load->view('subir_archivos/no_clasificados');
 		} else {
-			$this->datos['registros'] = $this->Subir_archivos_model->consulta($id_file->id, $id_file->cliente_hijo_id);
+
+			$this->datos['registros'] = $this->Subir_archivos_model->consulta($id_file->id, str_replace('-','',$id_file->no_identificacion), $opcion);
 			$this->datos['num_file'] = $_POST['c807_file'];
 
 			$_SESSION["no_clasificado"] = '';
-			$this->load->view('subir_archivos/no_clasificados', $this->datos);
+			if ($opcion == 2) {
+				$this->datos['mensaje'] = "Listado de Productos: ";
+				$this->load->view('subir_archivos/listado_productos', $this->datos);
+			}else {
+				$this->load->view('subir_archivos/no_clasificados', $this->datos);
+			}
+
 		}
 	}
 
@@ -143,16 +175,33 @@ class Subir_Archivo extends CI_Controller {
 		$cod_importador = $this->Subir_archivos_model->obtener_datos_file($num_file);
 
 		enviarJson(array(
+			'num_factura'     => $datos->num_factura,
 			'codigo_producto' => $datos->codigo_producto,
 			'descripcion'     => $datos->descripcion,
-			'importador'      => $cod_importador->cliente_hijo_id));
+			'importador'      => $cod_importador->no_identificacion));
 	}
 
 
-	public function grabar_partida()
+	public function grabar_partida($id_reg)
 	{
-		if (isset($_POST['partida_arancelaria']) && strlen(trim($_POST['partida_arancelaria'])) > 0) {
-			$this->Subir_archivos_model->insertar_partida($_POST);
+		//var_dump($_POST["partida_arancelaria"].$id_reg);
+
+//		var_dump($_POST["importador".$id_reg]);
+//		die();
+
+		if (isset($_POST["partida_arancelaria".$id_reg]) && strlen(trim($_POST["partida_arancelaria".$id_reg])) > 0) {
+		//if (isset($partida_arancelaria) && strlen(trim($partida_arancelaria)) > 0) {
+			//$this->Subir_archivos_model->insertar_partida($_POST, $id_reg);
+			//crear arreglo con los campo a pasar
+
+			$datos = array(
+					'importador'          => str_replace('-' ,'',$_POST["importador".$id_reg]),
+					'codigo_producto'     => $_POST["codigo_producto".$id_reg],
+					'descripcion'         => $_POST["descripcion".$id_reg],
+					'partida_arancelaria' => $_POST["partida_arancelaria".$id_reg]
+			);
+
+			$this->Subir_archivos_model->insertar_partida($datos);
 		} else {
 			enviarJson(array('mensaje' => 'Error, falta la partida arancelaria.'));
 		}
@@ -167,10 +216,11 @@ class Subir_Archivo extends CI_Controller {
 
 	public function generar_excel()
 	{
-		if(isset($_POST["c807_file"]) &&  isset($_POST["doc_transporte"]) && isset($_POST["tot_bultos"]) && isset($_POST["tot_kilos"])){
+		if(isset($_GET["c807_file"]) &&  isset($_GET["doc_transporte"]) && isset($_GET["tot_bultos"]) && isset($_GET["tot_kilos"])){
 
-			$this->datos['cliente'] = $this->Subir_archivos_model->obtener_datos_file($_POST ["c807_file"]);
-			$registros   = $this->Subir_archivos_model->generar_excel($_POST ["c807_file"] , $_POST['doc_transporte']);
+			$this->datos['cliente'] = $this->Subir_archivos_model->obtener_datos_file($_GET ["c807_file"]);
+			$registros   = $this->Subir_archivos_model->generar_excel($_GET ["c807_file"] , $_GET['doc_transporte']);
+
 			$objPHPExcel = new PHPExcel();
 
 			$objPHPExcel->getProperties()
@@ -281,6 +331,34 @@ class Subir_Archivo extends CI_Controller {
 					}
 				}
 
+				//Actualizar Numero de Fila en el excel
+				for ($x = 0; $x < count($registros); $x++) {
+					foreach ($registros[$x]  as $item => $field) {
+						if ($item == 'linea') {
+							$registros[$x]->linea = $x+1;
+						}
+					}
+				}
+
+				//Actualizar Linea de Agrupacion de DPR
+				$num_linea = 0;
+				$tlc = 0;
+				for ($x = 0; $x < count($registros); $x++) {
+					foreach ($registros[$x]  as $item => $field) {
+						if ($item == 'linea') {
+							$num_linea = $field;
+						}
+						if ($item == 'tlc') {
+							$tlc = $field;
+						}
+						if ($item == 'partida') {
+							//Actualziar pasar numero de file y partida y numero de linea
+							//$field es el codigo de partida arancelaria
+							 $this->Subir_archivos_model->actualizar_linea_agrupacion($_GET["c807_file"] , $field , $num_linea, $tlc);
+						}
+					}
+				}
+
 				for ($x = 0; $x < count($registros); $x++) {
 					if ($x == 0) {
 						$datos = array();
@@ -300,11 +378,12 @@ class Subir_Archivo extends CI_Controller {
 				}
 			}
 
-			$objPHPExcel->getActiveSheet()->setTitle('Cuadricula Generada');
+
+			$objPHPExcel->getActiveSheet()->setTitle('Hoja1');
 			$objPHPExcel->setActiveSheetIndex(0);
 
 			header('Content-Type: application/vnd.ms-excel');
-			header('Content-Disposition: attachment;filename='.$_POST ["c807_file"].'.xls');
+			header('Content-Disposition: attachment;filename='.$_GET ["c807_file"].'.xls');
 			header('Cache-Control: max-age=0');
 			header('Cache-Control: max-age=1');
 			header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
@@ -316,9 +395,151 @@ class Subir_Archivo extends CI_Controller {
 			ob_end_clean();
 			$objWriter->save('php://output');
 
+
+
 			exit;
+
+
 		}
 	}
+
+
+	public function consulta_producto_file()
+	{
+		$this->datos["vista"] = 'subir_archivos/consulta_productos_file';
+		$this->load->view("principal", $this->datos);
+
+	}
+
+
+	public function generar_rayado()
+	{
+
+		if(isset($_GET["c807_file"]) ){
+			$registros   = $this->Subir_archivos_model->generar_rayado($_GET["c807_file"]);
+
+			include getcwd() . "/application/libraries/fpdf/fpdf.php";
+
+			// Creacion del PDF
+
+			/*
+			* Se crea un objeto de la clase Pdf, recuerda que la clase Pdf
+			* heredó todos las variables y métodos de fpdf
+			*/
+			$this->pdf = new FPDF();
+			// Agregamos una página
+			$this->pdf->AddPage();
+			// Define el alias para el número de página que se imprimirá en el pie
+			$this->pdf->AliasNbPages();
+
+			/* Se define el titulo, márgenes izquierdo, derecho y
+			* el color de relleno predeterminado
+			*/
+
+			$this->pdf->SetTitle("Rayado de Factura");
+			$this->pdf->SetLeftMargin(15);
+			$this->pdf->SetRightMargin(15);
+			$this->pdf->SetFillColor(200,200,200);
+
+			// Se define el formato de fuente: Arial, negritas, tamaño 9
+			$this->pdf->SetFont('Arial', 'B', 9);
+
+			///$this->pdf->Ln(7);
+			// La variable $x se utiliza para mostrar un número consecutivo
+			$x = 0;
+
+			$datos = array();
+				foreach ($registros  as $item) {
+					if ($x == 0) {
+						$this->pdf->Cell(160,7,'Rayado de Factura', 0 ,0, 'C','0');
+						$this->pdf->Cell(10,7,'Pagina '. $this->pdf->PageNo() . '/{nb}' , 0 ,0, 'C','0');
+						$this->pdf->Ln(9);
+
+						$this->pdf->Cell(160,7,'File Numero: '. $_GET["c807_file"], 0 ,0, 'C','0');
+						$this->pdf->Ln(7);
+
+						$this->pdf->Cell(12,7,'Linea','TBL',0,'C','1');
+						$this->pdf->Cell(45,7,'Producto','TB',0,'L','1');
+						$this->pdf->Cell(50,7,'Descripcion','TB',0,'L','1');
+						$this->pdf->Cell(30,7,'Factura','TB',0,'L','1');
+						$this->pdf->Cell(20,7,'Partida','TBR',0,'L','1');
+						$this->pdf->Cell(20,7,'TLC','TBR',0,'L','1');
+						$this->pdf->Ln(9);
+					}
+					$x +=1;
+					// Se imprimen los datos de cada alumno
+					$this->pdf->Cell(12,5,$item->linea, 0 , 0,'L',0);
+					$this->pdf->Cell(45,5,$item->Codigo_Producto, 0, 0,'L',0);
+					$this->pdf->Cell(50,5,$item->descripcion, 0 , 0,'L',0);
+					$this->pdf->Cell(30,5,$item->num_factura, 0 , 0,'L',0);
+					$this->pdf->Cell(20,5,$item->partida, 0 , 0,'L',0);
+					$this->pdf->Cell(20,5,$item->tlc, 0 , 0,'L',0);
+
+					$this->pdf->Ln(5);
+
+					if ($x == 48)
+					{
+						 $x = 0;
+					}
+				}
+
+
+			$this->pdf->Output("Rayado.pdf", 'D');
+
+		}
+	}
+
+
+	public function enviar_correo($opcion)
+	{
+		correo(); # Carga la libreria de correo
+		//$opcion 1 Aforador a Clasificador
+		//Buscar los usuario de tipo Clasificador en la base de datos de usuarios
+		$user = $this->Conf_model->dtusuario($_SESSION['UserID']);
+		$texto  = "";
+		$asunto = "";
+		if ($opcion == 1){
+			$usuario = $this->Subir_archivos_model->buscar_usuarios($_GET['c807_file']);
+			$asunto = 'File Numero '. $_GET['c807_file']. ' para clasificacion';
+			$texto  = "<p> Se ha creado una nueva poliza en el sistema.</p>";
+			$mensaje = "El correo fue enviado al clasificador";
+		}else{
+			$usuario = $this->Subir_archivos_model->buscar_usuario_aforador($_GET['c807_file']);
+			$asunto = 'File Numero '. $_GET['c807_file']. ' lista para declaracion';
+			$texto = "<p> Se ha finalizado la clasificacion de la poliza.</p>";
+			$mensaje = "El correo fue enviado al aforador";
+		}
+
+		$para = array();
+
+		foreach ($usuario as $item ) {
+			$para[] = $item->mail;
+		}
+
+		//Obtener Listado de Usuarios a enviarle el correo
+
+ 		$correo = array(
+			'de'     => array($user->mail, $user->nombre),
+			'para'   => array($para),
+			'asunto' => $asunto,
+			'texto'  => $texto,
+			'copia'  => array("desarrollo2@c807.com"));
+
+			if (enviarCorreo($correo,2)) {
+				echo $mensaje;
+			} else {
+				echo "Error al enviar el correo";
+			}
+		}
+
+
+		public function listado_polizas()
+		{
+			$this->datos['registros'] = $this->Subir_archivos_model->polizas_no_clasificadas();
+
+			$this->datos["vista"] = 'subir_archivos/listado_polizas';
+			$this->load->view("principal", $this->datos);
+		}
 
 
 
