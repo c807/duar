@@ -14,17 +14,18 @@ if (isset($_SESSION["no_clasificado"])) {?>
     <?php } ?>
     <div card="card-body ">
         <div class="table-responsive">
-            <table class="table table-hover">
+            <table class="table table-hover table-condensed">
                 <?php if (isset($registros)) { 
                     if (count($registros) == 0) { ?>     
                         <div class="text-center">
-                            <button type="button" class="btn btn-sm btn-primary" onclick="enviar_correo()">Enviar Correo Aforador</button>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="enviar_correo(2)">Enviar Correo Aforador</button>
                         </div>
                     <?php }?>    
                     <?php for ($x = 0; $x < count($registros); $x++) { ?>
                         <tr>
                             <?php if ( $x == 0) { #solo imprime los encabezados
-                                foreach ($registros[$x]  as $item => $field) { ?>
+                                foreach ($registros[$x]  as $item => $field) {
+                                    ?>
                                     <td><?php echo $item?></td>
                                 <?php } ?>
 

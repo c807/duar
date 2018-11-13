@@ -8,7 +8,6 @@ class Subir_Archivo extends CI_Controller {
     {
 		parent::__construct();
 		$this->load->library('PHPEXCEL/PHPExcel.php');
-		//$this->load->library('fpdf/fpdf.php');
 		$this->load->model(array('subir_archivos/Subir_archivos_model'));
 		$this->datos = array();
 		$this->datos["navtext"] = "DPR";
@@ -24,7 +23,9 @@ class Subir_Archivo extends CI_Controller {
 			$this->datos['file']               = $_GET["c807_file"];
 			$this->datos['cantidad_productos'] = $this->Subir_archivos_model->consulta($_GET["file"], str_replace('-','',$id_file->no_identificacion), 3);
 			$this->datos['registros']          = $this->Subir_archivos_model->consulta($_GET["file"], str_replace('-','',$id_file->no_identificacion), 2);
-    	}
+    	} else{
+			$this->datos['file']               = "";
+		}
 
 		$this->datos["mensaje"]	= "";
     	$this->datos["vista"] = "subir_archivos/subir_archivo";
@@ -33,7 +34,9 @@ class Subir_Archivo extends CI_Controller {
 
 	public function import()
  	{
+
 		if(isset($_FILES["file"]["name"]) && isset($_POST['c807_file'])) {
+
 			$id_file = $this->Subir_archivos_model->obtener_datos_file($_POST['c807_file']);
 
 			$contador = 0;
@@ -65,19 +68,34 @@ class Subir_Archivo extends CI_Controller {
 					$highestRow    = $worksheet->getHighestRow();
 					$highestColumn = $worksheet->getHighestColumn();
 
+					$facturaIni = "";
+
 					for($row=2; $row <= $highestRow; $row++) {
-						$num_factura  = 	$worksheet->getCellByColumnAndRow(0, $row)->getValue();
-						$data = array(
-							'num_factura' => $num_factura,
-							'num_file'    => $_POST['c807_file']);
 
-						$cantidad = $this->Subir_archivos_model->existe_factura($data);
-
-						if ($cantidad->cantidad == 0) {
-							$existe_Factura = 'N';
-						} else {
-							$existe_Factura = 'S';
+						if ($row == 2) {
+							$facturaIni = $worksheet->getCellByColumnAndRow(0, $row)->getValue();
 						}
+
+						$num_factura  = 	$worksheet->getCellByColumnAndRow(0, $row)->getValue();
+
+						if ($facturaIni !== $num_factura) {
+							$facturaIni = $num_factura;
+
+							$data = array(
+								'num_factura' => $num_factura,
+								'num_file'    => $_POST['c807_file']);
+
+							$cantidad = $this->Subir_archivos_model->existe_factura($data);
+
+							if ($cantidad->cantidad == 0) {
+								$existe_Factura = 'N';
+							} else {
+								$existe_Factura = 'S';
+							}
+
+						}
+
+
 					}
 				}
 
@@ -85,6 +103,7 @@ class Subir_Archivo extends CI_Controller {
 					$_SESSION["no_clasificado"] = 'Factuta ya fue Procesada al file '. $_POST['c807_file'];
 					redirect("subir_archivo");
 				} else {
+
 					foreach($object->getWorksheetIterator() as $worksheet) {
 						$highestRow    = $worksheet->getHighestRow();
 						$highestColumn = $worksheet->getHighestColumn();
@@ -92,12 +111,18 @@ class Subir_Archivo extends CI_Controller {
 						for($row=2; $row<=$highestRow; $row++) {
 							$num_factura     = $worksheet->getCellByColumnAndRow(0, $row)->getValue();
 							$codigo          = $worksheet->getCellByColumnAndRow(1, $row)->getValue();
-							$descripcion     = $worksheet->getCellByColumnAndRow(2, $row)->getValue();
-							$pais_origen     = $worksheet->getCellByColumnAndRow(3, $row)->getValue();
-							$unidades        = $worksheet->getCellByColumnAndRow(4, $row)->getValue();
-							$precio_unitario = $worksheet->getCellByColumnAndRow(5, $row)->getValue();
-							$total           = $worksheet->getCellByColumnAndRow(6, $row)->getValue();
-							$tlc             = $worksheet->getCellByColumnAndRow(7, $row)->getValue();
+							$proveedor       = $worksheet->getCellByColumnAndRow(2, $row)->getValue();
+							$descripcion     = $worksheet->getCellByColumnAndRow(3, $row)->getValue();
+							$pais_origen     = $worksheet->getCellByColumnAndRow(4, $row)->getValue();
+							$unidades        = $worksheet->getCellByColumnAndRow(5, $row)->getValue();
+							$precio_unitario = $worksheet->getCellByColumnAndRow(6, $row)->getValue();
+							$total           = $worksheet->getCellByColumnAndRow(7, $row)->getValue();
+							$tlc             = $worksheet->getCellByColumnAndRow(8, $row)->getValue();
+
+							//var_dump($num_factura);
+							//var_dump($codigo);
+							//var_dump($proveedor);
+							//die();
 
 							if ($tlc == null )
 							{
@@ -108,6 +133,7 @@ class Subir_Archivo extends CI_Controller {
 									'num_factura'     => $num_factura,
 									'id_file'         => $id_file->id,
 									'codigo_producto' => $codigo,
+									'proveedor'       => $proveedor,
 									'descripcion'     => $descripcion,
 									'pais_origen'     => $pais_origen,
 									'cuantia'         => $unidades,
@@ -129,20 +155,24 @@ class Subir_Archivo extends CI_Controller {
 					redirect("subir_archivo?file={$id_file->id}&contador={$contador}&c807_file={$_POST['c807_file']}");
 				}
 			}
+		}else
+		{
+			$_SESSION["no_clasificado"] = "Error al subir el archivo";
+			redirect("subir_archivo");
 		}
  	}
 
 
 	public function clasificar_productos()
 	{
+		if (isset($_GET['c807_file'])) {
+			$id_file = $this->Subir_archivos_model->obtener_datos_file($_GET['c807_file']);
+			$data = array('id_file' => $id_file->id, 'id_usuario_clasificador' => $_SESSION["UserID"], 'fecha' =>  0);
+			$this->Subir_archivos_model->crear_listado_polizas($data);
+		}
 
-		$id_file = $this->Subir_archivos_model->obtener_datos_file($_GET['c807_file']);
-		$data = array('id_file' => $id_file->id, 'id_usuario_clasificador' => 2);
-		$this->Subir_archivos_model->crear_listado_polizas($data);
+		$this->datos["c807_file"] = (isset($_GET['c807_file'])) ? $_GET['c807_file'] : '';
 
-
-
-		$this->datos["c807_file"] = $_GET['c807_file'];
 		$this->datos["vista"] = 'subir_archivos/clasificar_productos';
 		$this->load->view("principal", $this->datos);
 	}
@@ -175,6 +205,7 @@ class Subir_Archivo extends CI_Controller {
 		$cod_importador = $this->Subir_archivos_model->obtener_datos_file($num_file);
 
 		enviarJson(array(
+			'proveedor'       => $datos->proveedor,
 			'num_factura'     => $datos->num_factura,
 			'codigo_producto' => $datos->codigo_producto,
 			'descripcion'     => $datos->descripcion,
@@ -189,21 +220,26 @@ class Subir_Archivo extends CI_Controller {
 //		var_dump($_POST["importador".$id_reg]);
 //		die();
 
-		if (isset($_POST["partida_arancelaria".$id_reg]) && strlen(trim($_POST["partida_arancelaria".$id_reg])) > 0) {
+		if (isset($_POST["partida_arancelaria".$id_reg]) && strlen(trim($_POST["partida_arancelaria".$id_reg])) > 0
+		 && isset($_POST["descripcion_generica".$id_reg]) && strlen(trim($_POST["descripcion_generica".$id_reg])) > 0
+		) {
 		//if (isset($partida_arancelaria) && strlen(trim($partida_arancelaria)) > 0) {
 			//$this->Subir_archivos_model->insertar_partida($_POST, $id_reg);
 			//crear arreglo con los campo a pasar
 
 			$datos = array(
-					'importador'          => str_replace('-' ,'',$_POST["importador".$id_reg]),
-					'codigo_producto'     => $_POST["codigo_producto".$id_reg],
-					'descripcion'         => $_POST["descripcion".$id_reg],
-					'partida_arancelaria' => $_POST["partida_arancelaria".$id_reg]
+					'importador'           => str_replace('-' ,'',$_POST["importador".$id_reg]),
+					'codigo_producto'      => $_POST["codigo_producto".$id_reg],
+					'descripcion'          => $_POST["descripcion".$id_reg],
+					'partida_arancelaria'  => $_POST["partida_arancelaria".$id_reg],
+					'codigo_extendido'     => $_POST["codigo_extendido".$id_reg],
+					'descripcion_generica' => $_POST["descripcion_generica".$id_reg],
+					'usuario'              => $_SESSION["UserID"]
 			);
 
 			$this->Subir_archivos_model->insertar_partida($datos);
 		} else {
-			enviarJson(array('mensaje' => 'Error, falta la partida arancelaria.'));
+			enviarJson(array('mensaje' => 'Error, falta la partida arancelaria o descripción generica.'));
 		}
 	}
 
@@ -216,7 +252,10 @@ class Subir_Archivo extends CI_Controller {
 
 	public function generar_excel()
 	{
-		if(isset($_GET["c807_file"]) &&  isset($_GET["doc_transporte"]) && isset($_GET["tot_bultos"]) && isset($_GET["tot_kilos"])){
+
+		if(isset($_GET["c807_file"]) &&  isset($_GET["doc_transporte"]) && isset($_GET["tot_bultos"]) && isset($_GET["tot_kilos"])
+		   && strlen(trim($_GET["c807_file"])) > 0  && strlen(trim($_GET["doc_transporte"])) > 0  && strlen(trim($_GET["tot_bultos"])) > 0
+		   && strlen(trim($_GET["tot_kilos"])) > 0 )   {
 
 			$this->datos['cliente'] = $this->Subir_archivos_model->obtener_datos_file($_GET ["c807_file"]);
 			$registros   = $this->Subir_archivos_model->generar_excel($_GET ["c807_file"] , $_GET['doc_transporte']);
@@ -230,7 +269,7 @@ class Subir_Archivo extends CI_Controller {
 						->setSubject("Office 2007 XLSX Test Document")
 						->setDescription("Test document for Office 2007 XLSX, generated using PHP classes.")
 						->setKeywords("office 2007 openxml php")
-						->setCategory("Test venta");
+						->setCategory("Poliza");
 
 			$pos = 1;
 			if ($registros) {
@@ -258,9 +297,14 @@ class Subir_Archivo extends CI_Controller {
 
 							if (isset($this->datos['partida']))	{
 								$paises = $this->Subir_archivos_model->traer_paises($this->datos);
+
+								//var_dump($this->datos['partida']);
+								//var_dump($paises);
+								//die();
+
 								for ($i=0; $i < count($paises) ; $i++) {
 									foreach ($paises[$i] as $key => $value) {
-										$det_Paises = $det_Paises . $value . " ";
+										$det_Paises = $det_Paises . $value . ",";
 									}
 								}
 							}
@@ -270,33 +314,91 @@ class Subir_Archivo extends CI_Controller {
 					}
 				}
 
+				//Traer todas las descripcion de los productos
+				//se usar la descripcion generica digitada por el clasificador
+			/* 	$descripcion = "";
+				$det_descripcion = "";
+				foreach ($registros as $item ) {
+					$this->datos['partida'] = $item->partida;
+					$this->datos['tlc'] = $item->tlc;
+					$descripcion = $this->Subir_archivos_model->traer_descripcion_productos($this->datos);
+
+					foreach($descripcion as $value) {
+						$det_descripcion = $det_descripcion . $value->descripcion . ",";
+					}
+
+					$item->descripcion = $det_descripcion;
+					$det_descripcion = "";
+				} */
+
+				$bulto_por_partida = $_GET["tot_bultos"] / count($registros);
+				$peso_por_partida  = $_GET["tot_kilos"] / count($registros);
+
+				//Calculo de Flete, Seguro y Otros
+				$cuantia_Paquete = 0;
+				$fob_Paquete     = 0;
+				$flete_Paquete   = 0;
+				$seguro_Paquete  = 0;
+				$otros_Paquete   = 0;
+
+				$cuantia_paq_calculado  = 0;
+				$flete_paq_calculado    = 0;
+				$seguro_paq_calculado   = 0;
+				$otros_paq_calculado    = 0;
+				$peso_bruto_calculado   = 0;
+
 				for ($x = 0; $x < count($registros); $x++) {
-					$cuantia_Paquete = 0;
-					$fob_Paquete     = 0;
-					$flete_Paquete   = 0;
-					$seguro_Paquete  = 0;
-					$otros_Paquete   = 0;
 
 					foreach ($registros[$x]  as $item => $field) {
 						if ($item == 'cuantia') {
-							$cuantia_Paquete = round($field * $_POST["tot_bultos"] / $total_Cuantia,2);
-						}
+							$cuantia_Paquete = round($field * $_GET["tot_bultos"] / $total_Cuantia,2);
 
-						if ($item == 'numero_de_bultos') {
+							//segun el cuador de prorrateo de excel
 							$registros[$x]->numero_de_bultos  = $cuantia_Paquete;
+							$cuantia_paq_calculado           += $cuantia_Paquete;
 							$cuantia_Paquete = 0;
 						}
 
-						if ($item == 'fob') {
-							$fob_Paquete    = round($field * $_POST["tot_kilos"] / $total_fob,2);
-							$flete_Paquete  = round($_POST["flete"] / $total_fob * $field,2);
-							$seguro_Paquete = round($_POST["seguro"] / $total_fob * $field,2);
-							$otros_Paquete  = round($_POST["otros"] / $total_fob * $field,2);
+						if ($item == 'numero_de_bultos') {
+							//$registros[$x]->numero_de_bultos = $bulto_por_partida;
+
+							//segun el cuador de prorrateo de excel
+							//$registros[$x]->numero_de_bultos  = $cuantia_Paquete;
+							//$cuantia_paq_calculado += $cuantia_Paquete;
+							//$cuantia_Paquete = 0;
 						}
-						if ($item == 'peso_bruto'){
+
+						if ($item == 'fob') {
+							$fob_Paquete    = round($field * $_GET["tot_kilos"] / $total_fob,2);
+
+
+							//(isset($_GET['c807_file'])) ? $_GET['c807_file'] : '';
+
+						 	$flete_Paquete  = round((isset($_GET['flete'])) ? $_GET['flete'] : 0 / $total_fob * $field,2);
+							$seguro_Paquete = round((isset($_GET['seguro'])) ? $_GET['seguro'] : 0 / $total_fob * $field,2);
+							$otros_Paquete  = round((isset($_GET['otros'])) ? $_GET['otros'] : 0 / $total_fob * $field,2);
+
+							$flete_paq_calculado    += $flete_Paquete;
+							$seguro_paq_calculado   += $seguro_Paquete;
+							$otros_paq_calculado    += $otros_Paquete;
+
+							//segun el cuadro de excel de prorrateo
 							$registros[$x]->peso_bruto  = $fob_Paquete;
+							$registros[$x]->peso_neto   = $fob_Paquete;
+							$peso_bruto_calculado       += $fob_Paquete;
 							$fob_Paquete = 0;
 						}
+
+						 if ($item == 'peso_bruto'){
+							//$registros[$x]->peso_bruto = $peso_por_partida;
+
+							//segun el cuadro de excel de prorrateo
+							//$registros[$x]->peso_bruto  = $fob_Paquete;
+							//$registros[$x]->peso_neto   = $fob_Paquete;
+							//$peso_bruto_calculado       += $fob_Paquete;
+							//$fob_Paquete = 0;
+						}
+
 						if ($item == 'flete'){
 							$registros[$x]->flete  = $flete_Paquete;
 							$flete_Paquete = 0;
@@ -322,7 +424,7 @@ class Subir_Archivo extends CI_Controller {
 							$tot_Gastos += $field;
 						}
 						if ($item == 'otros') {
-							$tot_gastos += $field;
+							$tot_Gastos += $field;
 						}
 						if ($item == 'cif') {
 							$registros[$x]->cif  += $tot_Gastos;
@@ -330,6 +432,53 @@ class Subir_Archivo extends CI_Controller {
 						}
 					}
 				}
+
+
+				//Ajustar datos de Prorrateo
+
+				$registros[0]->numero_de_bultos = $registros[0]->numero_de_bultos + $_GET["tot_bultos"] - $cuantia_paq_calculado;
+				$registros[0]->peso_bruto       = $registros[0]->peso_bruto + $_GET["tot_kilos"] - $peso_bruto_calculado;
+				$registros[0]->peso_neto        = $registros[0]->peso_neto  + $_GET["tot_kilos"] - $peso_bruto_calculado;
+
+				$registros[0]->flete            = $registros[0]->flete - $_GET["flete"] + $flete_paq_calculado;
+				$registros[0]->seguro           = $registros[0]->seguro + $_GET["seguro"] - $seguro_paq_calculado;
+				$registros[0]->otros            = $registros[0]->otros + $_GET["otros"] - $otros_paq_calculado;
+				//var_dump($_GET["tot_bultos"]);
+				//var_dump($cuantia_paq_calculado);
+
+
+
+				/* if ($_GET["tot_bultos"] > $cuantia_paq_calculado) {
+					$registros[0]->numero_de_bultos = $registros[0]->numero_de_bultos + $_GET["tot_bultos"] - $cuantia_paq_calculado;
+				}else{
+					$registros[0]->numero_de_bultos = $registros[0]->numero_de_bultos + $_GET["tot_bultos"] - $cuantia_paq_calculado;
+				}
+
+				if ($_GET["tot_kilos"] > $peso_bruto_calculado) {
+					$registros[0]->peso_bruto = $registros[0]->peso_bruto + $_GET["tot_kilos"] - $peso_bruto_calculado;
+					$registros[0]->peso_neto  = $registros[0]->peso_neto  + $_GET["tot_kilos"] - $peso_bruto_calculado;
+				}else{
+					$registros[0]->peso_bruto = $registros[0]->peso_bruto - $_GET["tot_kilos"] + $peso_bruto_calculado;
+					$registros[0]->peso_neto  = $registros[0]->peso_neto  - $_GET["tot_kilos"] + $peso_bruto_calculado;
+				}
+
+				if ($_GET["flete"] > $flete_paq_calculado) {
+					$registros[0]->flete = $registros[0]->flete + $_GET["flete"] - $flete_paq_calculado;
+				}else{
+					$registros[0]->flete = $registros[0]->flete - $_GET["flete"] + $flete_paq_calculado;
+				}
+
+				if ($_GET["seguro"] > $seguro_paq_calculado) {
+					$registros[0]->seguro = $registros[0]->seguro + $_GET["seguro"] - $seguro_paq_calculado;
+				}else{
+					$registros[0]->seguro = $registros[0]->seguro - $_GET["seguro"] + $seguro_paq_calculado;
+				}
+
+				if ($_GET["otros"] > $otros_paq_calculado) {
+					$registros[0]->otros = $registros[0]->otros + $_GET["otros"] - $otros_paq_calculado;
+				}else{
+					$registros[0]->otros = $registros[0]->otros - $_GET["otros"] + $otros_paq_calculado;
+				}  */
 
 				//Actualizar Numero de Fila en el excel
 				for ($x = 0; $x < count($registros); $x++) {
@@ -342,22 +491,25 @@ class Subir_Archivo extends CI_Controller {
 
 				//Actualizar Linea de Agrupacion de DPR
 				$num_linea = 0;
-				$tlc = 0;
+				$tlc       = 0;
+				$partida   = "";
 				for ($x = 0; $x < count($registros); $x++) {
 					foreach ($registros[$x]  as $item => $field) {
-						if ($item == 'linea') {
-							$num_linea = $field;
-						}
 						if ($item == 'tlc') {
 							$tlc = $field;
 						}
 						if ($item == 'partida') {
+							$partida = $field;
+						}
+						if ($item == 'linea') {
+							$num_linea = $field;
 							//Actualziar pasar numero de file y partida y numero de linea
 							//$field es el codigo de partida arancelaria
-							 $this->Subir_archivos_model->actualizar_linea_agrupacion($_GET["c807_file"] , $field , $num_linea, $tlc);
+							$this->Subir_archivos_model->actualizar_linea_agrupacion($_GET["c807_file"] , $partida , $num_linea, $tlc);
 						}
 					}
 				}
+
 
 				for ($x = 0; $x < count($registros); $x++) {
 					if ($x == 0) {
@@ -400,8 +552,564 @@ class Subir_Archivo extends CI_Controller {
 			exit;
 
 
+		}else{
+			$this->datos["vista"] = "subir_archivos/generar_archivo_clasificado";
+			$this->load->view('principal', $this->datos);
 		}
 	}
+
+
+	public function generar_excel_sidunea()
+	{
+
+		if(isset($_GET["c807_file"]) &&  isset($_GET["doc_transporte"]) && isset($_GET["tot_bultos"]) && isset($_GET["tot_kilos"])
+		   && strlen(trim($_GET["c807_file"])) > 0  && strlen(trim($_GET["doc_transporte"])) > 0  && strlen(trim($_GET["tot_bultos"])) > 0
+		   && strlen(trim($_GET["tot_kilos"])) > 0 )   {
+
+			$this->datos['cliente'] = $this->Subir_archivos_model->obtener_datos_file($_GET ["c807_file"]);
+			$registros   = $this->Subir_archivos_model->generar_excel_sidunea($_GET ["c807_file"] , $_GET['doc_transporte']);
+
+			$objPHPExcel = new PHPExcel();
+
+			$objPHPExcel->getProperties()
+						->setCreator("IMPALA - C807")
+						->setLastModifiedBy("Maarten Balliauw")
+						->setTitle("Office 2007 XLSX Test Document")
+						->setSubject("Office 2007 XLSX Test Document")
+						->setDescription("Test document for Office 2007 XLSX, generated using PHP classes.")
+						->setKeywords("office 2007 openxml php")
+						->setCategory("Poliza");
+
+			$pos = 1;
+			if ($registros) {
+				$total_Cuantia = 0;
+				$total_fob     = 0;
+
+				for ($x = 0; $x < count($registros); $x++) {
+					foreach ($registros[$x]  as $item => $field) {
+						if ($item == 'supplementaryunits') {
+							$total_Cuantia += $field;
+						}
+						if ($item == 'fob') {
+							$total_fob += $field;
+						}
+					}
+				}
+
+				for ($x = 0; $x < count($registros); $x++) {
+					foreach ($registros[$x]  as $item => $field) {
+						if ($item == 'partida') {
+							$this->datos['partida'] = $field;
+						}
+						if ($item == 'countryoforigin') {
+							$det_Paises = '';
+
+							if (isset($this->datos['partida']))	{
+								$paises = $this->Subir_archivos_model->traer_paises($this->datos);
+
+								//var_dump($this->datos['partida']);
+								//var_dump($paises);
+								//die();
+
+								for ($i=0; $i < count($paises) ; $i++) {
+									foreach ($paises[$i] as $key => $value) {
+										$det_Paises = $det_Paises . $value . ",";
+									}
+								}
+							}
+
+							$registros[$x]->countryoforigin = $det_Paises;
+						}
+					}
+				}
+
+				//Traer todas las descripcion de los productos
+				//se usar la descripcion generica digitada por el clasificador
+			/* 	$descripcion = "";
+				$det_descripcion = "";
+				foreach ($registros as $item ) {
+					$this->datos['partida'] = $item->partida;
+					$this->datos['tlc'] = $item->tlc;
+					$descripcion = $this->Subir_archivos_model->traer_descripcion_productos($this->datos);
+
+					foreach($descripcion as $value) {
+						$det_descripcion = $det_descripcion . $value->descripcion . ",";
+					}
+
+					$item->descripcion = $det_descripcion;
+					$det_descripcion = "";
+				} */
+
+				$bulto_por_partida = $_GET["tot_bultos"] / count($registros);
+				$peso_por_partida  = $_GET["tot_kilos"] / count($registros);
+
+				//Calculo de Flete, Seguro y Otros
+				$cuantia_Paquete = 0;
+				$fob_Paquete     = 0;
+				$flete_Paquete   = 0;
+				$seguro_Paquete  = 0;
+				$otros_Paquete   = 0;
+
+				$cuantia_paq_calculado  = 0;
+				$flete_paq_calculado    = 0;
+				$seguro_paq_calculado   = 0;
+				$otros_paq_calculado    = 0;
+				$peso_bruto_calculado   = 0;
+
+				for ($x = 0; $x < count($registros); $x++) {
+
+					foreach ($registros[$x]  as $item => $field) {
+						if ($item == 'supplementaryunits') {
+							$cuantia_Paquete = round($field * $_GET["tot_bultos"] / $total_Cuantia,2);
+
+							//segun el cuador de prorrateo de excel
+							//$registros[$x]->numero_de_bultos  = $cuantia_Paquete;
+							$cuantia_paq_calculado           += $cuantia_Paquete;
+							$cuantia_Paquete = 0;
+						}
+
+						if ($item == 'numero_de_bultos') {
+							//$registros[$x]->numero_de_bultos = $bulto_por_partida;
+
+							//segun el cuador de prorrateo de excel
+							//$registros[$x]->numero_de_bultos  = $cuantia_Paquete;
+							//$cuantia_paq_calculado += $cuantia_Paquete;
+							//$cuantia_Paquete = 0;
+						}
+
+						if ($item == 'fob') {
+							$fob_Paquete    = round($field * $_GET["tot_kilos"] / $total_fob,2);
+
+
+							//(isset($_GET['c807_file'])) ? $_GET['c807_file'] : '';
+
+						 	$flete_Paquete  = round((isset($_GET['flete'])) ? $_GET['flete'] : 0 / $total_fob * $field,2);
+							$seguro_Paquete = round((isset($_GET['seguro'])) ? $_GET['seguro'] : 0 / $total_fob * $field,2);
+							$otros_Paquete  = round((isset($_GET['otros'])) ? $_GET['otros'] : 0 / $total_fob * $field,2);
+
+							$flete_paq_calculado    += $flete_Paquete;
+							$seguro_paq_calculado   += $seguro_Paquete;
+							$otros_paq_calculado    += $otros_Paquete;
+
+							//segun el cuadro de excel de prorrateo
+							$registros[$x]->grossmass   = $fob_Paquete;
+							$registros[$x]->netweight   = $fob_Paquete;
+							$peso_bruto_calculado       += $fob_Paquete;
+							$fob_Paquete = 0;
+						}
+
+						 if ($item == 'peso_bruto'){
+							//$registros[$x]->peso_bruto = $peso_por_partida;
+
+							//segun el cuadro de excel de prorrateo
+							//$registros[$x]->peso_bruto  = $fob_Paquete;
+							//$registros[$x]->peso_neto   = $fob_Paquete;
+							//$peso_bruto_calculado       += $fob_Paquete;
+							//$fob_Paquete = 0;
+						}
+
+						if ($item == 'flete'){
+							$registros[$x]->flete  = $flete_Paquete;
+							$flete_Paquete = 0;
+						}
+						if ($item == 'seguro'){
+							$registros[$x]->seguro  = $seguro_Paquete;
+							$seguro_Paquete = 0;
+						}
+						if ($item == 'otros'){
+							$registros[$x]->otros  = $otros_Paquete;
+							$otros_Paquete = 0;
+						}
+					}
+				}
+
+				$tot_Gastos = 0;
+				for ($x = 0; $x < count($registros); $x++) {
+					foreach ($registros[$x]  as $item => $field) {
+						if ($item == 'flete') {
+							$tot_Gastos = $field;
+						}
+						if ($item == 'seguro') {
+							$tot_Gastos += $field;
+						}
+						if ($item == 'otros') {
+							$tot_Gastos += $field;
+						}
+						if ($item == 'cif') {
+							$registros[$x]->cif  += $tot_Gastos;
+							$tot_Gastos  = 0;
+						}
+					}
+				}
+
+
+				//Ajustar datos de Prorrateo
+
+				//$registros[0]->numero_de_bultos = $registros[0]->numero_de_bultos + $_GET["tot_bultos"] - $cuantia_paq_calculado;
+				$registros[0]->grossmass       = $registros[0]->grossmass + $_GET["tot_kilos"] - $peso_bruto_calculado;
+				$registros[0]->netweight       = $registros[0]->netweight + $_GET["tot_kilos"] - $peso_bruto_calculado;
+/*
+				$registros[0]->flete            = $registros[0]->flete - $_GET["flete"] + $flete_paq_calculado;
+				$registros[0]->seguro           = $registros[0]->seguro + $_GET["seguro"] - $seguro_paq_calculado;
+				$registros[0]->otros            = $registros[0]->otros + $_GET["otros"] - $otros_paq_calculado; */
+
+
+
+
+				//Actualizar Numero de Fila en el excel
+				for ($x = 0; $x < count($registros); $x++) {
+					foreach ($registros[$x]  as $item => $field) {
+						if ($item == 'itemnumber') {
+							$registros[$x]->itemnumber = $x+1;
+						}
+					}
+				}
+
+				//Actualizar Linea de Agrupacion de DPR
+				$num_linea = 0;
+				$tlc       = 0;
+				$partida   = "";
+				for ($x = 0; $x < count($registros); $x++) {
+					foreach ($registros[$x]  as $item => $field) {
+						if ($item == 'tlc') {
+							$tlc = $field;
+						}
+						if ($item == 'partida') {
+							$partida = $field;
+						}
+						if ($item == 'itemnumber') {
+							$num_linea = $field;
+							//Actualziar pasar numero de file y partida y numero de linea
+							//$field es el codigo de partida arancelaria
+							$this->Subir_archivos_model->actualizar_linea_agrupacion($_GET["c807_file"] , $partida , $num_linea, $tlc);
+						}
+					}
+				}
+
+
+				for ($x = 0; $x < count($registros); $x++) {
+					if ($x == 0) {
+						$datos = array();
+						foreach ($registros[$x]  as $item => $field) {
+							$datos[] = $item;
+						}
+						$objPHPExcel->getActiveSheet()->fromArray($datos, NULL, "A{$pos}");
+						$pos += 1;
+					}
+
+					$datos = array();
+					foreach ($registros[$x]  as $item => $field) {
+						$datos[] = $field;
+					}
+					$objPHPExcel->getActiveSheet()->fromArray($datos, NULL, "A{$pos}");
+					$pos += 1;
+				}
+			}
+
+
+			$objPHPExcel->getActiveSheet()->setTitle('Hoja1');
+			$objPHPExcel->setActiveSheetIndex(0);
+
+			header('Content-Type: application/vnd.ms-excel');
+			header('Content-Disposition: attachment;filename='.$_GET ["c807_file"].'.xls');
+			header('Cache-Control: max-age=0');
+			header('Cache-Control: max-age=1');
+			header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+			header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+			header('Cache-Control: cache, must-revalidate');
+			header('Pragma: public');
+
+			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+			ob_end_clean();
+			$objWriter->save('php://output');
+
+
+
+			exit;
+
+
+		}else{
+			$this->datos["vista"] = "subir_archivos/generar_archivo_clasificado";
+			$this->load->view('principal', $this->datos);
+		}
+	}
+
+	public function generar_excel_dva()
+	{
+
+		if(isset($_GET["c807_file"]) &&  isset($_GET["doc_transporte"]) && isset($_GET["tot_bultos"]) && isset($_GET["tot_kilos"])
+		   && strlen(trim($_GET["c807_file"])) > 0  && strlen(trim($_GET["doc_transporte"])) > 0  && strlen(trim($_GET["tot_bultos"])) > 0
+		   && strlen(trim($_GET["tot_kilos"])) > 0 )   {
+
+			$this->datos['cliente'] = $this->Subir_archivos_model->obtener_datos_file($_GET ["c807_file"]);
+			$registros   = $this->Subir_archivos_model->generar_excel_dva($_GET ["c807_file"] , $_GET['doc_transporte']);
+
+			$objPHPExcel = new PHPExcel();
+
+			$objPHPExcel->getProperties()
+						->setCreator("IMPALA - C807")
+						->setLastModifiedBy("Maarten Balliauw")
+						->setTitle("Office 2007 XLSX Test Document")
+						->setSubject("Office 2007 XLSX Test Document")
+						->setDescription("Test document for Office 2007 XLSX, generated using PHP classes.")
+						->setKeywords("office 2007 openxml php")
+						->setCategory("Poliza");
+
+			$pos = 1;
+			if ($registros) {
+				$total_Cuantia = 0;
+				$total_fob     = 0;
+
+				for ($x = 0; $x < count($registros); $x++) {
+					foreach ($registros[$x]  as $item => $field) {
+						if ($item == 'supplementaryunits') {
+							$total_Cuantia += $field;
+						}
+						if ($item == 'fob') {
+							$total_fob += $field;
+						}
+					}
+				}
+
+				for ($x = 0; $x < count($registros); $x++) {
+					foreach ($registros[$x]  as $item => $field) {
+						if ($item == 'partida') {
+							$this->datos['partida'] = $field;
+						}
+						if ($item == 'countryoforigin') {
+							$det_Paises = '';
+
+							if (isset($this->datos['partida']))	{
+								$paises = $this->Subir_archivos_model->traer_paises($this->datos);
+
+								//var_dump($this->datos['partida']);
+								//var_dump($paises);
+								//die();
+
+								for ($i=0; $i < count($paises) ; $i++) {
+									foreach ($paises[$i] as $key => $value) {
+										$det_Paises = $det_Paises . $value . ",";
+									}
+								}
+							}
+
+							$registros[$x]->countryoforigin = $det_Paises;
+						}
+					}
+				}
+
+				//Traer todas las descripcion de los productos
+				//se usar la descripcion generica digitada por el clasificador
+			/* 	$descripcion = "";
+				$det_descripcion = "";
+				foreach ($registros as $item ) {
+					$this->datos['partida'] = $item->partida;
+					$this->datos['tlc'] = $item->tlc;
+					$descripcion = $this->Subir_archivos_model->traer_descripcion_productos($this->datos);
+
+					foreach($descripcion as $value) {
+						$det_descripcion = $det_descripcion . $value->descripcion . ",";
+					}
+
+					$item->descripcion = $det_descripcion;
+					$det_descripcion = "";
+				} */
+
+				$bulto_por_partida = $_GET["tot_bultos"] / count($registros);
+				$peso_por_partida  = $_GET["tot_kilos"] / count($registros);
+
+				//Calculo de Flete, Seguro y Otros
+				$cuantia_Paquete = 0;
+				$fob_Paquete     = 0;
+				$flete_Paquete   = 0;
+				$seguro_Paquete  = 0;
+				$otros_Paquete   = 0;
+
+				$cuantia_paq_calculado  = 0;
+				$flete_paq_calculado    = 0;
+				$seguro_paq_calculado   = 0;
+				$otros_paq_calculado    = 0;
+				$peso_bruto_calculado   = 0;
+
+				for ($x = 0; $x < count($registros); $x++) {
+
+					foreach ($registros[$x]  as $item => $field) {
+						if ($item == 'supplementaryunits') {
+							$cuantia_Paquete = round($field * $_GET["tot_bultos"] / $total_Cuantia,2);
+
+							//segun el cuador de prorrateo de excel
+							//$registros[$x]->numero_de_bultos  = $cuantia_Paquete;
+							$cuantia_paq_calculado           += $cuantia_Paquete;
+							$cuantia_Paquete = 0;
+						}
+
+						if ($item == 'numero_de_bultos') {
+							//$registros[$x]->numero_de_bultos = $bulto_por_partida;
+
+							//segun el cuador de prorrateo de excel
+							//$registros[$x]->numero_de_bultos  = $cuantia_Paquete;
+							//$cuantia_paq_calculado += $cuantia_Paquete;
+							//$cuantia_Paquete = 0;
+						}
+
+						if ($item == 'fob') {
+							$fob_Paquete    = round($field * $_GET["tot_kilos"] / $total_fob,2);
+
+
+							//(isset($_GET['c807_file'])) ? $_GET['c807_file'] : '';
+
+						 	$flete_Paquete  = round((isset($_GET['flete'])) ? $_GET['flete'] : 0 / $total_fob * $field,2);
+							$seguro_Paquete = round((isset($_GET['seguro'])) ? $_GET['seguro'] : 0 / $total_fob * $field,2);
+							$otros_Paquete  = round((isset($_GET['otros'])) ? $_GET['otros'] : 0 / $total_fob * $field,2);
+
+							$flete_paq_calculado    += $flete_Paquete;
+							$seguro_paq_calculado   += $seguro_Paquete;
+							$otros_paq_calculado    += $otros_Paquete;
+
+							//segun el cuadro de excel de prorrateo
+							$registros[$x]->grossmass   = $fob_Paquete;
+							$registros[$x]->netweight   = $fob_Paquete;
+							$peso_bruto_calculado       += $fob_Paquete;
+							$fob_Paquete = 0;
+						}
+
+						 if ($item == 'peso_bruto'){
+							//$registros[$x]->peso_bruto = $peso_por_partida;
+
+							//segun el cuadro de excel de prorrateo
+							//$registros[$x]->peso_bruto  = $fob_Paquete;
+							//$registros[$x]->peso_neto   = $fob_Paquete;
+							//$peso_bruto_calculado       += $fob_Paquete;
+							//$fob_Paquete = 0;
+						}
+
+						if ($item == 'flete'){
+							$registros[$x]->flete  = $flete_Paquete;
+							$flete_Paquete = 0;
+						}
+						if ($item == 'seguro'){
+							$registros[$x]->seguro  = $seguro_Paquete;
+							$seguro_Paquete = 0;
+						}
+						if ($item == 'otros'){
+							$registros[$x]->otros  = $otros_Paquete;
+							$otros_Paquete = 0;
+						}
+					}
+				}
+
+				$tot_Gastos = 0;
+				for ($x = 0; $x < count($registros); $x++) {
+					foreach ($registros[$x]  as $item => $field) {
+						if ($item == 'flete') {
+							$tot_Gastos = $field;
+						}
+						if ($item == 'seguro') {
+							$tot_Gastos += $field;
+						}
+						if ($item == 'otros') {
+							$tot_Gastos += $field;
+						}
+						if ($item == 'cif') {
+							$registros[$x]->cif  += $tot_Gastos;
+							$tot_Gastos  = 0;
+						}
+					}
+				}
+
+
+				//Ajustar datos de Prorrateo
+
+				//$registros[0]->numero_de_bultos = $registros[0]->numero_de_bultos + $_GET["tot_bultos"] - $cuantia_paq_calculado;
+				$registros[0]->grossmass       = $registros[0]->grossmass + $_GET["tot_kilos"] - $peso_bruto_calculado;
+				$registros[0]->netweight       = $registros[0]->netweight + $_GET["tot_kilos"] - $peso_bruto_calculado;
+/*
+				$registros[0]->flete            = $registros[0]->flete - $_GET["flete"] + $flete_paq_calculado;
+				$registros[0]->seguro           = $registros[0]->seguro + $_GET["seguro"] - $seguro_paq_calculado;
+				$registros[0]->otros            = $registros[0]->otros + $_GET["otros"] - $otros_paq_calculado; */
+
+
+
+
+				//Actualizar Numero de Fila en el excel
+				for ($x = 0; $x < count($registros); $x++) {
+					foreach ($registros[$x]  as $item => $field) {
+						if ($item == 'itemnumber') {
+							$registros[$x]->itemnumber = $x+1;
+						}
+					}
+				}
+
+				//Actualizar Linea de Agrupacion de DPR
+				//en DVA NO aplica este clasificacion para rayado
+		/* 		$num_linea = 0;
+				$tlc       = 0;
+				$partida   = "";
+				for ($x = 0; $x < count($registros); $x++) {
+					foreach ($registros[$x]  as $item => $field) {
+						if ($item == 'tlc') {
+							$tlc = $field;
+						}
+						if ($item == 'partida') {
+							$partida = $field;
+						}
+						if ($item == 'itemnumber') {
+							$num_linea = $field;
+							//Actualziar pasar numero de file y partida y numero de linea
+							//$field es el codigo de partida arancelaria
+							$this->Subir_archivos_model->actualizar_linea_agrupacion($_GET["c807_file"] , $partida , $num_linea, $tlc);
+						}
+					}
+				} */
+
+
+				for ($x = 0; $x < count($registros); $x++) {
+					if ($x == 0) {
+						$datos = array();
+						foreach ($registros[$x]  as $item => $field) {
+							$datos[] = $item;
+						}
+						$objPHPExcel->getActiveSheet()->fromArray($datos, NULL, "A{$pos}");
+						$pos += 1;
+					}
+
+					$datos = array();
+					foreach ($registros[$x]  as $item => $field) {
+						$datos[] = $field;
+					}
+					$objPHPExcel->getActiveSheet()->fromArray($datos, NULL, "A{$pos}");
+					$pos += 1;
+				}
+			}
+
+
+			$objPHPExcel->getActiveSheet()->setTitle('Hoja1');
+			$objPHPExcel->setActiveSheetIndex(0);
+
+			header('Content-Type: application/vnd.ms-excel');
+			header('Content-Disposition: attachment;filename='.$_GET ["c807_file"].'.xls');
+			header('Cache-Control: max-age=0');
+			header('Cache-Control: max-age=1');
+			header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+			header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+			header('Cache-Control: cache, must-revalidate');
+			header('Pragma: public');
+
+			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+			ob_end_clean();
+			$objWriter->save('php://output');
+
+
+
+			exit;
+
+
+		}else{
+			$this->datos["vista"] = "subir_archivos/generar_archivo_clasificado";
+			$this->load->view('principal', $this->datos);
+		}
+	}
+
 
 
 	public function consulta_producto_file()
@@ -415,7 +1123,7 @@ class Subir_Archivo extends CI_Controller {
 	public function generar_rayado()
 	{
 
-		if(isset($_GET["c807_file"]) ){
+		if(isset($_GET["c807_file"]) && !empty($_GET["c807_file"]) ){
 			$registros   = $this->Subir_archivos_model->generar_rayado($_GET["c807_file"]);
 
 			include getcwd() . "/application/libraries/fpdf/fpdf.php";
@@ -437,12 +1145,12 @@ class Subir_Archivo extends CI_Controller {
 			*/
 
 			$this->pdf->SetTitle("Rayado de Factura");
-			$this->pdf->SetLeftMargin(15);
-			$this->pdf->SetRightMargin(15);
+			$this->pdf->SetLeftMargin(10);
+			$this->pdf->SetRightMargin(10);
 			$this->pdf->SetFillColor(200,200,200);
 
 			// Se define el formato de fuente: Arial, negritas, tamaño 9
-			$this->pdf->SetFont('Arial', 'B', 9);
+			$this->pdf->SetFont('Arial', 'B', 7);
 
 			///$this->pdf->Ln(7);
 			// La variable $x se utiliza para mostrar un número consecutivo
@@ -458,22 +1166,22 @@ class Subir_Archivo extends CI_Controller {
 						$this->pdf->Cell(160,7,'File Numero: '. $_GET["c807_file"], 0 ,0, 'C','0');
 						$this->pdf->Ln(7);
 
-						$this->pdf->Cell(12,7,'Linea','TBL',0,'C','1');
-						$this->pdf->Cell(45,7,'Producto','TB',0,'L','1');
-						$this->pdf->Cell(50,7,'Descripcion','TB',0,'L','1');
+						$this->pdf->Cell(10,7,'Linea','TBL',0,'C','1');
+						$this->pdf->Cell(20,7,'Producto','TB',0,'L','1');
+						$this->pdf->Cell(80,7,'Descripcion','TB',0,'L','1');
 						$this->pdf->Cell(30,7,'Factura','TB',0,'L','1');
 						$this->pdf->Cell(20,7,'Partida','TBR',0,'L','1');
-						$this->pdf->Cell(20,7,'TLC','TBR',0,'L','1');
+						$this->pdf->Cell(10,7,'TLC','TBR',0,'L','1');
 						$this->pdf->Ln(9);
 					}
 					$x +=1;
-					// Se imprimen los datos de cada alumno
-					$this->pdf->Cell(12,5,$item->linea, 0 , 0,'L',0);
-					$this->pdf->Cell(45,5,$item->Codigo_Producto, 0, 0,'L',0);
-					$this->pdf->Cell(50,5,$item->descripcion, 0 , 0,'L',0);
+					// Se imprimen los datos de cada producto
+					$this->pdf->Cell(10,5,$item->linea, 0 , 0,'L',0);
+					$this->pdf->Cell(20,5,$item->Codigo_Producto, 0, 0,'L',0);
+					$this->pdf->Cell(80,5,$item->descripcion, 0 , 0,'L',0);
 					$this->pdf->Cell(30,5,$item->num_factura, 0 , 0,'L',0);
 					$this->pdf->Cell(20,5,$item->partida, 0 , 0,'L',0);
-					$this->pdf->Cell(20,5,$item->tlc, 0 , 0,'L',0);
+					$this->pdf->Cell(10,5,$item->tlc, 0 , 0,'L',0);
 
 					$this->pdf->Ln(5);
 
@@ -485,6 +1193,10 @@ class Subir_Archivo extends CI_Controller {
 
 
 			$this->pdf->Output("Rayado.pdf", 'D');
+		}else{
+
+			$this->datos["vista"] = "subir_archivos/generar_archivo_clasificado";
+			$this->load->view('principal', $this->datos);
 
 		}
 	}
@@ -492,44 +1204,51 @@ class Subir_Archivo extends CI_Controller {
 
 	public function enviar_correo($opcion)
 	{
-		correo(); # Carga la libreria de correo
+
 		//$opcion 1 Aforador a Clasificador
 		//Buscar los usuario de tipo Clasificador en la base de datos de usuarios
-		$user = $this->Conf_model->dtusuario($_SESSION['UserID']);
+		//Obtener Listado de Usuarios a enviarle el correo
 		$texto  = "";
 		$asunto = "";
 		if ($opcion == 1){
 			$usuario = $this->Subir_archivos_model->buscar_usuarios($_GET['c807_file']);
 			$asunto = 'File Numero '. $_GET['c807_file']. ' para clasificacion';
-			$texto  = "<p> Se ha creado una nueva poliza en el sistema.</p>";
-			$mensaje = "El correo fue enviado al clasificador";
+			$texto  = "Se ha creado una nueva poliza en el sistema, para su clasificacion.";
 		}else{
 			$usuario = $this->Subir_archivos_model->buscar_usuario_aforador($_GET['c807_file']);
 			$asunto = 'File Numero '. $_GET['c807_file']. ' lista para declaracion';
-			$texto = "<p> Se ha finalizado la clasificacion de la poliza.</p>";
-			$mensaje = "El correo fue enviado al aforador";
+			$texto = "Se ha finalizado la clasificacion de la poliza.";
 		}
+
+
+		require(getcwd() . "../../enviar_correo.php");
 
 		$para = array();
 
 		foreach ($usuario as $item ) {
+			#$para = $para . $item->mail . ';';
 			$para[] = $item->mail;
 		}
 
-		//Obtener Listado de Usuarios a enviarle el correo
+		$user = $this->Conf_model->dtusuario($_SESSION["UserID"]);
 
- 		$correo = array(
+		enviarCorreo(array(
 			'de'     => array($user->mail, $user->nombre),
-			'para'   => array($para),
+			'para'   => $para,
 			'asunto' => $asunto,
-			'texto'  => $texto,
-			'copia'  => array("desarrollo2@c807.com"));
+			'texto'  => $texto
+		  ),2);
 
-			if (enviarCorreo($correo,2)) {
-				echo $mensaje;
-			} else {
-				echo "Error al enviar el correo";
-			}
+		#  mail($para, $asunto, $texto, "From: $user->mail" );
+		  //$this->enviar_email($correo);
+
+		  if ($opcion == 2)  {
+			$id_file = $this->Subir_archivos_model->obtener_datos_file($_GET['c807_file']);
+		  	$data = array('id_file' => $id_file->id, 'id_usuario_clasificador' => $_SESSION["UserID"], 'fecha' =>  1);
+		  	$this->Subir_archivos_model->crear_listado_polizas($data);
+		  }
+
+
 		}
 
 
@@ -540,6 +1259,18 @@ class Subir_Archivo extends CI_Controller {
 			$this->datos["vista"] = 'subir_archivos/listado_polizas';
 			$this->load->view("principal", $this->datos);
 		}
+
+		/* public function sendMailGmail()
+ 		{
+
+			$message = "prueba";
+			$header = "From: desarrollosv@c807.com";
+			mail("desarrollosv@c807.com","test", $message, $header);
+
+
+
+		} */
+
 
 
 

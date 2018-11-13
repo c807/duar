@@ -12,61 +12,62 @@ class Subir_archivos_model extends CI_Model {
 
     function consulta($id_file, $no_identificacion = null, $opcion = null)
     {
-
+        
 
         if (isset($no_identificacion))
             {
                 if ($opcion == 1)
                     {
 
-                        $query = $this->db
-                                      ->select("d.id , d.codigo_producto, d.descripcion, du.partida,  d.num_factura , d.tlc")
+                        $query = $this->db 
+                                      ->select("d.id , d.codigo_producto, d.descripcion,   d.num_factura , d.tlc , d.cuantia")
                                       ->join('duarx.dpr as d' , 'd.id_file =  f.id', 'inner')
                                       ->join('duarx.producto_importador as du', "du.codproducto = d.codigo_producto and du.importador = '$no_identificacion'", 'left')
                                       ->where('du.partida IS  NULL')
-                                      ->where('f.id', $id_file)
-                                      ->order_by('d.descripcion')
+                                      ->where('f.id', $id_file)                 
+                                      ->order_by('d.num_factura, d.id')
 					                  ->get('gacela.file as f')
                                      ->result();
                     } elseif ($opcion == 2) {
-                        $query = $this->db
-                                      ->select("d.id as Id , d.codigo_producto as 'Codigo Producto' , d.descripcion as Descripcion, du.partida as 'Partida Arancelaria',
-                                       d.num_factura as 'Numero Factura' , d.tlc as TLC, f.c807_file as 'File'  ")
+                        $query = $this->db 
+                                      ->select("d.id as Id , d.codigo_producto as 'Codigo Producto' , d.descripcion as Descripcion, du.partida as 'Partida Arancelaria', 
+                                       d.num_factura as 'Numero Factura' , d.tlc as TLC, f.c807_file as 'File' , d.cuantia, d.proveedor ")
                                       ->join('duarx.dpr as d' , 'd.id_file =  f.id', 'inner')
                                       ->join('duarx.producto_importador as du', "du.codproducto = d.codigo_producto and du.importador = '$no_identificacion'", 'left')
-                                      ->where('f.id', $id_file)
-                                      ->order_by('d.descripcion')
+                                      ->where('f.id', $id_file)                 
+                                      //->where('du.partida', '8708990000')                 
+                                      ->order_by('d.id')
 					                  ->get('gacela.file as f')
-                                     ->result();
+                                      ->result();
                     }  else {
                         //Verificar si archivo que se subio tiene productos SIN CLASIFICAR
-                        $query = $this->db
+                        $query = $this->db 
                                ->select("count(*) as cantidad")
                                ->join('duarx.dpr as d' , 'd.id_file =  f.id', 'inner')
                                ->join('duarx.producto_importador as du', "du.codproducto = d.codigo_producto and du.importador = '$no_identificacion'", 'left')
                                ->where('du.partida IS  NULL')
-                               ->where('f.id', $id_file)
+                               ->where('f.id', $id_file)                 
                                ->order_by('d.descripcion')
 				               ->get('gacela.file as f')
-                               ->result();
-
+                               ->result();    
+                        
                       /*   echo "Cantidad de Registro: ";
                         var_dump($query);
                         die(); */
-                    }
+                    }       
 
             }else {
 
 
-               /*  $query = $this->db
+               /*  $query = $this->db 
                               ->select("d.id , d.codigo_producto, d.descripcion")
                               ->join('duarx.dpr as d' , 'd.id_file =  f.id', 'inner')
                               //->join('duarx.producto_importador as du', 'du.codproducto = d.codigo_producto and du.importador = '.  $no_identificacion, 'left')
-                              ->where('f.id', $id_file)
+                              ->where('f.id', $id_file)                 
                               ->order_by('d.descripcion')
 					          ->get('gacela.file as f')
                               ->result(); */
-            }
+            }    
 
         return $query;
         //echo $this->db->last_query();exit();
@@ -79,7 +80,7 @@ class Subir_archivos_model extends CI_Model {
 
         //$importador = $this->obtener_datos_file($data['numero_file']);
         $importador = $this->obtener_datos_file($data['num_file']);
-
+        
         $query = $this->db
                 ->select('count(*) as cantidad')
                 ->where('id_file',$importador->id )
@@ -88,7 +89,7 @@ class Subir_archivos_model extends CI_Model {
                 ->get('duarx.dpr')
                 ->row();
 
-        return $query;
+        return $query;        
         //var_dump(intval($query->cantidad));
         //die();
     }
@@ -99,19 +100,45 @@ class Subir_archivos_model extends CI_Model {
         $this->db->insert('duarx.dpr', $data);
       }
 
+    /*   function insert_catalogo($data)
+
+      {
+        $this->db->insert('macfw.cuenta', $data);
+      } */
+
     function crear_listado_polizas($data)
     {
 
         if (isset($data['id_usuario_clasificador'])) {
+
+            date_default_timezone_set("America/Guatemala");
+            //0 es fecha de asignacion y 1 es finalizacion
+            $fecha = "";
+            if ($data['fecha'] == 0){
+                $fecha = 'lp.fecha_asignacion';
+            }else{
+                $fecha = 'lp.fecha_finalizacion';
+            }
+
             $this->db
                      ->set('lp.id_usuario_clasificador' , $data['id_usuario_clasificador'])
+                     ->set($fecha , date("Y/m/d h:i:s"))
                      ->where('lp.id_file' , $data['id_file'])
                      ->update('duarx.listado_polizas as lp');
         }else{
-            $this->db->insert('duarx.listado_polizas' , $data);
+
+            $query = $this->db
+                          ->select('count(*) as cantidad')
+                          ->where('lp.id_file' , $data['id_file'])
+                          ->get('duarx.listado_polizas as lp')
+                          ->result();
+     
+            if ($query[0]->cantidad == 0 ) {
+                $this->db->insert('duarx.listado_polizas' , $data);
+            }
+            
         }
-
-
+        
     }
 
     function polizas_no_clasificadas()
@@ -123,14 +150,14 @@ class Subir_archivos_model extends CI_Model {
                       ->get('duarx.listado_polizas as lp')
                       ->result();
 
-        return $query;
+        return $query;              
     }
 
-
+    
     function traer_informacion_producto($id_reg)
     {
         return  $this->db
-                     ->select('id , id_file  , codigo_producto, descripcion, num_factura')
+                     ->select('id , id_file  , codigo_producto, descripcion, num_factura, proveedor')
                      ->where('id' , $id_reg)
                      ->get('duarx.dpr')
                      ->row();
@@ -142,7 +169,7 @@ class Subir_archivos_model extends CI_Model {
         //grabar IMPORTADOR, CODIGO DE PRODUCTO, DESCRIPCION Y PARTIDA ARANCEARIA
         if (verDato($args, 'importador')) {
 			$datos['importador'] = $args['importador'];
-        }
+        } 
         if (verDato($args, 'codigo_producto')) {
 			$datos['codproducto'] = $args['codigo_producto'];
 		}
@@ -152,50 +179,106 @@ class Subir_archivos_model extends CI_Model {
         if (verDato($args, "partida_arancelaria")) {
 			$datos['partida'] = $args["partida_arancelaria"];
 		}
+        if (verDato($args, "codigo_extendido")) {
+			$datos['codigo_extendido'] = $args["codigo_extendido"];
+        }
+        if (verDato($args, "descripcion_generica")) {
+			$datos['descripcion_generica'] = $args["descripcion_generica"];
+        }
+        if (verDato($args, "usuario")) {
+			$datos['usuario'] = $args["usuario"];
+		}
 
         $this->db->insert('duarx.producto_importador', $datos);
 
     }
-
+    
     function generar_excel($numero_file, $doc_transporte)
-    {
-
+    {        
+        
         $importador = $this->obtener_datos_file($numero_file);
         $importador->no_identificacion = str_replace('-','',$importador->no_identificacion);
-
+        
         return  $this->db
-                    ->select(" 0 as linea,  '' as 'Codigo Producto', d.tlc as tlc, '' as acuerdo, '' as cuota,
-                    'S/M' as marca , 'S/N' as numero, du.partida, $doc_transporte as 'Documento de Transporte' , 'PK' AS 'Tipo Bulto',
-                    d.pais_origen as pais ,  sum(d.cuantia) as cuantia,  sum(d.total) as fob, 0 as  'peso_bruto' , 0 as 'peso_neto',
-                    0 as flete, 0 as seguro , 0 as otros, sum(d.total) as cif , 0 as 'numero_de_bultos', du.descripcion , '' as contenedor1
-                    , '' as contenedor2, '' as contenedor3, '' as contenedor4")
+                    ->select("  '' as 'Codigo Producto', d.tlc as tlc, '' as acuerdo, '' as cuota,
+                    'S/M' as marca , 'S/N' as numero, du.partida as partida,  '$doc_transporte' as 'Documento de Transporte' , 'PK' AS 'Tipo Bulto', 
+                    d.pais_origen as pais , 0 as  'peso_bruto' , 0 as 'peso_neto', sum(d.cuantia) as cuantia,  sum(d.total) as fob, 
+                    0 as flete, 0 as seguro , 0 as otros, sum(d.total) as cif , 0 as 'numero_de_bultos', du.descripcion_generica  as descripcion, '' as contenedor1
+                    , '' as contenedor2, '' as contenedor3, '' as contenedor4, du.codigo_extendido  , 0 as linea" )
                     ->join('duarx.dpr as d' , 'd.id_file =  f.id', 'inner')
                     ->join('duarx.producto_importador as du', "du.codproducto = d.codigo_producto and du.importador = '$importador->no_identificacion'"  , 'left')
                     ->where('f.c807_file' , $numero_file)
-                    ->group_by('du.partida , d.tlc')
+                    ->group_by('du.partida, du.codigo_extendido , d.tlc')             
                     ->order_by('du.partida ')
                     ->get('gacela.file as f')
                     ->result();
-            //echo $this->db->last_query();exit();
 
     }
+
+    function generar_excel_sidunea($numero_file, $doc_transporte)
+    {        
+        
+        $importador = $this->obtener_datos_file($numero_file);
+        $importador->no_identificacion = str_replace('-','',$importador->no_identificacion);
+        
+        return  $this->db
+                    ->select(" 0 as itemnumber , concat(du.partida,du.codigo_extendido) as commoditycode, sum(d.cuantia) as supplementaryunits,
+                    d.pais_origen as countryoforigin , 0 as  grossmass , d.tlc as tlc , sum(d.total) as fob ,   '' as preference, 
+                    '' as internal , '' as moneda, '' as external , '' as moneda ,  '' as insurance , '' as moneda, '' as othercosts , '' as moneda,
+                    '' as deduction , '' as moneda, '' as r , '' as s , 'S/M' as marca , du.descripcion_generica as commercialdescripcionofgoods,
+                    '' as 'summarydeclaration' , 0 as netweight , du.partida")
+                    ->join('duarx.dpr as d' , 'd.id_file =  f.id', 'inner')
+                    ->join('duarx.producto_importador as du', "du.codproducto = d.codigo_producto and du.importador = '$importador->no_identificacion'"  , 'left')
+                    ->where('f.c807_file' , $numero_file)
+                    ->group_by('du.partida, du.codigo_extendido , d.tlc')             
+                    ->order_by('du.partida ')
+                    ->get('gacela.file as f')
+                    ->result();
+
+    }
+
+    function generar_excel_dva($numero_file, $doc_transporte)
+    {        
+        
+        $importador = $this->obtener_datos_file($numero_file);
+        $importador->no_identificacion = str_replace('-','',$importador->no_identificacion);
+        
+        return  $this->db
+                    ->select(" 0 as itemnumber , concat(du.partida,du.codigo_extendido) as commoditycode, sum(d.cuantia) as supplementaryunits,
+                    d.pais_origen as countryoforigin ,  sum(d.total) as fob ,
+                    'S/M' as marca , du.descripcion_generica as commercialdescripcionofgoods, du.partida, d.num_factura")
+                    ->join('duarx.dpr as d' , 'd.id_file =  f.id', 'inner')
+                    ->join('duarx.producto_importador as du', "du.codproducto = d.codigo_producto and du.importador = '$importador->no_identificacion'"  , 'left')
+                    ->where('f.c807_file' , $numero_file)
+                    ->group_by('du.partida, du.codigo_extendido , d.num_factura')             
+                    ->order_by('d.num_factura ')
+                    ->get('gacela.file as f')
+                    ->result();
+
+    }
+
+
 
     public function generar_rayado($numero_file)
     {
         $importador = $this->obtener_datos_file($numero_file);
         $importador->no_identificacion = str_replace('-','',$importador->no_identificacion);
-
-        return  $this->db
-                    ->select(" d.linea_agrupacion as linea ,  d.codigo_producto as 'Codigo_Producto', d.num_factura , d.tlc as tlc,  du.partida,
-                     d.pais_origen as pais ,  d.cuantia as cuantia,  d.total as fob, du.descripcion")
+        
+        $query =  $this->db
+                    ->select(" d.linea_agrupacion as linea ,  d.codigo_producto as 'Codigo_Producto', d.num_factura , d.tlc as tlc,  du.partida, 
+                     d.pais_origen as pais ,  d.cuantia as cuantia,  d.total as fob, mid(du.descripcion,1,50) as descripcion")
                     ->join('duarx.dpr as d' , 'd.id_file =  f.id', 'inner')
                     ->join('duarx.producto_importador as du', "du.codproducto = d.codigo_producto and du.importador = '$importador->no_identificacion'"  , 'left')
                     ->where('f.c807_file' , $numero_file)
                     ->order_by('d.id ')
                     ->get('gacela.file as f')
                     ->result();
-    }
 
+                    //echo $this->db->last_query();exit();
+    
+        return $query;
+    }
+    
     public function contar_registros($id_file)
 
     {
@@ -204,19 +287,19 @@ class Subir_archivos_model extends CI_Model {
                     ->join('dpr as d' , 'd.id_file =  f.id', 'inner')
                     ->join('dua as du', 'du.codigo_producto = d.codigo_producto', 'left')
                     ->where('du.partida_arancelaria IS NULL')
-                    ->where('f.c807_file', $id_file)
+                    ->where('f.c807_file', $id_file)    
                     ->get('file as f')
                     ->result();
     }
 
     function generar_excel_no_agrupada($id_file)
-    {
+    {        
         return $this->db
                     ->select('d.id ,  d.codigo_producto, d.descripcion , du.partida_arancelaria, d.cuantia, d.precio_unitario, d.total')
                     ->join('dpr as d' , 'd.id_file =  f.id', 'inner')
                     ->join('dua as du', 'du.codigo_producto = d.codigo_producto', 'inner')
                     ->where('du.partida_arancelaria IS NOT NULL')
-                    ->where('f.c807_file', $id_file)
+                    ->where('f.c807_file', $id_file)    
                     ->get('file as f')
                     ->result();
     }
@@ -224,10 +307,10 @@ class Subir_archivos_model extends CI_Model {
 
     public function actualizar_linea_agrupacion($numero_file, $partida_arancelaria, $linea, $tlc)
     {
-
+        
         $listado = $this->obtener_listado_productos($numero_file,$partida_arancelaria);
 
-        for ($i=0; $i <count($listado) ; $i++) {
+        for ($i=0; $i <count($listado) ; $i++) { 
             foreach ($listado[$i] as $key => $value) {
                  $this->db
                      ->set('dp.linea_agrupacion' , $linea)
@@ -236,7 +319,7 @@ class Subir_archivos_model extends CI_Model {
                      ->update('duarx.dpr as dp');
             }
         }
-
+        
     }
 
     public function obtener_listado_productos($numero_file,$partida_arancelaria)
@@ -266,7 +349,7 @@ class Subir_archivos_model extends CI_Model {
                      ->join('gacela.cliente_hijo as ch' , 'ch.id = f.cliente_hijo_id' ,'inner')
                      ->get('gacela.file  as f')
                      ->row();
-
+        
     }
 
     public function traer_paises($arreglo)
@@ -275,25 +358,52 @@ class Subir_archivos_model extends CI_Model {
         // id_file , partida, importador, codproducto, id_file, codigo_producto, pais_origen
         if (isset($arreglo['partida']))
         {
+            $arreglo['cliente']->no_identificacion = str_replace('-','',$arreglo['cliente']->no_identificacion);
             $query = $this->db
-                       ->distinct()
-                       ->select('iso2')
+                       ->distinct()            
+                       ->select('iso2')  
                        ->join('duarx.dpr' , 'codigo_producto = codproducto and id_file = ' . $arreglo['cliente']->id, 'inner')
                        ->join('gacela.pais' ,'nombre = pais_origen', 'inner')
                        ->where('partida' , $arreglo['partida'])
-                       ->where('importador' ,  $arreglo['cliente']->cliente_hijo_id)
+                       ->where('importador' ,  $arreglo['cliente']->no_identificacion)
                        ->get('duarx.producto_importador')
                        ->result();
+
+                       //echo $this->db->last_query();exit();
         }
-        //echo $this->db->last_query();exit();
+       // echo $this->db->last_query();exit();
 
         return $query;
 
     }
 
+    public function traer_descripcion_productos($arreglo)
+    {
+
+        // id_file , partida, importador, codproducto, id_file, codigo_producto, pais_origen
+        if (isset($arreglo['partida']))
+        {
+            $arreglo['cliente']->no_identificacion = str_replace('-','',$arreglo['cliente']->no_identificacion);
+            $query = $this->db
+                       ->select('dp.descripcion')  
+                       ->join('duarx.dpr as dp' , 'codigo_producto = codproducto and id_file = ' . $arreglo['cliente']->id, 'inner')
+                       ->where('partida' , $arreglo['partida'])
+                       ->where('importador' ,  $arreglo['cliente']->no_identificacion)
+                       ->where('dp.tlc' , $arreglo['tlc'])
+                       ->get('duarx.producto_importador')
+                       ->result();
+            
+            return $query;
+        }
+        //echo $this->db->last_query();exit();
+
+        
+
+    }
 
     public function buscar_usuarios($numero_file)
     {
+
         $query = $this->db
                       ->select('us.mail, us.nombre')
                       ->join('gacela.master as ma' , 'ma.id = f.master_id' ,'inner')
@@ -303,20 +413,21 @@ class Subir_archivos_model extends CI_Model {
                       ->get('gacela.file as f')
                       ->result();
 
-        return $query;
+        return $query;              
     }
+
 
     public function buscar_usuario_aforador($numero_file)
     {
         $query = $this->db
                       ->select('us.mail, us.nombre')
-                      ->join('csd.usuario as us' , 'us.usuario = f.usuario_id' , 'inner')
+                      ->join('csd.usuario us' , 'us.usuario = f.usuario_id' , 'inner')
                       ->where('f.c807_file', $numero_file)
                       //->where('us.tipo_usuario' , 1)
-                      ->get('gacela.file as f')
+                      ->get('gacela.file f')
                       ->result();
 
-        return $query;
+        return $query;              
     }
 
 }

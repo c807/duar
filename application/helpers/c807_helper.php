@@ -41,7 +41,7 @@ if ( ! function_exists('formatoFecha')) {
 					case 2:
 						$formato = 'd/m/Y';
 						break;
-					case 3: 
+					case 3:
 						$fh = explode('/', $fecha);
 						return $fh[2].'-'.$fh[1].'-'.$fh[0];
 						break;
@@ -99,7 +99,7 @@ if (! function_exists('verDatovalor')) {
 if ( ! function_exists('enviarJson'))
 {
 	/**
-	 * Recibe un arreglo de datos y devuelve un archivo de cabecera json, 
+	 * Recibe un arreglo de datos y devuelve un archivo de cabecera json,
 	 * ideal para retornar en peticiones ajax
 	 * @param  array $args arreglo de datos
 	 * @return json
@@ -110,3 +110,24 @@ if ( ! function_exists('enviarJson'))
 		echo json_encode($datos);
 	}
 }
+
+
+if ( ! function_exists(('sys_base'))) {
+	# Devuelve la ruta de un archivo o carpeta en disco. Ej.: /home/usuer/documentos/archivo.pdf
+	# El parémetro a recibir es igual al formato de base_url
+	function sys_base($dir = '') {
+		return dirname( getcwd() ) . "/{$dir}";
+	}
+}
+
+
+if ( ! function_exists('correo'))
+{
+	function correo($args, $tipo = 2)
+	{
+		include sys_base('enviar_correo.php');
+		return enviarCorreo($args, $tipo);
+	}
+}
+
+

@@ -42,14 +42,13 @@
                                 </tr>
                                 <tr>
                                  
-                                    <td colspan="2"> <button type="button" class="btn btn-primary pull-right" onclick="generar_excel()">Generar Excel</button></td>
-                                    
-                                    <td colspan="2">
-                                        <button type="button" class="btn btn-primary pull-left" onclick="generar_rayado()" >Generar PDF</button>
+                                    <td colspan="2"><button type="button" class="btn btn-primary pull-right" onclick="generar_excel()">Generar Excel</button></td>
+                                    <td colspan="2"><button type="button" class="btn btn-primary pull-center" onclick="generar_rayado()" >Generar PDF</button>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td></td>
+                                    <td colspan="2"><button type="button" class="btn btn-primary pull-right" onclick="generar_excel_sidunea()">Generar Excel Siduena</button></td>
+                                    <td colspan="2"><button type="button" class="btn btn-primary pull-center" onclick="generar_excel_dva()">Generar Excel DVA</button></td>
 
                                 </tr>
                             </tbody>

@@ -17,7 +17,7 @@
 
 
        function cerrar($id_Reg) {
-
+        
         $("#actualizar_partida"+$id_Reg).hide();
 
        }
@@ -27,7 +27,7 @@
         //Opcion 1 = productos no clasificados
         //Opcion 2 = todos los prodcutos
 
-        var url = base_url_erp("index.php/subir_archivo/no_clasificados/" + $opcion);;
+        var url = base_url_erp("index.php/subir_Archivo/no_clasificados/" + $opcion);;
 
         datos = $("#c807_file").serialize();
 
@@ -44,9 +44,10 @@
           //alert($("#actualizar_partida") + $id_Reg);
           $("#actualizar_partida"+$id_Reg).show("blind");
 
-          var url = base_url_erp("index.php/subir_archivo/traer_informacion_producto/" + $id_Reg + "/" + $cod_importador);
+          var url = base_url_erp("index.php/subir_Archivo/traer_informacion_producto/" + $id_Reg + "/" + $cod_importador);
 
           $.get(url,   function (data) {
+            $('#proveedor'+$id_Reg).val(data.proveedor);
             $('#num_factura'+$id_Reg).val(data.num_factura);
             $('#codigo_producto'+$id_Reg).val(data.codigo_producto);
             $('#descripcion'+$id_Reg).val(data.descripcion);
@@ -67,7 +68,7 @@
               {
                 alert(data.mensaje);
               }else {
-                $.notify("Partida Arancelaria creada." , "success" );
+               // $.notify("Partida Arancelaria creada." , "success" );
                 $("#actualizar_partida".$id_Reg).hide("slow");
                 no_clasificadas(1);
               }
@@ -86,27 +87,106 @@
 
       function generar_excel() {
 
-        var url = base_url_erp("index.php/subir_archivo/generar_excel/" );
+        var url = base_url_erp("index.php/subir_Archivo/generar_excel/" );
 
-        window.location.href = url +"?"+ $("#c807_file").serialize() + "&" + $("#doc_transporte").serialize() + "&" + $("#tot_bultos").serialize() + "&" + $("#tot_kilos").serialize() ;
-        $.notify("Archivo de Excel Generado.", "success");
+        $num_file = $("#c807_file").val();
+        $doc_tra  = $("#doc_transporte").val();
+        $t_bultos = $("#tot_bultos").val();
+        $t_kilos   = $("#tot_kilos").val();
+
+        $mensaje = "";
+
+        if ($num_file.length  == 0) {$mensaje = "numero de File";}
+        if ($doc_tra.length   == 0) {$mensaje += ", documento de transporte";}
+        if ($t_bultos.length  == 0) {$mensaje += ", total bultos";}
+        if ($t_kilos.length   == 0) {$mensaje += ", total kilos.";}
+
+        if ($mensaje.length > 0 )
+        {
+          $mesnsaje = "numero de File.";
+          $.notify("Falta digitar " + $mensaje , "error");
+        }else {
+          window.location.href = url +"?"+ $("#c807_file").serialize() + "&" + $("#doc_transporte").serialize() + "&" + $("#tot_bultos").serialize() + "&" + $("#tot_kilos").serialize() ;
+          $.notify("Archivo de Excel Generado.", "success");
+        }
       }
 
+      function generar_excel_sidunea() {
+
+        var url = base_url_erp("index.php/subir_Archivo/generar_excel_sidunea/" );
+
+        $num_file = $("#c807_file").val();
+        $doc_tra  = $("#doc_transporte").val();
+        $t_bultos = $("#tot_bultos").val();
+        $t_kilos   = $("#tot_kilos").val();
+
+        $mensaje = "";
+
+        if ($num_file.length  == 0) {$mensaje = "numero de File";}
+        if ($doc_tra.length   == 0) {$mensaje += ", documento de transporte";}
+        if ($t_bultos.length  == 0) {$mensaje += ", total bultos";}
+        if ($t_kilos.length   == 0) {$mensaje += ", total kilos.";}
+
+        if ($mensaje.length > 0 )
+        {
+          $mesnsaje = "numero de File.";
+          $.notify("Falta digitar " + $mensaje , "error");
+        }else {
+          window.location.href = url +"?"+ $("#c807_file").serialize() + "&" + $("#doc_transporte").serialize() + "&" + $("#tot_bultos").serialize() + "&" + $("#tot_kilos").serialize() ;
+          $.notify("Archivo de Excel Generado.", "success");
+        }
+      }
+
+      function generar_excel_dva() {
+
+        var url = base_url_erp("index.php/subir_Archivo/generar_excel_dva/" );
+
+        $num_file = $("#c807_file").val();
+        $doc_tra  = $("#doc_transporte").val();
+        $t_bultos = $("#tot_bultos").val();
+        $t_kilos   = $("#tot_kilos").val();
+
+        $mensaje = "";
+
+        if ($num_file.length  == 0) {$mensaje = "numero de File";}
+        if ($doc_tra.length   == 0) {$mensaje += ", documento de transporte";}
+        if ($t_bultos.length  == 0) {$mensaje += ", total bultos";}
+        if ($t_kilos.length   == 0) {$mensaje += ", total kilos.";}
+
+        if ($mensaje.length > 0 )
+        {
+          $mesnsaje = "numero de File.";
+          $.notify("Falta digitar " + $mensaje , "error");
+        }else {
+          window.location.href = url +"?"+ $("#c807_file").serialize() + "&" + $("#doc_transporte").serialize() + "&" + $("#tot_bultos").serialize() + "&" + $("#tot_kilos").serialize() ;
+          $.notify("Archivo de Excel Generado.", "success");
+        }
+      }
+
+
+
       function generar_rayado() {
+        
+        var url = base_url_erp("index.php/subir_Archivo/generar_rayado/");
+        $datos = $("#c807_file").val();
 
-        var url = base_url_erp("index.php/subir_archivo/generar_rayado/");
+        
+        if ($datos == null || $datos== undefined || $datos.length == 0) {
+          $.notify("Falta digitar número de file." , "error");
+        }else{
 
-        window.location.href = url +"?"+ $("#c807_file").serialize();
-        $.notify("Archivo de Rayado de Factura Generado.", "success");
+          window.location.href = url +"?"+ $("#c807_file").serialize();
+          $.notify("Archivo PDF generado.", "success");
+      }
 
       }
 
       function enviar_correo ($opcion) {
-
+        
         //$opcion 1 de Aforador a Clasificador
         //$opcion 2 de Clasificacdor a Aforador
-
-        var url = base_url_erp("index.php/subir_archivo/enviar_correo/" + $opcion);
+        
+        var url = base_url_erp("index.php/subir_Archivo/enviar_correo/" + $opcion);
         $datos = $("#c807_file").serialize();
 
         $.get(url, $datos, function(data){
