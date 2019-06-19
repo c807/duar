@@ -28,6 +28,7 @@ class Subir_Archivo extends CI_Controller {
 		}
 
 		$this->datos["mensaje"]	= "";
+
     	$this->datos["vista"] = "subir_archivos/subir_archivo";
         $this->load->view('principal', $this->datos);
     }
