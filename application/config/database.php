@@ -6,10 +6,10 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => '192.168.168.14',
-	'username' => 'root',
-	'password' => 'd@ta807web',
-	'database' => 'duarx',
+	'hostname' => 'localhost',
+	'username' => 'XXXXXXX',
+	'password' => 'XXXXXXX',
+	'database' => 'xxxxxxx',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
