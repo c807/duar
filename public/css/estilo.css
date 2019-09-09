@@ -73,3 +73,39 @@ table tr:hover{
 	width: 35px;
 	display: inline-block;
 }
+
+/* para mostrar alerta verde*/
+.alertgreen{
+	background: #28a745;
+	color : #FFF;
+}
+
+.alertred{
+	background: #dc3545;
+	color : #FFF;
+}
+
+.btnsuccess {
+	background: #28a745;
+}
+
+.hdmodal {
+	  background-color: #385B34;
+	  color:#FFF;
+  }
+
+.close {
+    position: absolute;
+    right: 25px;
+    top: 1;
+    color: #ccc;
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: white;
+    cursor: pointer;
+}
+

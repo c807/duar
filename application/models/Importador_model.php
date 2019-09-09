@@ -16,9 +16,24 @@ class Importador_model extends CI_Model
 								if(a.tlc = 1, 1,0) as tlc,
 								a.partida,
 								a.paisorigen,
-								a.fecha
+								a.fecha,
+								a.no_bultos,
+								a.peso_neto,
+								a.numeros,
+								a.marca,
+								a.tipo_bulto,
+								a.funcion,
+								a.descripcion_generica,
+								a.permiso,
+								a.observaciones,
+								a.nombre_proveedor,
+								a.importador,
+								c.descripcion as descrip
+								
 								')
 						->join('gacela.cliente_hijo b', 'a.importador = b.no_identificacion')
+						->join('tipo_bulto c', 'a.tipo_bulto = c.codigo')
+						->join('pricing.pais d', 'a.paisorigen = d.id_pais')
 						->limit(10, $ars['inicio'])
 						->get('producto_importador a')
 				 		->result();
@@ -39,6 +54,12 @@ class Importador_model extends CI_Model
 								a.numeros,
 								a.marca,
 								a.tipo_bulto,
+								a.funcion,
+								a.permiso,
+								a.descripcion_generica,
+								a.observaciones,
+								a.nombre_proveedor,
+								a.importador,
 								d.nombre as npaisorigen,
 								c.descripcion as nombrebulto
 								')
@@ -61,14 +82,18 @@ class Importador_model extends CI_Model
 	function guardardatos($ars){
 		if (verDato($ars, 'producimport')) {
 			$this->db->where('producimport', $ars['producimport']);
-
+/*
 			if ($this->db->update('producto_importador', $ars)) {
 				return $ars['producimport'];
 			} else {
 				$this->set_mensaje("No se puede realizar la actualización ",$ars['producimport']);
-			}
+			}*/
+			$this->db->update('producto_importador', $ars);
+			
+
 		} else {
-			$this->set_mensaje("Faltan datos principales para editar",$ars['producimport']);
+			$this->db->insert('producto_importador', $ars);
+			//$this->set_mensaje("Faltan datos principales para editar",$ars['producimport']);
 		}
 
 		return FALSE;

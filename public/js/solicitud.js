@@ -61,5 +61,6 @@ function poliza(sts,id) {
 }
 
 function cerrar(id) {
+
 	$("#"+id).hide('blind');
 }

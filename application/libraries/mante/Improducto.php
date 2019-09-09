@@ -201,6 +201,102 @@ class Improducto
 		);
 	}
 
+	private function permiso(){
+		$this->datos['permiso'] = form_checkbox(
+			array(
+				'id'      => 'permiso',
+				'name'    => 'permiso',
+				'value'   => 1,
+				'checked' => (($this->producto->permiso == 1) ? TRUE : FALSE)
+			)
+		);
+	}
+	private function descripcion_generica(){
+		$this->datos['lab_descripcion_generica'] = form_label(
+			'Descripción Generica',
+			'descripcion generica',
+			$this->labclas
+		);
+
+		$this->datos['descripcion_generica'] = form_textarea(
+			array(
+				'id'    => 'descripcion_generica',
+				'name'  => 'descripcion_generica',
+				'class' => $this->clase,
+				'rows'  => '3',
+				'value' => (($this->producto) ? $this->producto->descripcion_generica : '')
+			)
+		);
+	}
+	private function funcion(){
+		$this->datos['lab_funcion'] = form_label(
+			'Función',
+			'funcion',
+			$this->labclas
+		);
+
+		$this->datos['funcion'] = form_textarea(
+			array(
+				'id'    => 'funcion',
+				'name'  => 'funcion',
+				'class' => $this->clase,
+				'rows'  => '3',
+				'value' => (($this->producto) ? $this->producto->funcion : '')
+			)
+		);
+	}
+	private function observaciones(){
+		$this->datos['lab_observaciones'] = form_label(
+			'Observaciones',
+			'observaciones',
+			$this->labclas
+		);
+
+		$this->datos['observaciones'] = form_textarea(
+			array(
+				'id'    => 'observaciones',
+				'name'  => 'observaciones',
+				'class' => $this->clase,
+				'rows'  => '3',
+				'value' => (($this->producto) ? $this->producto->observaciones : '')
+			)
+		);
+	}
+
+	private function nombre_proveedor(){
+		$this->datos['lab_nombre_proveedor'] = form_label(
+			'Proveedor',
+			'proveedor',
+			$this->labclas
+		);
+
+		$this->datos['nombre_proveedor'] = form_input(
+			array(
+				'id'    => 'nombre_proveedor',
+				'name'  => 'nombre_proveedor',
+				'class' => $this->clase,
+				'value' => (($this->producto) ? $this->producto->nombre_proveedor : '')
+			)
+		);
+	}
+
+	
+	private function importador(){
+		$this->datos['lab_importador'] = form_label(
+			'Importador',
+			'importador',
+			$this->labclas
+		);
+
+		$this->datos['importador'] = form_input(
+			array(
+				'id'    => 'importador',
+				'name'  => 'importador',
+				'class' => $this->clase,
+				'value' => (($this->producto) ? $this->producto->importador : '')
+			)
+		);
+	}
 	public function crear(){
 		$this->idproducto();
 		$this->codigo();
@@ -213,6 +309,12 @@ class Improducto
 		$this->marca();
 		$this->descripcion();
 		$this->tlc();
+		$this->permiso();
+		$this->funcion();
+		$this->descripcion_generica();
+		$this->observaciones();
+		$this->nombre_proveedor();
+		$this->importador();
 		return $this->datos;
 	}
 }

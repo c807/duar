@@ -27,7 +27,7 @@
         //Opcion 1 = productos no clasificados
         //Opcion 2 = todos los prodcutos
 
-        var url = base_url_erp("index.php/subir_Archivo/no_clasificados/" + $opcion);;
+        var url = base_url_erp("index.php/subir_Archivo/no_clasificados/" + $opcion);
 
         datos = $("#c807_file").serialize();
 
@@ -193,6 +193,22 @@
           $.notify(data, "success");
         });
 
+      }
+
+      function no_clasificadas_new ($opcion) {
+
+        //Opcion 1 = productos no clasificados
+        //Opcion 2 = todos los prodcutos
+
+        var url = base_url_erp("index.php/subir_Archivo/no_clasificados/" + $opcion);
+
+        datos = $("#c807_file").serialize();
+
+        $.post(url, datos, function (data) {
+            $("#no_clasificados").html(data);
+         }
+
+       );
       }
 
 

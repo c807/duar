@@ -15,6 +15,7 @@
 	<script type="text/javascript" src="<?php echo base_url('public/js/solicitud.js') ?>"></script>
 	<script type="text/javascript" src="<?php echo base_url('public/js/modelo.js') ?>"></script>
 	<script type="text/javascript" src="<?php echo base_url('public/js/poliza.js') ?>"></script>
+  <script type="text/javascript" src="<?php echo base_url('public/js/productos.js') ?>"></script>
   <script type="text/javascript" src="<?php echo base_url('public/js/funciones_subir_archivo.js') ?>"></script>
 	<title>DuaR</title>
 </head>

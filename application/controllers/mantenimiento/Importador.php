@@ -6,16 +6,19 @@ class Importador extends CI_Controller
 	{
 		parent:: __construct();
 		$this->load->model("Importador_model");
+		
 	}
 
 	function index(){}
 
 	function productos() {
+		
 		$this->datos['navtext']   = "Producto Importador";
 		$this->datos['vista']     = "importador/contenido";
 		$this->datos['form']      = "importador/form";
-		$this->datos['action']    = base_url('index.php/mante/importador/buscar');
-
+		$this->datos['action']    = base_url('index.php/mantenimiento/importador/buscar');
+		$this->datos['paises'] = $this->Conf_model->paises();
+		$this->datos['tipobulto'] = $this->Conf_model->tipoBulto();
 		$this->datos['productos'] = $this->Importador_model->verproductos(array('inicio' => 0));
 
 		$contar = count($this->datos['productos']);
@@ -49,7 +52,7 @@ class Importador extends CI_Controller
 
 		$imp->set_dtproducto($this->Importador_model->verlineaproducto(array('prodimpor' => $id)));
 		$this->datos['informacion'] = $this->Importador_model->verlineaproducto(array('prodimpor' => $id));
-		$this->datos['action'] = base_url('index.php/mante/importador/guardar');
+		$this->datos['action'] = base_url('index.php/mantenimiento/importador/guardar');
 
 		$this->load->view('importador/editar', array_merge($this->datos, $imp->crear()));
 	}
@@ -61,6 +64,12 @@ class Importador extends CI_Controller
 				$_GET['tlc'] = 1;
 			} else {
 				$_GET['tlc'] = 0;
+			}
+
+			if (verDato($_GET, 'permiso')){
+				$_GET['permiso'] = 1;
+			} else {
+				$_GET['permiso'] = 0;
 			}
 			if ($this->Importador_model->guardardatos($_GET)) {
 				$res = array('msj' => "Actualización de datos correcto", 'res' => $_GET['producimport']);

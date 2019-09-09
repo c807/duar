@@ -24,7 +24,7 @@ function vermas(inicio) {
 }
 
 function editarprod(id){
-	var url = base_url('index.php/mante/importador/formeditar/' + id);
+	var url = base_url('index.php/mantenimiento/importador/formeditar/' + id);
 	$('body,html').animate({scrollTop : 0}, 100);
 
 	$.post(url, function (data) {
@@ -42,4 +42,9 @@ function enviaredicion(form){
 		editarprod(data.res);
 		$("#formproducto").submit();
 	})
+}
+
+function cerrar(id) {
+
+	$("#"+id).hide('blind');
 }

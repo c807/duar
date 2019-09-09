@@ -1275,7 +1275,10 @@ class Subir_Archivo extends CI_Controller {
 
 
 
+
 }
+
+
 
 /* End of file Controllername.php */
 

@@ -1,7 +1,14 @@
 <div class="container">
-    <div class="panel panel-success">
-        <div class="panel-heading">
-                <h3 class="panel-title">Clasificar Productos</h3>
+    <div class="panel panel-success" >
+      
+        <div class="panel-heading" id="titulo">Clasificar Productos
+
+               
+              
+
+        
+        <a href="<?php echo base_url('index.php/productos/ProductosController/lista_productos_importador?mid=29/') ?>" 
+        class="btn btn-default btn-xs pull-right"><i class="glyphicon glyphicon-th-list"></i> Gestionar Productos</a>
         </div>
         <div class="panel-body">
 

@@ -9,6 +9,7 @@ class Principal extends CI_Controller {
 
 	function index(){
 		echo '¡Hola!';
+		//$_SESSION['UserID'] ='';
 	}
 
 	function crearpoliza($proceso){
