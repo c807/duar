@@ -95,11 +95,7 @@ table tr:hover{
   }
 
 .close {
-    position: absolute;
-    right: 25px;
-    top: 1;
     color: #ccc;
-    font-size: 40px;
     font-weight: bold;
 }
 
@@ -108,4 +104,8 @@ table tr:hover{
     color: white;
     cursor: pointer;
 }
+
+.sinborde {
+	border: 0;
+  }
 

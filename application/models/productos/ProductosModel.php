@@ -6,27 +6,36 @@
     
                 
         public function lista_productos_importador(){
-            return $this->db->select('
-            b.nombre,
-            a.producimport,
-            a.descripcion,
-            a.codproducto,
-            a.tlc,
-            a.partida,
-            a.paisorigen,
-            a.fecha,
-            a.importador,
-            a.funcion,
-            a.descripcion_generica,
-            a.observaciones,
-            a.permiso,
-            a.nombre_proveedor
            
-            ')
-            ->join('gacela.cliente_hijo b', 'a.importador = b.no_identificacion')
-            ->get('producto_importador a')
-            ->result();
-     
+		return $this->db->select('
+								b.nombre,
+								a.producimport,
+								a.descripcion,
+								a.codproducto,
+								if(a.tlc = 1, 1,0) as tlc,
+								a.partida,
+								a.paisorigen,
+								a.fecha,
+								a.no_bultos,
+								a.peso_neto,
+								a.numeros,
+								a.marca,
+								a.tipo_bulto,
+								a.funcion,
+								a.descripcion_generica,
+								a.permiso,
+								a.observaciones,
+								a.nombre_proveedor,
+								a.importador
+								
+								
+								')
+						->join('gacela.cliente_hijo b', 'a.importador = b.no_identificacion')
+						->join('tipo_bulto c', 'a.tipo_bulto = c.codigo')
+						->join('pricing.pais d', 'a.paisorigen = d.id_pais')
+						->limit(10, $ars['inicio'])
+						->get('producto_importador a')
+				 		->result();
         }
 
        
@@ -100,24 +109,43 @@
             }
 
 
-            function get_salaries_dropdown()
-            {
-                $this->db->from($this->empresa);
-                $this->db->order_by('id');
-                $result = $this->db->get();
-                $return = array();
-                if($result->num_rows() > 0){
-                        $return[''] = 'please select';
-                    foreach($result->result_array() as $row){
-                        $return[$row['id']] = $row['nombre'];
-                    }
-                }
-                return $return;
-            }
+            
+   
+    function consulta_personalizada()
+    {
+        return $this->db->select('
+        b.nombre,
+        a.producimport,
+        a.descripcion,
+        a.codproducto,
+        if(a.tlc = 1, 1,0) as tlc,
+        a.partida,
+        a.paisorigen,
+        a.fecha,
+        a.no_bultos,
+        a.peso_neto,
+        a.numeros,
+        a.marca,
+        a.tipo_bulto,
+        a.funcion,
+        a.descripcion_generica,
+        a.permiso,
+        a.observaciones,
+        a.nombre_proveedor,
+        a.importador
+               
+        ')
+
         
-    
+        ->join('gacela.cliente_hijo b', 'a.importador = b.no_identificacion')
+        ->join('tipo_bulto c', 'a.tipo_bulto = c.codigo')
+        ->join('pricing.pais d', 'a.paisorigen = d.id_pais')
+        ->limit(10, $ars['inicio'])
+        ->get('producto_importador a')
+         ->result();
     }
-    
+
+    }
     /* End of file ModelName.php */
     
 ?>

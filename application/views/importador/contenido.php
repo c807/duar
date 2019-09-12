@@ -1,9 +1,5 @@
-<style>
-
-
-</style>
 <script src="<?php echo base_url('public/js/importador.js') ?>"></script>
-<script  type="text/javascript" src="<?php echo base_url('public/js/productos.js') ?>"></script>
+<script type="text/javascript" src="<?php echo base_url('public/js/productos.js') ?>"></script>
 <!-- Comienza -->
 
 
@@ -33,9 +29,13 @@
                 <tr>
                     <th>#</th>
                     <th>Importador</th>
+                    <th>Proveedor</th>
                     <th>Producto</th>
                     <th>Código</th>
+                    <th>Descripción Generica</th>
+                    <th>Función</th>
                     <th>TLC</th>
+                    <th>Permiso</th>
                     <th>Partida</th>
                     <th>Origen</th>
                     <th>Fecha</th>
@@ -91,13 +91,13 @@
 
 <!-- Modal Crear Producto -->
 <div class="container">
-    <div class="modal fade" id="crear_producto"  role="dialog" data-backdrop="static">
+    <div class="modal fade" id="crear_producto" role="dialog" data-backdrop="static">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header hdmodal buttonclose">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 id="opcion" class="modal-title border-bottom pb-3 mb-4"><strong>AGREGAR PRODUCTO </strong></h4>
-                    
+
                 </div>
                 <div class="row-fluid  message" id="message"></div>
                 <div class="modal-body">
@@ -111,8 +111,9 @@
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label">Importador</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control required" name="importador"
-                                                id="importador" placeholder="Introduzca Importador" required />
+                                         <!--   <input type="text" class="form-control required" name="importador"
+                                                 id="importador" placeholder="Introduzca Importador" required /> -->
+                                                <?php $this->load->view('importador'); ?>
                                         </div>
                                     </div>
                                 </div>
@@ -145,7 +146,7 @@
                                     <div class="form-group row">
                                         <label for="tipobulto" class="col-sm-4 control-label">Tipo Bulto</label>
                                         <div class="col-sm-8">
-                                      
+
 
                                             <?php
                                           
@@ -352,65 +353,258 @@
 
 <!-- fin modal eliminar producto -->
 
+<!--- modal para ver ficha -->
+<div class="modal" id="verficha" role="dialog" data-backdrop="static">
 
-<!-- Modal multipropositos,tanto para agregar usuarios a  -->
-<div class="modal fade" id="multi_opt_user" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <i class="fi-heart"></i>
-                <button id="pethatlimypro" type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title"></h4>
+
+            <!-- Modal Header -->
+            <div class="modal-header hdmodal buttonclose">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 id="opcion" class="modal-title border-bottom pb-3 mb-4"><strong>FICHA </strong></h4>
+               
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form enctype="multipart/form-data" class="del_producto">
+                    <div class="container-fluid">
+
+                        <div class="row">
+                            <div class="col-sm-5 text-left">
+                          <h4><strong><input type="text" class="sinborde" name="nombre_importador" /></strong></h4>
+                            </div>
+                        </div>
 
 
 
-                <div class="modal-body">
-                    <div id="pocos"></div>
-                </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-tag"></i> Producto:</b>
+                            </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
+                            <div class="col-sm-8">
+                                <textarea class="sinborde" rows="1" id="descripcion" name="descripcion" style="width:100%"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-barcode"></i> Código:</b>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="text" class="sinborde" name="codproducto" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-star"></i> Marca:</b> <br>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="text" class="sinborde" name="marca" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-registration-mark"></i> Partida:</b> <br>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="text" class="sinborde" name="partida" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-indent-right"></i> Peso Neto: </b> <br>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="text" class="sinborde" name="pesoneto" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-th"></i> Numeros: </b> <br>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="text" class="sinborde" name="numeros" readonly />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-certificate"></i> Tipo Bulto:</b> <br>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="text" class="sinborde" name="descripcion_bulto" readonly />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-th" ></i> Número de Bultos:</b> <br>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="text" class="sinborde" name="nbultos" />
+                            </div>
+
+                           
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-road"></i> País de Origen</b> <br>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="text" class="sinborde" name="paisorigen" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-calendar"></i> Fecha: </b> <br>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-wrench"></i> Aplica TLC: </b> <br>
+                            </div>
+
+                            <div class="col-sm-8">
+                                <label><input type="checkbox" value="" name="tlc" id="tlc" class="pull-right"></label>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-ok"></i> Permiso: </b> <br>
+                            </div>
+
+                            <div class="col-sm-8">
+                                <label><input type="checkbox" value="" name="permiso" id="permiso"
+                                        class="pull-right"></label>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+
+
+
+
             </div>
         </div>
     </div>
 
-    <script type="text/javascript">
-    $('#delmodal').on('show.bs.modal', function(e) {
-        var bookId = $(e.relatedTarget).data('book-id');
-        var bookId1 = $(e.relatedTarget).data('book-id1');
+</div>
+
+<!-- fin modal ver ficha -->
 
 
-        $(e.currentTarget).find('input[name="txtcodigo"]').val(bookId);
-        $(e.currentTarget).find('input[name="txtnombre"]').val(bookId1);
+<!--- modal busqueda personalizada -->
+<div class="modal" id="buscar" role="dialog" data-backdrop="static">
+    <form role="search" method="get" action="<?php echo $action; ?>" id="formproducto"
+        onsubmit="enviarformproducto(this); return false;">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Buscar...</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+
+                    <div class="form-group has-success ">
+                        <select name="opcionbuscar" class="form-control" required>
+
+                            <option value="">Elige una opción</option>
+
+                            <option value="1"> NIt Importador</option>
+
+                            <option value="2">Nombre Importador</option>
+
+                            <option value="3">Nombre Provedor</option>
+
+                            <option value="4">Código Producto</option>
+
+                            <option value="5">Descripción Factura</option>
+
+                            <option value="6">Partida</option>
+
+                            <option value="7">Descripción Genérica</option>
+
+                            <option value="8">Función</option>
+
+                        </select>
+
+                        <br><input type="search" class="form-control" placeholder="Importador" id="Buscador"
+                            name="importador" />
+
+                    </div><br>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+
+                        <button type="submit" class="btn btn-success btnsuccess ">
+                            <i class="glyphicon glyphicon-search">Aceptar</i>
+                        </button>
+                    </div>
+
+
+                </div>
+            </div>
+    </form>
+</div>
+
+<!---fin  modal busqueda personalizada -->
+
+
+<script type="text/javascript">
+$('#delmodal').on('show.bs.modal', function(e) {
+    var bookId = $(e.relatedTarget).data('book-id');
+    var bookId1 = $(e.relatedTarget).data('book-id1');
+
+
+    $(e.currentTarget).find('input[name="txtcodigo"]').val(bookId);
+    $(e.currentTarget).find('input[name="txtnombre"]').val(bookId1);
 
 
 
-    });
-    </script>
+});
+</script>
 
 
-    <script type="text/javascript">
-   </script>
+<script type="text/javascript">
+</script>
 
-    <script>
-    $(document).ready(function() {
+<script>
+$(document).ready(function() {
 
-        $("#myInput").on("keyup", function() {
+    $("#myInput").on("keyup", function() {
 
-            var value = $(this).val().toLowerCase();
+        var value = $(this).val().toLowerCase();
 
-            $("#tbl tr").filter(function() {
+        $("#tbl tr").filter(function() {
 
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-
-            });
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
 
         });
 
     });
-    </script>
 
- 
+});

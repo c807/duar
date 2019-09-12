@@ -181,11 +181,7 @@ function mostrarModal(titulo) {
    
     $("#crear_producto").modal("show");
   }
-  function mostrar(opc){
-    
-   
-    
-    
+  function mostrar(){
    
     $('#crear_producto').on('show.bs.modal', function(e) {
         var bookId = $(e.relatedTarget).data('book-id');
@@ -204,7 +200,7 @@ function mostrarModal(titulo) {
         var bookId13 = $(e.relatedTarget).data('book-id13');
         var bookId14 = $(e.relatedTarget).data('book-id14');
         var bookId15 = $(e.relatedTarget).data('book-id15');
-                  
+        var bookId16 = $(e.relatedTarget).data('book-id16');          
   
         $(e.currentTarget).find('input[name="producimport"]').val(bookId);
         $(e.currentTarget).find('input[name="importador"]').val(bookId1);
@@ -234,11 +230,94 @@ function mostrarModal(titulo) {
         $(e.currentTarget).find('input[name="numeros"]').val(bookId12);
         $(e.currentTarget).find('input[name="nbultos"]').val(bookId13);
         $(e.currentTarget).find('input[name="marca"]').val(bookId14);
-      
        
+        /* esta es otra forma de hacerlo
+        var modal = $(this)
+        modal.find('.modal-body #tipobulto').val(bookId15)
+        */
+        $("#tipobulto").val(bookId15)
+        $('#tipobulto').change();
+        $("#paises").val(bookId16)
+        $('#paises').change();
 
+        //document.ready = document.getElementById("tipobulto").value=bookId15; esto tambien funciona
+    
     });
     
   }
+  function mostrarficha(){
+   
+    $('#verficha').on('show.bs.modal', function(e) {
+        var bookId = $(e.relatedTarget).data('book-id');
+        var bookId1 = $(e.relatedTarget).data('book-id1');
+        var bookId2 = $(e.relatedTarget).data('book-id2');
+        var bookId3 = $(e.relatedTarget).data('book-id3');
+        var bookId4 = $(e.relatedTarget).data('book-id4');
+        var bookId5 = $(e.relatedTarget).data('book-id5');
+        var bookId6 = $(e.relatedTarget).data('book-id6');
+        var bookId7 = $(e.relatedTarget).data('book-id7');
+        var bookId8 = $(e.relatedTarget).data('book-id8');
+        var bookId9 = $(e.relatedTarget).data('book-id9');
+        var bookId10 = $(e.relatedTarget).data('book-id10');
+        var bookId11 = $(e.relatedTarget).data('book-id11');
+        var bookId12 = $(e.relatedTarget).data('book-id12');
+        var bookId13 = $(e.relatedTarget).data('book-id13');
+        var bookId14 = $(e.relatedTarget).data('book-id14');
+        var bookId15 = $(e.relatedTarget).data('book-id15');
+        var bookId16 = $(e.relatedTarget).data('book-id16'); 
+        var bookId17 = $(e.relatedTarget).data('book-id17'); 
+        var bookId18 = $(e.relatedTarget).data('book-id18');    
+        var bookId19 = $(e.relatedTarget).data('book-id19');           
   
+        $(e.currentTarget).find('label[name="producimport"]').val(bookId);
+        $(e.currentTarget).find('input[name="importador"]').val(bookId1);
+        $(e.currentTarget).find('input[name="codproducto"]').val(bookId2);
+        $(e.currentTarget).find('textarea[name="descripcion"]').val(bookId3);
+        $(e.currentTarget).find('textarea[name="descripcion_generica"]').val(bookId4);
+        $(e.currentTarget).find('textarea[name="funcion"]').val(bookId5);
+        $(e.currentTarget).find('input[name="partida"]').val(bookId6);
+        $(e.currentTarget).find('textarea[name="observaciones"]').val(bookId7);
+        $(e.currentTarget).find('checked[name="permiso"]').val(bookId8);
+        $(e.currentTarget).find('checked[name="tlc"]').val(bookId9);
 
+
+        if (bookId8 == 1) {
+            $(e.currentTarget).find('input[name="permiso"]').prop("checked", true)
+        } else {
+            $(e.currentTarget).find('input[name="permiso"]').prop("checked", false)
+        }
+
+        if (bookId9 == 1) {
+            $(e.currentTarget).find('input[name="tlc"]').prop("checked", true)
+        } else {
+            $(e.currentTarget).find('input[name="tlc"]').prop("checked", false)
+        }
+        $(e.currentTarget).find('input[name="proveedor"]').val(bookId10);
+        $(e.currentTarget).find('input[name="pesoneto"]').val(bookId11);
+        $(e.currentTarget).find('input[name="numeros"]').val(bookId12);
+        $(e.currentTarget).find('input[name="nbultos"]').val(bookId13);
+        $(e.currentTarget).find('input[name="marca"]').val(bookId14);
+       
+        /* esta es otra forma de hacerlo
+        var modal = $(this)
+        modal.find('.modal-body #tipobulto').val(bookId15)
+        */
+        $("#tipobulto").val(bookId15)
+        $('#tipobulto').change();
+        $("#paises").val(bookId16)
+        $('#paises').change();
+        $("#importador").val(bookId16)
+        $('#importador').change();
+
+        $(e.currentTarget).find('input[name="paisorigen"]').val(bookId17);
+        $(e.currentTarget).find('input[name="descripcion_bulto"]').val(bookId18);
+        $(e.currentTarget).find('input[name="nombre_importador"]').val(bookId19);
+
+        //document.ready = document.getElementById("tipobulto").value=bookId15; esto tambien funciona
+    
+    });
+    
+  }
+
+ 
+ 

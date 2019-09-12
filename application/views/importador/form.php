@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title></title>
+    <script src="<?php echo base_url('public/js/importador.js') ?>"></script>
+<script  type="text/javascript" src="<?php echo base_url('public/js/productos.js') ?>"></script>
 </head>
 
 <body>
@@ -26,8 +28,10 @@
                 data-target="#crear_producto" data-whatever="AGREGAR PRODUCTO">
                 <i class="glyphicon glyphicon-plus" title="Agregar un nuevo producto"></i> Agregar</button>
 
+
+
             <button type="button" class="btn btn-success btn-md pull-center btnsuccess" data-toggle="modal"
-                data-target="#crear_productoss">
+                data-target="#buscar">
                 <i class="glyphicon glyphicon-list"></i></button>
 
 
@@ -35,10 +39,16 @@
         </div>
 
     </form>
+
+    
 </body>
 
 </html>
+
+
 <script>
+
+
 $(document).ready(function() {
 
     $('#crear_producto').on('show.bs.modal', function(event) {

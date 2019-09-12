@@ -104,7 +104,7 @@
             $this->datos['action']    = base_url('index.php/mantenimiento/importador/buscar');
             $this->datos['productos'] = $this->ProductosModel->lista_productos_importador();
             $this->datos['vista']     = "productos/clasificar";
-            $this->datos['productos'] = $this->ProductosModel->lista_productos_importador(array('inicio' => 0));
+            $this->datos['productos'] = $this->ProductosModel->lista_productos_importador();
             $this->load->view('principal',$this->datos);
         }
 
@@ -230,23 +230,22 @@
             $this->productos();
             
         }
-        public function opcionguardar($opcion){
-            if ($opcion==1){
-                $_SESSION['opcionSave']='AGREGAR PRODUCTOS';
-            }else{
-                $_SESSION['opcionSave']='EDITAR PRODUCTO';
+     public   function consulta_personalizada(){
+       // $this->datos['navtext']   = "Producto Importador";
+         // $this->datos['form']      = "importador/form";
+          //  $this->datos['action']    = base_url('index.php/mantenimiento/importador/buscar');
+         
+          $this->datos['productos'] = $this->ProductosModel->consulta_personalizada();
+            $this->datos['vista']     = "importador/contenido";
+           
+         //   $this->datos['vista']     = "productos/clasificar";
+        // var_dump($datos);
+         //   $this->datos['productos'] = $this->ProductosModel->lista_productos_importador(array('inicio' => 0));
+         $this->load->view('importador/lista', $this->datos);
+         $this->load->view('principal',$this->datos);
+       }
 
-            }
-        }
-
-        public  function tbulto($id){
-            
-           /* if ($id) {
-              $_SESSION['tb_seleccionado']=$id;
-            } else {
-              $_SESSION['tb_seleccionado']=" ";
-            }*/
-        }
+       
     }
     
     /* End of file Controllername.php */

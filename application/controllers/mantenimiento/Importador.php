@@ -18,25 +18,22 @@ class Importador extends CI_Controller
 		$this->datos['form']      = "importador/form";
 		$this->datos['action']    = base_url('index.php/mantenimiento/importador/buscar');
 		$this->datos['paises'] = $this->Conf_model->paises();
+		$this->datos['importador'] = $this->Conf_model->empresas();
 		$this->datos['tipobulto'] = $this->Conf_model->tipoBulto();
-		$this->datos['productos'] = $this->Importador_model->verproductos(array('inicio' => 0));
+		//$this->datos['productos'] = $this->Importador_model->verproductos();
 
-		$contar = count($this->datos['productos']);
-		if (10 == $contar) {
-			$this->datos['cantidad'] = $contar;
-		}
+	
 
 		$this->load->view("principal", $this->datos);
 	}
 
 	function buscar(){
+		//$this->datos['vista']     = "importador/contenido";
 		$this->datos['productos'] =  $this->Importador_model->verproductos($_POST);
-		$contar = count($this->datos['productos']);
-		if (10 == $contar) {
-			$this->datos['cantidad'] = $contar;
-		}
-		$this->datos['aumenta'] = $_POST['inicio'] + 1;
+		
+		//var_dump($_POST);
 		$this->load->view('importador/lista', $this->datos);
+		
 	}
 
 	function formeditar($id){

@@ -53,7 +53,7 @@ class Conf_model extends CI_Model {
 
 	function empresas($nit=''){
 
-		/*if (!empty($nit)) {
+	if (!empty($nit)) {
 			$query = $this->db->where("no_identificacion",$nit)
 							  ->get('gacela.cliente_hijo')
 							  ->row();
@@ -63,8 +63,9 @@ class Conf_model extends CI_Model {
 							  ->result();
 		}
 
-		return $query;*/
-
+		return $query;
+	
+/*
 		if (!empty($nit)) {
 			$query = $this->db->where("cod_empresa",$nit)
 							  ->get('empresa')
@@ -75,7 +76,7 @@ class Conf_model extends CI_Model {
 							  ->result();
 		}
 
-		return $query;
+		return $query;*/
 
 	}
 

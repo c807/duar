@@ -2,17 +2,9 @@
 <select name="tipobulto" id="tipobulto" class="form-control">          
 
 <?php     
-     
-if (isset($_SESSION['tb_seleccionado']))
-{
- $id=$_SESSION['tb_seleccionado'];
+ 
 
-}else
-{
-   $id="";
-}
 
-$id=$_POST['tipobulto'];
   foreach($tipobulto as $row){
     
 ?>   

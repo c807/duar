@@ -4,11 +4,64 @@ class Importador_model extends CI_Model
 	protected $resultado = array ();
 
 	function verproductos($ars){
-		if (verDato($ars, 'importador')) {
+		$ejecutar=0;
+		
+		if ($ars['opcionbuscar']==1)
+		{
+			$this->db->where('a.importador', $ars['importador'], 'after');
+			$ejecutar=1;
+		}
+		
+		if ($ars['opcionbuscar']==2)
+		{
 			$this->db->like('b.nombre', $ars['importador'], 'after');
+			$ejecutar=1;
 		}
 
-		return $this->db->select('
+		if ($ars['opcionbuscar']==3)
+		{
+			$this->db->where('a.nombre_proveedor', $ars['importador'], 'after');
+			$ejecutar=1;
+		}
+		if ($ars['opcionbuscar']==4)
+		{
+			$this->db->like('a.codproducto', $ars['importador'], 'after');
+			$ejecutar=1;
+		}
+
+		if ($ars['opcionbuscar']==5)
+		{
+			$this->db->like('a.descripcion', $ars['importador'], 'after');
+			$ejecutar=1;
+		}
+
+		if ($ars['opcionbuscar']==6)
+		{
+			$this->db->where('a.partida', $ars['importador'], 'after');
+			$ejecutar=1;
+		}
+
+		if ($ars['opcionbuscar']==7)
+		{
+			$this->db->like('a.descripcion_generica', $ars['importador'], 'after');
+			$ejecutar=1;
+		}
+
+		if ($ars['opcionbuscar']==8)
+		{
+			$this->db->like('a.funcion', $ars['importador'], 'after');
+			$ejecutar=1;
+		}
+		if (empty($ars['opcionbuscar'])){
+			if ($ars['inicio']==0){
+				$this->db->where('b.nombre', $ars['importador'], 'after');
+				$ejecutar=1;
+			}
+		}
+		
+		
+		if ($ejecutar==1) {
+    		return $this->db->select('
 								b.nombre,
 								a.producimport,
 								a.descripcion,
@@ -28,15 +81,15 @@ class Importador_model extends CI_Model
 								a.observaciones,
 								a.nombre_proveedor,
 								a.importador,
-								c.descripcion as descrip
-								
+								d.nombre nombre_pais,
+								c.descripcion descripcion_bulto
 								')
-						->join('gacela.cliente_hijo b', 'a.importador = b.no_identificacion')
-						->join('tipo_bulto c', 'a.tipo_bulto = c.codigo')
-						->join('pricing.pais d', 'a.paisorigen = d.id_pais')
-						->limit(10, $ars['inicio'])
-						->get('producto_importador a')
-				 		->result();
+                        ->join('gacela.cliente_hijo b', 'a.importador = b.no_identificacion')
+                        ->join('tipo_bulto c', 'a.tipo_bulto = c.codigo')
+                        ->join('pricing.pais d', 'a.paisorigen = d.id_pais')
+                        ->get('producto_importador a')
+                         ->result();
+		}
 	}
 
 	function verlineaproducto($ars) {
