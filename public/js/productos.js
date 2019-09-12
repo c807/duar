@@ -200,7 +200,8 @@ function mostrarModal(titulo) {
         var bookId13 = $(e.relatedTarget).data('book-id13');
         var bookId14 = $(e.relatedTarget).data('book-id14');
         var bookId15 = $(e.relatedTarget).data('book-id15');
-        var bookId16 = $(e.relatedTarget).data('book-id16');          
+        var bookId16 = $(e.relatedTarget).data('book-id16');  
+              
   
         $(e.currentTarget).find('input[name="producimport"]').val(bookId);
         $(e.currentTarget).find('input[name="importador"]').val(bookId1);
@@ -239,6 +240,8 @@ function mostrarModal(titulo) {
         $('#tipobulto').change();
         $("#paises").val(bookId16)
         $('#paises').change();
+        $("#importador").val(bookId1)
+        $('#importador').change();
 
         //document.ready = document.getElementById("tipobulto").value=bookId15; esto tambien funciona
     
@@ -306,8 +309,7 @@ function mostrarModal(titulo) {
         $('#tipobulto').change();
         $("#paises").val(bookId16)
         $('#paises').change();
-        $("#importador").val(bookId16)
-        $('#importador').change();
+        
 
         $(e.currentTarget).find('input[name="paisorigen"]').val(bookId17);
         $(e.currentTarget).find('input[name="descripcion_bulto"]').val(bookId18);

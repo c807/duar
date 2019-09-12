@@ -7,8 +7,8 @@
     <td><?php echo $a++; ?></td>
     <td><?php echo $row->nombre; ?></td>
     <td><?php echo $row->nombre_proveedor; ?></td>
-    <td><?php echo $row->descripcion; ?></td>
     <td><?php echo $row->codproducto; ?></td>
+    <td><?php echo $row->descripcion; ?></td>
     <td><?php echo $row->descripcion_generica; ?></td>
     <td><?php echo $row->funcion; ?></td>
     <td><b><?php $res = ($row->tlc == 1) ? '&#10003;' : 'x'; echo $res; ?></b></td>
@@ -19,8 +19,6 @@
 
     <!-- <td><a href="#formedita" class="btn btn-default btn-xs" onclick="editarprod(<?php echo $row->producimport;?>);"
             title="Editar "><i class="glyphicon glyphicon-edit"></i></a></td>-->
-
-
 
     <td>
 

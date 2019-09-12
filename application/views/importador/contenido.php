@@ -30,8 +30,8 @@
                     <th>#</th>
                     <th>Importador</th>
                     <th>Proveedor</th>
-                    <th>Producto</th>
                     <th>Código</th>
+                    <th>Producto</th>
                     <th>Descripción Generica</th>
                     <th>Función</th>
                     <th>TLC</th>
