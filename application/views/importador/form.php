@@ -48,7 +48,7 @@
 
 <script>
 
-
+//cambia header de modal: Agrgar /Editar
 $(document).ready(function() {
 
     $('#crear_producto').on('show.bs.modal', function(event) {
@@ -60,4 +60,9 @@ $(document).ready(function() {
 
     });
 });
+</script>
+
+
+<script>
+$('#tbld').toggle();
 </script>

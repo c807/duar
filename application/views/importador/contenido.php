@@ -45,8 +45,19 @@
             <tbody id="listaprod">
                 <?php $this->load->view('importador/lista'); ?>
             </tbody>
+
         </table>
+
+        <table class="table table-responsive table-hovered" id="tbld">
+
+
+            <tbody id="lista_duplicados">
+                <?php $this->load->view('importador/duplicados'); ?>
+            </tbody>
+        </table>
+
     </div>
+
 </div>
 </div>
 
@@ -55,15 +66,15 @@
 <div class="modal fade" id="upModal" role="dialog" data-backdrop="static">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-header alert-success ">
+            <div class="modal-header hdmodal buttonclose">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title border-bottom pb-3 mb-4"><strong>SUBIR ARCHIVO </strong></h4>
 
             </div>
             <div class="row-fluid" id="messagefile"></div>
-            <div class="modal-body">
-
-                <form enctype="multipart/form-data" class="up_productos" id="up_productos">
+            <form enctype="multipart/form-data" class="up_productos" id="up_productos"
+            action="javascript:subir_productos()">
+                <div class="modal-body">
 
                     <div class="container-fluid">
                         <div class="row">
@@ -74,15 +85,16 @@
 
                     </div>
 
-                </form>
-            </div> <br>
+                </div> <br>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
 
-                <input type="button" value="Aceptar" id="enviar" class="btn btn-success" onclick="subir_productos()" />
+                    <input type="submit" value="Aceptar" id="enviar" class="btn btn-success"
+                        />
 
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -102,18 +114,19 @@
                 <div class="row-fluid  message" id="message"></div>
                 <div class="modal-body">
 
-                    <form enctype="multipart/form-data" method='$_GET' class="add_producto" id="add_producto"
+                    <form enctype="multipart/form-data"  class="add_producto" id="add_producto"
                         action="javascript:gestion_productos('c')">
-                        <input type="hidden" class="form-control " name="producimport" id="producimport" />
+
                         <div class="container-fluid">
+                            <input type="hidden" class="form-control " name="producimport" id="producimport" />
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label">Importador</label>
                                         <div class="col-sm-8">
-                                         <!--   <input type="text" class="form-control required" name="importador"
+                                            <!--   <input type="text" class="form-control required" name="importador"
                                                  id="importador" placeholder="Introduzca Importador" required /> -->
-                                                <?php $this->load->view('importador'); ?>
+                                            <?php $this->load->view('importador'); ?>
                                         </div>
                                     </div>
                                 </div>
@@ -299,20 +312,21 @@
 
 
 <!--- modal para eliminar registro -->
-<div class="modal" id="delmodal" role="dialog" data-backdrop="static">
+<div class="modal" id="borrar_producto" role="dialog" data-backdrop="static">
 
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
 
             <!-- Modal Header -->
-            <div class="modal-header">
+            <div class="modal-header hdmodal buttonclose">
                 <h4 class="modal-title">Eliminar Producto</h4>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-
+            <div class="row-fluid  message" id="message_delete"></div>
             <!-- Modal body -->
             <div class="modal-body">
                 <form enctype="multipart/form-data" class="del_producto">
+                
                     <div class="form-group">
                         <label for="txtcodigo" class="control-label">Código</label>
                         <input type="text" class="form-control w-50 text-left" id="txtcodigo" name="txtcodigo" readonly>
@@ -342,7 +356,7 @@
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
 
                 <input type="button" value="Borrar" id="borrar" class="btn btn-success" onclick="borrar_productos()"
-                    data-dismiss="modal" />
+                    />
 
 
             </div>
@@ -361,9 +375,9 @@
 
             <!-- Modal Header -->
             <div class="modal-header hdmodal buttonclose">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 id="opcion" class="modal-title border-bottom pb-3 mb-4"><strong>FICHA </strong></h4>
-               
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 id="opcion" class="modal-title border-bottom pb-3 mb-4"><strong>FICHA </strong></h4>
+
             </div>
 
             <!-- Modal body -->
@@ -373,7 +387,8 @@
 
                         <div class="row">
                             <div class="col-sm-5 text-left">
-                          <h4><strong><input type="text" class="sinborde" name="nombre_importador" /></strong></h4>
+                                <h4><strong><input type="text" class="sinborde" name="nombre_importador" /></strong>
+                                </h4>
                             </div>
                         </div>
 
@@ -385,7 +400,8 @@
                             </div>
 
                             <div class="col-sm-8">
-                                <textarea class="sinborde" rows="1" id="descripcion" name="descripcion" style="width:100%"></textarea>
+                                <textarea class="sinborde" rows="1" id="descripcion" name="descripcion"
+                                    style="width:100%"></textarea>
                             </div>
                         </div>
 
@@ -445,13 +461,13 @@
                         </div>
                         <div class="row">
                             <div class="col-sm-4">
-                                <b><i class="glyphicon glyphicon-th" ></i> Número de Bultos:</b> <br>
+                                <b><i class="glyphicon glyphicon-th"></i> Número de Bultos:</b> <br>
                             </div>
                             <div class="col-sm-8">
                                 <input type="text" class="sinborde" name="nbultos" />
                             </div>
 
-                           
+
 
                         </div>
 
@@ -575,7 +591,7 @@
 
 
 <script type="text/javascript">
-$('#delmodal').on('show.bs.modal', function(e) {
+$('#borrar_producto').on('show.bs.modal', function(e) {
     var bookId = $(e.relatedTarget).data('book-id');
     var bookId1 = $(e.relatedTarget).data('book-id1');
 
@@ -587,24 +603,3 @@ $('#delmodal').on('show.bs.modal', function(e) {
 
 });
 </script>
-
-
-<script type="text/javascript">
-</script>
-
-<script>
-$(document).ready(function() {
-
-    $("#myInput").on("keyup", function() {
-
-        var value = $(this).val().toLowerCase();
-
-        $("#tbl tr").filter(function() {
-
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-
-        });
-
-    });
-
-});

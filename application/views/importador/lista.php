@@ -35,7 +35,7 @@
             data-book-id16="<?php echo  $row->paisorigen ?>">
             <i class="glyphicon glyphicon-edit"></i> </a>
 
-        <a href='#delmodal' class="btn btn-default btn-xs" title="Eliminar " data-toggle="modal"
+        <a href='#borrar_producto' class="btn btn-default btn-xs" title="Eliminar " data-toggle="modal"
             style="margin-left:2px;" data-book-id="<?php echo trim($row->codproducto); ?>"
             data-book-id1="<?php echo trim($row->descripcion);?>">
             <i class="glyphicon glyphicon-trash"></i> </a>

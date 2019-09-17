@@ -27,6 +27,7 @@ function gestion_productos(opcion)
             success: function(response){
                 var accion="";
             if (response == 1) {
+                
                 //alert('Ya existe no puede continuar');
                 //  document.getElementById("message").innerHTML = 'Ya existe no puede continuar';
                
@@ -41,9 +42,10 @@ function gestion_productos(opcion)
                 $('.alert .close').on("click", function (e) {
                 $(this).parent().fadeTo(500, 0).slideUp(500);
                 });
-              
-
+            
+                
             } else {
+               
                 if ($('#producimport').val().length == 0) {
                     $("#importador").val("");
                     $("#codproducto").val("");
@@ -59,9 +61,9 @@ function gestion_productos(opcion)
                     $("#nbultos").val("");
                     $("#marca").val("");
                     $("#proveedor").val("");
-                  }
-                
-
+                }
+                  
+                 // $("#listaprod").html($("#producimport").val(""));
                   $("#message").html('<div class="alert alert-success alertgreen"><button type="button" class="close">x</button><strong>Producto ha sido guardado correctamente</strong></div>');
                   window.setTimeout(function () {
                     $(".alert").fadeTo(500, 0).slideUp(500, function () {
@@ -73,11 +75,27 @@ function gestion_productos(opcion)
                     $(this).parent().fadeTo(500, 0).slideUp(500);
                     });
                    
-                } 
+                   
+                }
+                var id= $('#producimport').val();
+                var url = base_url('index.php/productos/ProductosController/consulta/'+ id);
+                            
+               // var url =  $("#formproducto").attr('action');
+               // var datos = $("#formproducto").serialize();
+
+                $.post(url,  function(data){
+                   document.getElementById("listaprod").innerHTML = data;
+                   //$("#listaprod").append( data );
+                })
+           
+           
+
             },
+
             
                      
         });
+        
     }  
 }
 
@@ -96,52 +114,38 @@ function subir_productos()
         contentType: false,
         processData: false,
         success: function(response){
-        $("#messagefile").html('<div class="alert alert-success alertgreen "><button type="button" class="close">x</button><strong>Proceso ha finalizado correctamente.</strong></div>');
-        window.setTimeout(function () {
-        $(".alert").fadeTo(500, 0).slideUp(500, function () {
-            $(this).remove();
-        });
-        }, 5000);
-        $('.alert .close').on("click", function (e) {
-        $(this).parent().fadeTo(500, 0).slideUp(500);
-        });
-        },
-    });
-}
-
-
-function update_productos()
-{
-    var formData;
-    url_destino = "index.php/productos/ProductosController/actualizar_producto/";
-    formData = new FormData($(".edit_producto")[0]);
- 
-    $.ajax({
-        url: base_url(url_destino),  
-        type: 'POST',
-        data: formData,
-        cache: false,
-        contentType: false,
-        processData: false,
-        success: function(data){
+        if (response==1) {
            
-        $("#messageup").html('<div class="alert alert-success alertgreen "><button type="button" class="close">x</button><strong>la Actualización ha  finalizado correctamente.</strong></div>');
-        window.setTimeout(function () {
-        $(".alert").fadeTo(500, 0).slideUp(500, function () {
-            $(this).remove();
-        });
-        }, 5000);
-        $('.alert .close').on("click", function (e) {
-        $(this).parent().fadeTo(500, 0).slideUp(500);
-        });
-        
-        },
+            $("#messagefile").html('<div class="alert alert-success alertgreen "><button type="button" class="close">x</button><strong>Proceso ha finalizado correctamente.</strong></div>');
+            window.setTimeout(function () {
+            $(".alert").fadeTo(500, 0).slideUp(500, function () {
+                $(this).remove();
+            });
+            }, 5000);
+            $('.alert .close').on("click", function (e) {
+            $(this).parent().fadeTo(500, 0).slideUp(500);
+            });
+            
+        }   
+       else{
+       
+        var url = base_url('index.php/productos/ProductosController/consulta_duplicados/');
       
 
+        $.post(url,  function(data){
+          
+            document.getElementById("listaprod").innerHTML ="";
+            $("#msg").html('<div class="alert alert-danger alertred "><button type="button" class="close">x</button><strong>Los sguientes productos, ya existen en la Base de Datos (Proceso Cancelado)</strong></div>');
+           document.getElementById("lista_duplicados").innerHTML = data;
+          // $('#tbl').toggle(); 
+           //$('#tbl').show();
+           
+        })
 
-
-        
+       }
+        },
     });
+
 }
 
 
@@ -160,7 +164,7 @@ function borrar_productos()
         processData: false,
         success: function(data){
           
-        $("#message").html('<div class="alert alert-success alertgreen "><button type="button" class="close">x</button><strong>Producto ha  sido borrado.</strong></div>');
+        $("#message_delete").html('<div class="alert alert-success alertgreen "><button type="button" class="close">x</button><strong>Producto ha  sido borrado.</strong></div>');
         window.setTimeout(function () {
         $(".alert").fadeTo(500, 0).slideUp(500, function () {
             $(this).remove();
@@ -170,8 +174,8 @@ function borrar_productos()
         $('.alert .close').on("click", function (e) {
         $(this).parent().fadeTo(500, 0).slideUp(500);
         });
-       
- 
+      
+        document.getElementById("listaprod").innerHTML = ""; 
          
         },
     });

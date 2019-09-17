@@ -59,6 +59,8 @@ class Importador_model extends CI_Model
 			}
 		}
 		
+	
+		$ejecutar=1;
 		
 		if ($ejecutar==1) {
     		return $this->db->select('

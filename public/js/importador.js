@@ -9,7 +9,7 @@ function enviarformproducto(form){
 }
 
 function vermas(inicio) {
-	$("#textocargar").html('Cargando...');
+	Z$("#textocargar").html('Cargando...');
   
  	var ahora = $("input#inicio").val();
   	$("input#inicio").val(inicio+parseInt(ahora));
