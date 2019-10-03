@@ -26,7 +26,7 @@ function gestion_productos(opcion) {
 					$("#message").html(
 						'<div class="alert alert-success alertred "><button type="button" class="close">x</button><strong>Código de producto ya esta registrado en BDD</strong></div>'
 					);
-
+					document.getElementById("lista_duplicados").innerHTML = "";
 					alert_hide();
 				} else {
 					if ($("#producimport").val().length == 0) {
@@ -49,6 +49,9 @@ function gestion_productos(opcion) {
 					$("#message").html(
 						'<div class="alert alert-success alertgreen"><button type="button" class="close">x</button><strong>Producto ha sido guardado correctamente</strong></div>'
 					);
+					document.getElementById("msg").innerHTML = "";
+					document.getElementById("lista_duplicados").innerHTML = "";
+
 					alert_hide();
 				}
 				var id = $("#producimport").val();
@@ -116,7 +119,8 @@ function borrar_productos() {
 			$("#message_delete").html(
 				'<div class="alert alert-success alertgreen "><button type="button" class="close">x</button><strong>Producto ha  sido borrado.</strong></div>'
 			);
-
+			document.getElementById("msg").innerHTML = "";
+			document.getElementById("lista_duplicados").innerHTML = "";
 			document.getElementById("listaprod").innerHTML = "";
 		}
 	});

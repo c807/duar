@@ -212,7 +212,7 @@
         public function consulta_duplicados()
         {
             $this->datos['productos'] = $_SESSION['duplicados'];
-         
+            unset($_SESSION["duplicados"]);
             $this->load->view('importador/duplicados', $this->datos);
         }
     }
