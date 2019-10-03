@@ -1,5 +1,5 @@
 
-<select name="paises" id="paises" class="form-control">
+<select name="paises" id="paises" class="form-control chosen">
 
 <?php foreach ($paises as $row): ?>    
 
@@ -13,6 +13,6 @@
 
 <script>
 
-$(".chosen").chosen( { width: "50%"} );
+$(".chosen").chosen( { width: "100%"} );
 
 </script>

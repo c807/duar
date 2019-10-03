@@ -73,7 +73,7 @@
             </div>
             <div class="row-fluid" id="messagefile"></div>
             <form enctype="multipart/form-data" class="up_productos" id="up_productos"
-            action="javascript:subir_productos()">
+                action="javascript:subir_productos()">
                 <div class="modal-body">
 
                     <div class="container-fluid">
@@ -90,8 +90,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
 
-                    <input type="submit" value="Aceptar" id="enviar" class="btn btn-success"
-                        />
+                    <input type="submit" value="Aceptar" id="enviar" class="btn btn-success" />
 
                 </div>
             </form>
@@ -114,7 +113,7 @@
                 <div class="row-fluid  message" id="message"></div>
                 <div class="modal-body">
 
-                    <form enctype="multipart/form-data"  class="add_producto" id="add_producto"
+                    <form enctype="multipart/form-data" class="add_producto" id="add_producto"
                         action="javascript:gestion_productos('c')">
 
                         <div class="container-fluid">
@@ -326,13 +325,13 @@
             <!-- Modal body -->
             <div class="modal-body">
                 <form enctype="multipart/form-data" class="del_producto">
-                
-                    <div class="form-group">
+
+                    <div class="form-group  has-success">
                         <label for="txtcodigo" class="control-label">Código</label>
                         <input type="text" class="form-control w-50 text-left" id="txtcodigo" name="txtcodigo" readonly>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group  has-success">
                         <label for="txtnombre" class="control-label">Nombre</label>
                         <input type="text" class="form-control w-100 text-left" id="txtnombre" name="txtnombre"
                             readonly>
@@ -355,8 +354,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
 
-                <input type="button" value="Borrar" id="borrar" class="btn btn-success" onclick="borrar_productos()"
-                    />
+                <input type="button" value="Borrar" id="borrar" class="btn btn-success" onclick="borrar_productos()" />
 
 
             </div>
@@ -577,7 +575,7 @@
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
 
                         <button type="submit" class="btn btn-success btnsuccess ">
-                            <i class="glyphicon glyphicon-search">Aceptar</i>
+                            <i class="glyphicon glyphicon-search"> Buscar</i>
                         </button>
                     </div>
 
@@ -588,7 +586,6 @@
 </div>
 
 <!---fin  modal busqueda personalizada -->
-
 
 <script type="text/javascript">
 $('#borrar_producto').on('show.bs.modal', function(e) {

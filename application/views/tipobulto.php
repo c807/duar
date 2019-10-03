@@ -1,5 +1,5 @@
 
-<select name="tipobulto" id="tipobulto" class="form-control">          
+<select name="tipobulto" id="tipobulto" class="form-control chosen">          
 
 <?php     
  
@@ -18,6 +18,6 @@
 
 <script>
 
-$(".chosen").chosen( { width: "50%"} );
+$(".chosen").chosen( { width: "100%"} );
 
 </script>

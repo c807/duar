@@ -1,5 +1,5 @@
 
-<select name="importador" id="importador" class="form-control">
+<select name="importador" id="importador" class="form-control chosen">
 
 <?php foreach ($importador as $row): ?>    
 
@@ -13,6 +13,6 @@
 
 <script>
 
-$(".chosen").chosen( { width: "50%"} );
+$(".chosen").chosen( { width: "100%"} );
 
 </script>
