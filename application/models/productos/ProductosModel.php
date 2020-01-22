@@ -52,7 +52,6 @@
                                     a.peso_neto,
                                     a.numeros,
                                     a.marca,
-                                    a.tipo_bulto,
                                     a.funcion,
                                     a.descripcion_generica,
                                     a.permiso,
@@ -63,7 +62,6 @@
                                     c.descripcion descripcion_bulto
                                     ')
                             ->join('gacela.cliente_hijo b', 'a.importador = b.no_identificacion')
-                            ->join('tipo_bulto c', 'a.tipo_bulto = c.codigo')
                             ->join('pricing.pais d', 'a.paisorigen = d.id_pais')
                             ->get('producto_importador a')
                             ->result();

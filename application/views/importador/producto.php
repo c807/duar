@@ -42,33 +42,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group row">
-                                        <label class="col-sm-4 control-label">Peso Neto</label>
-                                        <div class="col-sm-8">
-                                            <input type="number" class="form-control" name="pesoneto" id="pesoneto"
-                                                min="0" step="0.01" placeholder="Introduzca peso neto" required />
-                                        </div>
-                                    </div>
 
-
-                                    <div class="form-group row">
-                                        <label for="tipobulto" class="col-sm-4 control-label">Tipo Bulto</label>
-                                        <div class="col-sm-8">
-                                      
-
-                                            <?php
-                                          
-                                            $this->load->view('tipobulto'); ?>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-sm-4 control-label">Números</label>
-                                        <div class="col-sm-8">
-                                            <input type="text" class="form-control" name="numeros" id="numeros"
-                                                placeholder="Introduzca Números" required />
-                                        </div>
-                                    </div>
 
 
                                     <div class="form-group row">
@@ -121,14 +95,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group row">
-                                        <label class="col-sm-4 control-label  ">No. Bultos</label>
-                                        <div class="col-sm-8">
-                                            <input type="number" class="form-control" name="nbultos" id="nbultos"
-                                                min="0" step="0.01" placeholder="Introduzca Número de Bultos"
-                                                required />
-                                        </div>
-                                    </div>
+                                  
 
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label  ">Marca</label>

@@ -56,7 +56,7 @@
             data-book-id17="<?php echo  $row->nombre_pais ?>"
             data-book-id18="<?php echo  $row->descripcion_bulto ?>"
             data-book-id19="<?php echo  $row->nombre ?>">
-            <i class="glyphicon glyphicon-edit"></i> </a>
+            <i class="glyphicon glyphicon-list"></i> </a>
 
     </td>
 </tr>

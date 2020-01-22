@@ -67,18 +67,15 @@ class Importador_model extends CI_Model
 								a.peso_neto,
 								a.numeros,
 								a.marca,
-								a.tipo_bulto,
 								a.funcion,
 								a.descripcion_generica,
 								a.permiso,
 								a.observaciones,
 								a.nombre_proveedor,
 								a.importador,
-								d.nombre nombre_pais,
-								c.descripcion descripcion_bulto
+								d.nombre nombre_pais
 								')
                         ->join('gacela.cliente_hijo b', 'a.importador = b.no_identificacion')
-                        ->join('tipo_bulto c', 'a.tipo_bulto = c.codigo')
                         ->join('pricing.pais d', 'a.paisorigen = d.id_pais')
                         ->get('producto_importador a')
                          ->result();
@@ -112,7 +109,6 @@ class Importador_model extends CI_Model
 								')
                         ->where('producimport', $ars['prodimpor'])
                         ->join('gacela.cliente_hijo b', 'a.importador = b.no_identificacion')
-                        ->join('tipo_bulto c', 'a.tipo_bulto = c.codigo')
                         ->join('pricing.pais d', 'a.paisorigen = d.id_pais')
                         ->get('producto_importador a')
                         ->row();

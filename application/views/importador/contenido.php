@@ -120,6 +120,15 @@
                             <input type="hidden" class="form-control " name="producimport" id="producimport" />
                             <div class="row">
                                 <div class="col-sm-6">
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="row">
+
+                                <div class="col-sm-6">
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label">Importador</label>
                                         <div class="col-sm-8">
@@ -128,15 +137,6 @@
                                             <?php $this->load->view('importador'); ?>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-sm-6"></div>
-                            </div>
-
-
-                            <div class="row">
-
-                                <div class="col-sm-6">
-
 
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label">Código</label>
@@ -146,33 +146,6 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group row">
-                                        <label class="col-sm-4 control-label">Peso Neto</label>
-                                        <div class="col-sm-8">
-                                            <input type="number" class="form-control" name="pesoneto" id="pesoneto"
-                                                min="0" step="0.01" placeholder="Introduzca peso neto" required />
-                                        </div>
-                                    </div>
-
-
-                                    <div class="form-group row">
-                                        <label for="tipobulto" class="col-sm-4 control-label">Tipo Bulto</label>
-                                        <div class="col-sm-8">
-
-
-                                            <?php
-                                          
-                                            $this->load->view('tipobulto'); ?>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <label class="col-sm-4 control-label">Números</label>
-                                        <div class="col-sm-8">
-                                            <input type="text" class="form-control" name="numeros" id="numeros"
-                                                placeholder="Introduzca Números" required />
-                                        </div>
-                                    </div>
 
 
                                     <div class="form-group row">
@@ -195,6 +168,19 @@
                                         </div>
                                     </div>
 
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 control-label">Observaciones</label>
+                                        <div class="col-sm-8">
+                                            <textarea class="form-control" rows="3" id="observaciones"
+                                                name="observaciones" placeholder="Introduzca Observación"
+                                                required></textarea>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <!--fin primera Columna -->
+                                <div class="col-sm-6">
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label">Proveedor</label>
                                         <div class="col-sm-8">
@@ -202,11 +188,6 @@
                                                 placeholder="Nombre Proveedor" required />
                                         </div>
                                     </div>
-
-
-                                </div>
-                                <!--fin primera Columna -->
-                                <div class="col-sm-6">
 
                                     <!--Inicio segunda Columna -->
                                     <div class="form-group row">
@@ -225,14 +206,6 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group row">
-                                        <label class="col-sm-4 control-label  ">No. Bultos</label>
-                                        <div class="col-sm-8">
-                                            <input type="number" class="form-control" name="nbultos" id="nbultos"
-                                                min="0" step="0.01" placeholder="Introduzca Número de Bultos"
-                                                required />
-                                        </div>
-                                    </div>
 
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label  ">Marca</label>
@@ -251,14 +224,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group row">
-                                        <label class="col-sm-4 control-label">Observaciones</label>
-                                        <div class="col-sm-8">
-                                            <textarea class="form-control" rows="3" id="observaciones"
-                                                name="observaciones" placeholder="Introduzca Observación"
-                                                required></textarea>
-                                        </div>
-                                    </div>
+                                   
 
 
                                     <div class="form-group row">
