@@ -29,9 +29,8 @@
             data-book-id4="<?php echo $row->descripcion_generica;?>" data-book-id5="<?php echo $row->funcion;?>"
             data-book-id6="<?php echo $row->partida;?>" data-book-id7="<?php echo $row->observaciones;?>"
             data-book-id8="<?php echo $row->permiso; ?> " data-book-id9="<?php echo $row->tlc; ?> "
-            data-book-id10="<?php echo $row->nombre_proveedor; ?>" data-book-id11="<?php echo $row->peso_neto; ?>"
-            data-book-id12="<?php echo $row->numeros; ?>" data-book-id13="<?php echo $row->no_bultos; ?>"
-            data-book-id14="<?php echo $row->marca; ?>" data-book-id15="<?php echo  $row->tipo_bulto ?>"
+            data-book-id10="<?php echo $row->nombre_proveedor; ?>" 
+            data-book-id14="<?php echo $row->marca; ?>" 
             data-book-id16="<?php echo  $row->paisorigen ?>">
             <i class="glyphicon glyphicon-edit"></i> </a>
 

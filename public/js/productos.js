@@ -26,6 +26,7 @@ function gestion_productos(opcion) {
 					$("#message").html(
 						'<div class="alert alert-success alertred "><button type="button" class="close">x</button><strong>Código de producto ya esta registrado en BDD</strong></div>'
 					);
+					
 					document.getElementById("lista_duplicados").innerHTML = "";
 					alert_hide();
 				} else {
@@ -39,20 +40,18 @@ function gestion_productos(opcion) {
 						$("#observaciones").val("");
 						$("#tlc").prop("checked", false);
 						$("#permiso").prop("checked", false);
-						$("#pesoneto").val("");
-						$("#numeros").val("");
-						$("#nbultos").val("");
 						$("#marca").val("");
 						$("#proveedor").val("");
+						$.notify("Producto guardado." , "success" );
+					}else{
+						$.notify("Los cambios han sido guardados" , "success" );
+						CerrarModal();
 					}
-
-					$("#message").html(
-						'<div class="alert alert-success alertgreen"><button type="button" class="close">x</button><strong>Producto ha sido guardado correctamente</strong></div>'
-					);
+				
+					
 					document.getElementById("msg").innerHTML = "";
 					document.getElementById("lista_duplicados").innerHTML = "";
-
-					alert_hide();
+					
 				}
 				var id = $("#producimport").val();
 				var url = base_url(
@@ -61,7 +60,10 @@ function gestion_productos(opcion) {
 
 				$.post(url, function(data) {
 					document.getElementById("listaprod").innerHTML = data;
+					
 				});
+
+				
 			}
 		});
 	}
@@ -116,12 +118,12 @@ function borrar_productos() {
 		contentType: false,
 		processData: false,
 		success: function(data) {
-			$("#message_delete").html(
-				'<div class="alert alert-success alertgreen "><button type="button" class="close">x</button><strong>Producto ha  sido borrado.</strong></div>'
-			);
+			
+			$.notify("Producto ha sido eliminado." , "success" );
 			document.getElementById("msg").innerHTML = "";
 			document.getElementById("lista_duplicados").innerHTML = "";
 			document.getElementById("listaprod").innerHTML = "";
+			
 		}
 	});
 }
@@ -143,11 +145,7 @@ function mostrar() {
 		var bookId8 = $(e.relatedTarget).data("book-id8");
 		var bookId9 = $(e.relatedTarget).data("book-id9");
 		var bookId10 = $(e.relatedTarget).data("book-id10");
-		var bookId11 = $(e.relatedTarget).data("book-id11");
-		var bookId12 = $(e.relatedTarget).data("book-id12");
-		var bookId13 = $(e.relatedTarget).data("book-id13");
 		var bookId14 = $(e.relatedTarget).data("book-id14");
-		var bookId15 = $(e.relatedTarget).data("book-id15");
 		var bookId16 = $(e.relatedTarget).data("book-id16");
 
 		$(e.currentTarget)
@@ -204,15 +202,6 @@ function mostrar() {
 			.find('input[name="proveedor"]')
 			.val(bookId10);
 		$(e.currentTarget)
-			.find('input[name="pesoneto"]')
-			.val(bookId11);
-		$(e.currentTarget)
-			.find('input[name="numeros"]')
-			.val(bookId12);
-		$(e.currentTarget)
-			.find('input[name="nbultos"]')
-			.val(bookId13);
-		$(e.currentTarget)
 			.find('input[name="marca"]')
 			.val(bookId14);
 
@@ -220,14 +209,16 @@ function mostrar() {
         var modal = $(this)
         modal.find('.modal-body #tipobulto').val(bookId15)
         */
-		$("#tipobulto").val(bookId15);
-		$("#tipobulto").change();
+	//	console.log(bookId16);
 		$("#paises").val(bookId16);
 		$("#paises").change();
 		$("#importador").val(bookId1);
 		$("#importador").change();
-
-		//document.ready = document.getElementById("tipobulto").value=bookId15; esto tambien funciona
+		$("#paises").val(bookId16).trigger("chosen:updated.chosen");
+		$("#importador").val(bookId1).trigger("chosen:updated.chosen");
+		$(".chosen").chosen( { width: "100%"} );
+		
+		//document.ready = document.getElementById("paises").value=bookId15; esto tambien funciona
 	});
 }
 function mostrarficha() {
@@ -357,3 +348,8 @@ function alert_hide() {
 			.slideUp(500);
 	});
 }
+function CerrarModal() {
+	$("#crear_producto").modal('hide');
+	$('body').removeClass('modal-open');
+	$('.modal-backdrop').remove();
+  }

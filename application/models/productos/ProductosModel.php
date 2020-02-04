@@ -58,9 +58,8 @@
                                     a.observaciones,
                                     a.nombre_proveedor,
                                     a.importador,
-                                    d.nombre nombre_pais,
-                                    c.descripcion descripcion_bulto
-                                    ')
+                                    d.nombre nombre_pais
+                                  ')
                             ->join('gacela.cliente_hijo b', 'a.importador = b.no_identificacion')
                             ->join('pricing.pais d', 'a.paisorigen = d.id_pais')
                             ->get('producto_importador a')

@@ -65,15 +65,9 @@
 
                 'paisorigen' => $_POST["paises"],
 
-                'tipo_bulto' => $_POST["tipobulto"],
+                'marca' => $_POST["marca"]
 
-                'peso_neto' => $_POST["pesoneto"],
-
-                'no_bultos' => $_POST["nbultos"],
-
-                'marca' => $_POST["marca"],
-
-                'numeros' => $_POST["numeros"]
+              
 
             );
 
@@ -103,7 +97,7 @@
                         $tlc = $worksheet->getCellByColumnAndRow(8, $row)->getValue();
                         $proveedor = $worksheet->getCellByColumnAndRow(9, $row)->getValue();
                         $origen = $worksheet->getCellByColumnAndRow(10, $row)->getValue();
-                        $tipo_bulto = $worksheet->getCellByColumnAndRow(11, $row)->getValue();
+                        $marca = $worksheet->getCellByColumnAndRow(11, $row)->getValue();  
 
 
                         $codigo=$this->ProductosModel->buscar_producto($codproducto, $origen);
@@ -157,7 +151,7 @@
                         $tlc = $worksheet->getCellByColumnAndRow(8, $row)->getValue();
                         $proveedor = $worksheet->getCellByColumnAndRow(9, $row)->getValue();
                         $origen = $worksheet->getCellByColumnAndRow(10, $row)->getValue();
-                        $tipo_bulto = $worksheet->getCellByColumnAndRow(11, $row)->getValue();
+                        $marca = $worksheet->getCellByColumnAndRow(11, $row)->getValue();
                      
                        
                         $data[] = array(
@@ -184,7 +178,7 @@
 
                             'paisorigen' =>  $origen,
 
-                            'tipo_bulto' =>  $tipo_bulto
+                            'marca' => $marca
                             
                         );
                     }

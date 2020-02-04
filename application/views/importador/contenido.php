@@ -38,7 +38,6 @@
                     <th>Permiso</th>
                     <th>Partida</th>
                     <th>Origen</th>
-                    <th>Fecha</th>
                     <th colspan="2">Acciones</th>
                 </tr>
             </thead>
@@ -261,7 +260,7 @@
 
                                 <div class="col">
                                     <input type="submit" value="Guardar" id="enviar"
-                                        class="btn btn-success pull-left btnsuccess" />
+                                        class="btn btn-success pull-left btnsuccess"  />
                                 </div>
                             </div>
                     </form>
@@ -320,7 +319,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
 
-                <input type="button" value="Borrar" id="borrar" class="btn btn-success" onclick="borrar_productos()" />
+                <input type="button" value="Borrar" id="borrar" class="btn btn-success" data-dismiss="modal"  onclick="borrar_productos()"  />
 
 
             </div>
