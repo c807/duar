@@ -71,17 +71,14 @@
 
             </div>
             <div class="row-fluid" id="messagefile"></div>
-            <form enctype="multipart/form-data" class="up_productos" id="up_productos"
+            <form enctype="multipart/form-data" method="post" class="up_productos" id="up_productos"
                 action="javascript:subir_productos()">
                 <div class="modal-body">
 
                     <div class="container-fluid">
                         <div class="row">
-
                             <input type="file" name="file" id="file" class="w-50" required accept=".xls" />
-
                         </div>
-
                     </div>
 
                 </div> <br>
