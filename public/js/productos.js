@@ -88,7 +88,8 @@ function subir_productos() {
 				);
 				$("#file").val("");
 				alert_hide();
-			} else {
+			} 
+			if (response == 0){
 				var url = base_url(
 					"index.php/productos/ProductosController/consulta_duplicados/"
 				);

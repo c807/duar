@@ -26,7 +26,9 @@
       
         public function insertar($data)
         {
-            $this->db->insert_batch('producto_importador', $data);
+           if($this->db->insert_batch('producto_importador', $data)){
+               echo 1;
+           }
         }
 
         public function borrar_producto($codigo)

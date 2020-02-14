@@ -78,11 +78,25 @@
        
         public function cargar_desde_archivo()
         {
-            $bandera="N";
-            if (isset($_FILES["file"]["name"])) {
-                $path = $_FILES["file"]["tmp_name"];
-                $object = PHPExcel_IOFactory::load($path);
-                foreach ($object->getWorksheetIterator() as $worksheet) {
+            $nombre=basename($_FILES["file"]["name"]);
+            $ubicacion = sys_base("duar/public/fls");
+
+            if (!file_exists($ubicacion)) {
+                if (!mkdir($ubicacion, 0777, true)) {
+                    die('Fallo al crear las carpeta de archivos...');
+                }
+            }
+           
+            $ubicacion .= "/".$nombre;
+            move_uploaded_file($_FILES['file']['tmp_name'], $ubicacion);
+
+         
+            try {
+                $objPHPExcel = PHPExcel_IOFactory::load($ubicacion);
+                $bandera="N";
+                                
+                $objPHPExcel = PHPExcel_IOFactory::load($ubicacion);
+                foreach ($objPHPExcel->getWorksheetIterator() as $worksheet) {
                     $highestRow = $worksheet->getHighestRow();
                     $highestColumn = $worksheet->getHighestColumn();
                     for ($row=2; $row<=$highestRow; $row++) {
@@ -97,7 +111,7 @@
                         $tlc = $worksheet->getCellByColumnAndRow(8, $row)->getValue();
                         $proveedor = $worksheet->getCellByColumnAndRow(9, $row)->getValue();
                         $origen = $worksheet->getCellByColumnAndRow(10, $row)->getValue();
-                        $marca = $worksheet->getCellByColumnAndRow(11, $row)->getValue();  
+                        $marca = $worksheet->getCellByColumnAndRow(11, $row)->getValue();
 
 
                         $codigo=$this->ProductosModel->buscar_producto($codproducto, $origen);
@@ -120,23 +134,36 @@
               
                 if ($bandera=='S') {
                     echo 0;
+                   
                     $_SESSION['duplicados']=$data;
                 }
+            } catch (Exception $e) {
+                die('Error loading file "'.pathinfo($ubicacion, PATHINFO_BASENAME).'": '.$e->getMessage());
             }
-             
+            
            
             if ($bandera=="N") {
                 $this->guardar();
             }
         }
+
         public function guardar()
         {
-            echo 1;
+            $nombre=basename($_FILES["file"]["name"]);
+            $ubicacion = sys_base("duar/public/fls");
 
-            if (isset($_FILES["file"]["name"])) {
-                $path = $_FILES["file"]["tmp_name"];
-                $object = PHPExcel_IOFactory::load($path);
-                foreach ($object->getWorksheetIterator() as $worksheet) {
+            if (!file_exists($ubicacion)) {
+                if (!mkdir($ubicacion, 0777, true)) {
+                    die('Fallo al crear las carpeta de archivos...');
+                }
+            }
+           
+            $ubicacion .= "/".$nombre;
+            move_uploaded_file($_FILES['file']['tmp_name'], $ubicacion);
+
+            try {
+                $objPHPExcel = PHPExcel_IOFactory::load($ubicacion);
+                foreach ($objPHPExcel->getWorksheetIterator() as $worksheet) {
                     $highestRow = $worksheet->getHighestRow();
                     $highestColumn = $worksheet->getHighestColumn();
                     for ($row=2; $row<=$highestRow; $row++) {
@@ -184,6 +211,9 @@
                     }
                 }
                 $this->ProductosModel->insertar($data);
+                unlink($ubicacion);
+            } catch (Exception $e) {
+                die('Error loading file "'.pathinfo($ubicacion, PATHINFO_BASENAME).'": '.$e->getMessage());
             }
         }
 
