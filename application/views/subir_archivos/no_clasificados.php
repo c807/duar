@@ -43,6 +43,7 @@ if (isset($_SESSION["no_clasificado"])) {?>
                                                     $this->data = array(
                                                         'id_reg' => $field);
                                                     $this->datos['id'] = $this->data;
+                                                   
                                                     $this->load->view("subir_archivos/crear_partida",$this->datos )
                                                  ?>
                                             </div>
@@ -61,3 +62,8 @@ if (isset($_SESSION["no_clasificado"])) {?>
             </div>
 </div>
 
+<script>
+if ($('tlc').is(':checked')) {
+    alert('fine');
+}
+</script>

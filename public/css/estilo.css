@@ -109,3 +109,15 @@ table tr:hover{
 	border: 0;
   }
 
+.cajafija{
+		position: fixed;
+		min-height: 300px;
+		width: 400px;
+		text-align: center;
+		word-wrap: break-word;
+		background-color: aquamarine;
+		
+		top:2px;
+		right:2px;
+	
+}

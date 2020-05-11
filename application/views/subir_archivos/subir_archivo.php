@@ -63,8 +63,7 @@
                         <br>
                             <?php } ?>
 				    <div card="card-body">
-                                            
-                        <div id="no_clasificados">
+                         <div id="no_clasificados">
                             <?php $this->load->view('subir_archivos/listado_productos')?>
                         </div>
                         <div>

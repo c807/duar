@@ -29,6 +29,7 @@
             if (isset($_POST["permiso"])>0) {
                 $permiso=1;
             }
+            
             $id=$_POST["producimport"];
             if ($id) {
             } else {

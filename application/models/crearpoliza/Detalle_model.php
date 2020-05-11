@@ -6,11 +6,10 @@ class Detalle_model extends Crearpoliza_model {
 		$this->idr = $id;
 	}
 
-	function numitem(){
+	function numitem($id){
 		$query = $this->db
 						->select('(max(item)+1) as item')
-						->where('duaduana',$this->idr)
-						->where('eliminar',0)
+						->where('duaduana',$id)
 						->get('detalle')
 						->row()->item;
 		if($query){
@@ -18,6 +17,20 @@ class Detalle_model extends Crearpoliza_model {
 		} else {
 			return 1;
 		}
+	}
+	function numitevvm($id){
+	//echo $id;
+		$query = $this->db
+						->select_max('item')
+						->where('duaduana',$id)
+						->get('detalle')
+						->row();
+		/*if($query){
+			return $query;
+		} else {
+			return 1;
+		}*/
+		return $query;
 	}
 
 	function verlineadetalle($id){

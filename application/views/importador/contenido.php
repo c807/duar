@@ -220,16 +220,11 @@
                                         </div>
                                     </div>
 
-                                   
-
-
                                     <div class="form-group row">
-
                                         <label class="col-sm-4 control-label  "></label>
                                         <div class=" checkbox col-sm-4">
                                             <label><input type="checkbox" value="" name="permiso"
                                                     id="permiso">PERMISO</label>
-
                                         </div>
                                         <label class="col-sm-0 control-label  "></label>
                                         <div class=" checkbox col-sm-4">
@@ -237,13 +232,7 @@
                                             <label><input type="checkbox" value="" name="tlc" id="tlc"
                                                     class="pull-right">TLC</label>
                                         </div>
-
-
-
                                     </div>
-
-
-
                                 </div>
                                 <!--fin segunda Columna -->
                             </div>
@@ -257,7 +246,7 @@
 
                                 <div class="col">
                                     <input type="submit" value="Guardar" id="enviar"
-                                        class="btn btn-success pull-left btnsuccess"  />
+                                        class="btn btn-success pull-left btnsuccess" />
                                 </div>
                             </div>
                     </form>
@@ -316,7 +305,8 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
 
-                <input type="button" value="Borrar" id="borrar" class="btn btn-success" data-dismiss="modal"  onclick="borrar_productos()"  />
+                <input type="button" value="Borrar" id="borrar" class="btn btn-success" data-dismiss="modal"
+                    onclick="borrar_productos()" />
 
 
             </div>
@@ -562,3 +552,4 @@ $('#borrar_producto').on('show.bs.modal', function(e) {
 
 });
 </script>
+

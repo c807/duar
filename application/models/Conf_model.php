@@ -2,6 +2,7 @@
 class Conf_model extends CI_Model {
 	function __construct(){
 		parent :: __construct();
+		$_SESSION['pais_id']=2;// remover esto antes de subirlo a git
 		if (isset($_SESSION['pais_id'])) {
 			$this->pais = $_SESSION['pais_id'];
 		} else {
@@ -104,6 +105,7 @@ class Conf_model extends CI_Model {
 							->result();
 		}
 	}
+	
 
 	function tipoBulto($ipo=''){
 		if (!empty($tipo)) {
@@ -129,6 +131,16 @@ class Conf_model extends CI_Model {
 		}
 	}
 
+	function preferencia($doc=''){
+		if (!empty($doc)) {
+			return $this->db->where('cod_preferencia',$doc)
+							->get('preferencia')
+							->row();
+		} else {
+			return $this->db->get('preferencia')
+						    ->result();
+		}
+	}
 	function verfinalizar($file=''){
 		if (! empty($file)){
 			$sql = $this->db->where('c807_file', $file)
@@ -144,6 +156,22 @@ class Conf_model extends CI_Model {
 		return $this->db->get('reg_extendido')
 				    	->result();
 	}
+
+	function equipamiento(){
+		return $this->db->get('equipamiento')
+				    	->result();
+	}
+
+	function tipocontenedor(){
+		return $this->db->get('tipo_contenedor')
+				    	->result();
+	}
+	function tipocarga(){
+		return $this->db->get('tipo_carga')
+				    	->result();
+	}
+
+	
 
 	function regadicional(){
 		return $this->db->where('')
@@ -161,6 +189,11 @@ class Conf_model extends CI_Model {
 						->result();
 	}
 
+	function entidad(){
+		return $this->db->get('entidad')
+						->result();
+	}
+
 	function localmercancia(){
 		return $this->db->where('pais_empresa', $this->pais)
 						->get('localizacion_mercancia')
@@ -172,6 +205,8 @@ class Conf_model extends CI_Model {
 						->get('zona_descargue')
 						->result();
 	}
+
+	
 
 	function presentacion(){
 		return $this->db->where('pais_empresa', $this->pais)
@@ -197,6 +232,8 @@ class Conf_model extends CI_Model {
 						->get('tipo_documento')
 						->result();
 	}
+
+
 
 	function agentes(){
 		return $this->db->where("pais_empresa", $this->pais)

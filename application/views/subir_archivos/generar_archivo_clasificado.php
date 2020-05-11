@@ -1,65 +1,188 @@
+<style>
+.boton {
+    background-color: white;
+    border-style: solid;
+    border-color: #3D6654;
+
+    padding: 6px 6px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+    cursor: pointer;
+
+    position: relative;
+    left: 13%;
+    clear: left;
+    font-size: 12px;
+    width: 125px;
+    border-radius: 8px;
+    padding: 10px;
+
+
+}
+
+.boton:hover {
+    background: #3D6654;
+    color: white;
+}
+</style>
 <div class="container">
+
     <div class="panel panel-success">
-          <div class="panel-heading">
-                <h3 class="panel-title">Generar Archivo Clasificado</h3>
-          </div>
-          <div class="panel-body">
-                <?php  echo form_open_multipart("subir_archivo/generar_excel",array("name"=>"form" , "method"=>"GET"));?>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <tbody>
-                                <tr>
-                                    <td><label for="c807_file" class="col-sm-2"></label>Numero de File</td>
-                                    <td><input type="text" name="c807_file" id="c807_file" class="form-control" required="required"></td>
-                                    <td><label for="doc_transporte" class="col-sm-2"></label>Documento de Transporte</td>
-                                    <td><input type="text" name="doc_transporte" id="doc_transporte" class="form-control" required="required"></td>
-                                </tr>
-                                <tr>
+        <div class="panel-heading">
+            <h3 class="panel-title">Generar Archivo Clasificado</h3>
+        </div>
+        <div class="panel-body">
+            <form enctype="multipart/form-data" class="retaceo" id="retaceo">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <tbody>
+                            <tr>
+                                <td><label for="c807_file" class="col-sm-2"></label>Numero de File</td>
+                                <td><input type="text" name="c807_file" id="c807_file" class="form-control"
+                                        required="required"></td>
+                                <td><label for="doc_transporte" class="col-sm-2"></label>Documento de Transporte</td>
+                                <td><input type="text" name="doc_transporte" id="doc_transporte" class="form-control"
+                                        required="required"></td>
+                            </tr>
 
-                                </tr>
-                                <tr>
-                                    <td><label for="tot_bultos" class="col-sm-2"></label>Total Bultos</td>
-                                    <td><input type="number" name="tot_bultos" id="tot_bultos" class="form-control" required="required"></td>
-                                    <td><label for="tot_kilos" class="col-sm-2"></label>Total Peso Kilos</td>
-                                    <td><input type="number" name="tot_kilos" id="tot_kilos" class="form-control" required="required" step="0.01"></td>
-                                </tr>
-                                <tr>
+                        </tbody>
+                    </table>
 
-                                </tr>
-                                <tr>
-                                    <td><label for="flete" class="col-sm-2"></label>Flete</td>
-                                    <td><input type="number" name="flete" id="flete" class="form-control" step="0.01"></td>
-                                    <td><label for="seguro" class="col-sm-2"></label>Seguro</td>
-                                    <td><input type="number" name="seguro" id="seguro" class="form-control"  step="0.01"></td>
-                                </tr>
-                                <tr>
 
-                                </tr>
-                                <tr>
-                                    <td><label for="otros" class="col-sm-2"></label>Otros</td>
-                                    <td><input type="number" name="otros" id="otros" class="form-control" step="0.01"></td>
-                                    <td colspan="2"></td>
-                                </tr>
-                                <tr>
-                                 
-                                    <td colspan="2"><button type="button" class="btn btn-primary pull-right" onclick="generar_excel()">Generar Excel</button></td>
-                                    <td colspan="2"><button type="button" class="btn btn-primary pull-center" onclick="generar_rayado()" >Generar PDF</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2"><button type="button" class="btn btn-primary pull-right" onclick="generar_excel_sidunea()">Generar Excel Siduena</button></td>
-                                    <td colspan="2"><button type="button" class="btn btn-primary pull-center" onclick="generar_excel_dva()">Generar Excel DVA</button></td>
+                    <button type="button" class="boton" onclick="lista_retaceo()">Retaceo</button>
+                    <button type="button" class="boton" onclick="cuadro_duca()">Crear PDF</button>
+                    <button type="button" class="boton" onclick="lista_cambiar_origen()">Cambiar Origen</button>
 
+
+                </div>
+                <?php echo form_close();?>
+                <div id="no_clasificados">
+                    <?php // $this->load->view('subir_archivos/no_clasificados')?>
+                </div>
+
+
+
+                <div class="panel panel-default" id="panel_lista" style="display: none">
+                    <div class="panel-heading" id="titulo">
+                        Cuadro de Retaceo
+                    </div>
+                    <div class="panel-body" id="contenido">
+
+                        <table class="table" id="tabla">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Partida</th>
+                                    <th>Nombre</th>
+                                    <th class="text-right">Bultos</th>
+                                    <th class="text-right">Peso Bruto</th>
+                                    <th class="text-right">Peso Neto</th>
+                                    <th class="text-right">Cuantia</th>
+                                    <th class="text-right">Total</th>
+                                    <th class="text-center" id="p_origen">origen</th>
+                                    <th>TLC</th>
+                                    <th class="text-center" id="item_pa">Item</th>
                                 </tr>
+                            </thead>
+                            <tbody id="contenidoLista">
+
                             </tbody>
                         </table>
                     </div>
-                <?php echo form_close();?>
-                <div id="no_clasificados">
-                    <?php $this->load->view('subir_archivos/no_clasificados')?>
                 </div>
-
-          </div>
+        </div>
     </div>
-
 </div>
+
+<!--- modal para mostrar dettalles de partidas -->
+<div class="modal" id="detalle" role="dialog" data-backdrop="static">
+
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header hdmodal buttonclose">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 id="opcion" class="modal-title border-bottom pb-3 mb-4"><strong>Detalle Origen </strong>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="panel panel-default" id="panel_lista_adjuntos">
+                    <div class="" id="titulo">
+                    </div>
+                    <div class="panel-body" id="contenido">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Partida</th>
+                                    <th>Cuantia</th>
+                                    <th>Total</th>
+                                    <th>Origen</th>
+                                    <th>TLC</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contenido_lista_origen">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--- modal para mostrar dettalles de partidas -->
+
+
+<!--- modal para cambiar pais de origen -->
+<div class="modal" id="EditarOrigen" role="dialog" data-backdrop="static">
+
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header hdmodal buttonclose">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 id="opcion" class="modal-title border-bottom pb-3 mb-4"><strong>Cambiar Origen </strong>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="panel panel-default" id="panel_lista_adjuntos">
+                    <div class="" id="titulo">
+                    </div>
+                    <div class="panel-body">
+                    <input type="hidden" class="form-control input-sm" id="id">
+                        <div class="form-group form-group-sm">
+                            <div class="col-md-2 text-left">
+                                <label for="origen" class="control-label">Origen</label>
+                            </div>
+                            <div class="col-md-12">
+                            <?php $this->load->view('paises'); ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"   onclick="guardar_origen()" >Guardar</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!---fin  modal para cambiar pais de origen -->
+
+<script>
+$(document).ready(function() {
+    $(".chosen").chosen({
+        width: "100%"
+    });
+});
+</script>
+
+<script>
+mostrar_origen()
+</script>

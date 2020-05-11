@@ -4,6 +4,7 @@
 	<meta charset="UTF-8">
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url('public/bootstrap/css/bootstrap.min.css') ?>">
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url('public/css/estilo.css') ?>">
+  <link rel="stylesheet" type="text/css" href="<?php echo base_url('public/css/dm.css') ?>">
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url('public/chosen/chosen.min.css');?>">
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url('public/confirm/jquery-confirm.min.css'); ?>">
 	<script type="text/javascript" src="<?php echo base_url('public/js/jquerypro.js') ?>"></script>

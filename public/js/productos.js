@@ -31,7 +31,7 @@ function gestion_productos(opcion) {
 					alert_hide();
 				} else {
 					if ($("#producimport").val().length == 0) {
-						$("#importador").val("");
+						//$("#importador").val("");
 						$("#codproducto").val("");
 						$("#descripcion").val("");
 						$("#descripcion_generica").val("");

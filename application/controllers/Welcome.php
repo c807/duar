@@ -5,6 +5,6 @@ class Welcome extends CI_Controller {
 
 	public function test()
 	{
-		echo "¡Hola Mundo!".
+		echo "¡Hola Mundo!";
 	}
 }
