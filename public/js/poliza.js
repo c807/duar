@@ -592,4 +592,8 @@ function ver_url_tramite_aduana(doc) {
 	);
 }
 
+function crear_pdf_sw(){
+	
+}
+
 

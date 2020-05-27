@@ -22,8 +22,8 @@ class Subir_Archivo extends CI_Controller
 
             $this->datos['contador']           = $_GET["contador"];
             $this->datos['file']               = $_GET["c807_file"];
-            $this->datos['cantidad_productos'] = $this->Subir_archivos_model->consulta($_GET["file"], str_replace('-', '', $id_file->no_identificacion), 3);
-            $this->datos['registros']          = $this->Subir_archivos_model->consulta($_GET["file"], str_replace('-', '', $id_file->no_identificacion), 2);
+            $this->datos['cantidad_productos'] = $this->Subir_archivos_model->consulta($_GET["file"], str_replace('', '', $id_file->no_identificacion), 3);
+            $this->datos['registros']          = $this->Subir_archivos_model->consulta($_GET["file"], str_replace('', '', $id_file->no_identificacion), 2);
         } else {
             $this->datos['file']               = "";
         }
@@ -38,10 +38,11 @@ class Subir_Archivo extends CI_Controller
     {
         if (isset($_FILES["file"]["name"]) && isset($_POST['c807_file'])) {
             $id_file = $this->Subir_archivos_model->obtener_datos_file($_POST['c807_file']);
-          
+            $nit_importador= $id_file->no_identificacion;
+                      
             $contador = 0;
             if (!$id_file) {
-                $_SESSION["no_clasificado"] = 'Número de File'. $_POST['c807_file'] .' no existe.';
+                $_SESSION["no_clasificado"] = 'Número de File: '. $_POST['c807_file'] .' no existe.';
                 redirect("subir_archivo");
             } else {
                 $destino = getcwd()."/public/uploads/file/";
@@ -104,19 +105,6 @@ class Subir_Archivo extends CI_Controller
                         $highestColumn = $worksheet->getHighestColumn();
 
                         for ($row=2; $row<=$highestRow; $row++) {
-                            /* asi estaba
-                            $num_factura     = $worksheet->getCellByColumnAndRow(0, $row)->getValue();
-                            $codigo          = $worksheet->getCellByColumnAndRow(1, $row)->getValue();
-                            $proveedor       = $worksheet->getCellByColumnAndRow(2, $row)->getValue();
-                            $descripcion     = $worksheet->getCellByColumnAndRow(3, $row)->getValue();
-                            $pais_origen     = $worksheet->getCellByColumnAndRow(4, $row)->getValue();
-                            $unidades        = $worksheet->getCellByColumnAndRow(5, $row)->getValue();
-                            $precio_unitario = $worksheet->getCellByColumnAndRow(6, $row)->getValue();
-                            $total           = $worksheet->getCellByColumnAndRow(7, $row)->getValue();
-                            $tlc
-                            */
-                            // $worksheet->setPreCalculateFormulas(false);
-
                             $codigo          = $worksheet->getCellByColumnAndRow(0, $row)->getValue();
                             $descripcion     = $worksheet->getCellByColumnAndRow(1, $row)->getValue();
                             $unidades        = $worksheet->getCellByColumnAndRow(2, $row)->getValue();
@@ -131,8 +119,9 @@ class Subir_Archivo extends CI_Controller
                             $proveedor       = $worksheet->getCellByColumnAndRow(39, $row)->getValue();
                         
                     
-                            $datos = $this->Subir_archivos_model->verificar_partida($codigo);
+                            $datos = $this->Subir_archivos_model->verificar_partida($codigo, $nit_importador);
                             $numero_partida=$datos[0]->partida;
+                            $permiso=$datos[0]->permiso;
                         
                             if ($tlc == null) {
                                 $tlc = '0';
@@ -152,10 +141,8 @@ class Subir_Archivo extends CI_Controller
                                 'tlc'              => $tlc,
                                 'nombre_proveedor' => $proveedor,
                                 'id_file'          => $id_file->id,
-                                'partida'          => $numero_partida
-                                   
-                                
-                                   
+                                'partida'          => $numero_partida,
+                                'permiso'          => $permiso
                             );
                           
 
@@ -166,7 +153,7 @@ class Subir_Archivo extends CI_Controller
 
                     $data = array('id_file' => $id_file->id);
                     $this->Subir_archivos_model->crear_listado_polizas($data);
-
+                   
                     $_SESSION["no_clasificado"] = 'Datos Procesados al file '. $_POST['c807_file'];
                     unlink($link);
                     redirect("subir_archivo?file={$id_file->id}&contador={$contador}&c807_file={$_POST['c807_file']}");
@@ -196,11 +183,12 @@ class Subir_Archivo extends CI_Controller
     public function no_clasificados($opcion)
     {
         $id_file = $this->Subir_archivos_model->obtener_datos_file($_POST['c807_file']);
+      
         if (!isset($id_file)) {
             $_SESSION["no_clasificado"] = 'Número de file: ' . $_POST['c807_file'] . ' no existe';
             $this->load->view('subir_archivos/no_clasificados');
         } else {
-            $this->datos['registros'] = $this->Subir_archivos_model->consulta($id_file->id, str_replace('-', '', $id_file->no_identificacion), $opcion);
+            $this->datos['registros'] = $this->Subir_archivos_model->consulta($id_file->id, str_replace('', '', $id_file->no_identificacion), $opcion);
             $this->datos['num_file'] = $_POST['c807_file'];
             $this->datos['paises'] = $this->Conf_model->paises();
             //$this->datos['preferencia'] = $this->Conf_model->preferencia();
@@ -254,7 +242,7 @@ class Subir_Archivo extends CI_Controller
             }
            
             $datos = array(
-                    'importador'           => str_replace('-', '', $_POST["importador".$id_reg]),
+                    'importador'           => str_replace('', '', $_POST["importador".$id_reg]),
                     'codigo_producto'      => $_POST["codigo_producto".$id_reg],
                     'descripcion'          => $_POST["descripcion".$id_reg],
                     'partida_arancelaria'  => $_POST["partida_arancelaria".$id_reg],
@@ -1258,7 +1246,7 @@ class Subir_Archivo extends CI_Controller
 
         #  mail($para, $asunto, $texto, "From: $user->mail" );
         //$this->enviar_email($correo);
-      //  var_dump($_SESSION());
+        //  var_dump($_SESSION());
         if ($opcion == 2) {
             $id_file = $this->Subir_archivos_model->obtener_datos_file($_GET['c807_file']);
             $data = array('id_file' => $id_file->id, 'id_usuario_clasificador' => $_SESSION["UserID"], 'fecha' =>  1);
@@ -1275,27 +1263,14 @@ class Subir_Archivo extends CI_Controller
         $this->load->view("principal", $this->datos);
     }
 
-    /* public function sendMailGmail()
-    {
-
-        $message = "prueba";
-        $header = "From: desarrollosv@c807.com";
-        mail("desarrollosv@c807.com","test", $message, $header);
-
-
-
-    } */
-
+    
     public function lista_retaceo($file, $doc)
     {
-       
         $datos['l_retaceo']    = $this->Subir_archivos_model->lista_retaceo($file);
         $incremento=1;
         foreach ($datos['l_retaceo'] as $item) {
-
             $this->Subir_archivos_model->rayar($incremento, $item->partida, $doc);
             $incremento = $incremento + 1;
-
         }
       
         $this->load->view('subir_archivos/cuerpo', $datos);
@@ -1304,11 +1279,11 @@ class Subir_Archivo extends CI_Controller
 
     public function cuadro_duca($file)
     {
-       // $file=10;
+        // $file=10;
         $datos['retaceo']    = $this->Subir_archivos_model->lista_retaceo($file);
         $data['facturas']    = $this->Subir_archivos_model->consulta_facturas($file);
         $data_origen['origen']    = $this->Subir_archivos_model->consulta_origenes($file);
-       // var_dump($datos['facturas']);
+        // var_dump($datos['facturas']);
 
         include getcwd() . "/application/libraries/fpdf/fpdf.php";
         include getcwd()."/" ;
@@ -1329,11 +1304,14 @@ class Subir_Archivo extends CI_Controller
         $total_cuantia=0;
         $monto_total=0;
         $tlc="NO";
-
+        $posicionY=35.00125;
         foreach ($datos['retaceo'] as $item) {
             if ($item->tlc==1) {
                 $tlc="SI";
+            } else {
+                $tlc="NO";
             }
+
             if ($x == 0) {
                 $this->pdf->SetFont('Arial', 'B', 12);
                 $this->pdf->Cell(160, 7, 'Cuadro Retaceo', 0, 0, 'C', '0');
@@ -1345,7 +1323,7 @@ class Subir_Archivo extends CI_Controller
                 $this->pdf->Ln(7);
                 $this->pdf->Cell(07, 7, 'ID', 'TBL', 0, 'C', '1');
                 $this->pdf->Cell(20, 7, 'Partida', 'TBL', 0, 'C', '1');
-                $this->pdf->Cell(60, 7, 'Descripcion', 'TB', 0, 'C', '1');
+                $this->pdf->Cell(70, 7, 'Descripcion', 'TB', 0, 'C', '1');
                 $this->pdf->Cell(20, 7, 'Bultos', 'TBR', 0, 'R', '1');
                 $this->pdf->Cell(16, 7, 'Peso Bruto', 'TBR', 0, 'L', '1');
                 $this->pdf->Cell(18, 7, 'Peso Neto', 'TBR', 0, 'L', '1');
@@ -1357,32 +1335,44 @@ class Subir_Archivo extends CI_Controller
             }
             $x +=1;
             $correla=$correla+1;
+            // $posx=$this->pdf->GetX();
+            // $posy=$this->pdf->GetY();
+            //  $this->pdf->Cell(20, 5, $posx." -- ".$posy, 0, 0, 'R', 0);
+            //  $this->pdf->Cell(20, 5, $posicion, 0, 0, 'R', 0);
             $this->pdf->Cell(07, 5, $correla, 0, 0, 'C', 0);
             $this->pdf->Cell(20, 5, $item->partida, 0, 0, 'L', 0);
-            $this->pdf->Cell(60, 5, $item->nombre, 0, 0, 'L', 0);
+           
+            
+            $this->pdf->MultiCell(70, 5, $item->nombre, 0, 'L');
+            $y=$this->pdf->GetY();
+         
+            //  $this->pdf->SetY($posy);
+            $this->pdf->SetY($y-5);
+            $this->pdf->SetX(108);
+           
             $this->pdf->Cell(20, 5, $item->bultos, 0, 0, 'R', 0);
             $this->pdf->Cell(15, 5, $item->peso_bruto, 0, 0, 'R', 0);
             $this->pdf->Cell(15, 5, $item->peso_neto, 0, 0, 'R', 0);
             $this->pdf->Cell(15, 5, $item->cuantia, 0, 0, 'R', 0);
             $this->pdf->Cell(17, 5, $item->total, 0, 0, 'R', 0);
             $this->pdf->Cell(13, 5, $tlc, 0, 0, 'C', 0);
+            //  $this->pdf->Cell(20, 5, $posy."-".$y, 0, 0, 'R', 0);
+            //$this->pdf->SetY($y);
             $total_bultos=$total_bultos+$item->bultos;
             $total_peso_bruto=$total_peso_bruto+$item->peso_bruto;
             $total_peso_neto=  $total_peso_neto+$item->peso_neto;
             $total_cuantia=$total_cuantia+ $item->cuantia;
             $monto_total=$monto_total+$item->total;
-             
-
+            
+            //  $posicionY=$posicionY+10;
+            // $this->pdf->SetY($posicionY+10);
             $this->pdf->Ln(5);
-
-            if ($x == 48) {
-                $x = 0;
-            }
         }
         //
+      
         $this->pdf->Ln(7);
               
-        $this->pdf->Cell(107, 7, $total_bultos, 'TBR', 0, 'R', '1');
+        $this->pdf->Cell(117, 7, $total_bultos, 'TBR', 0, 'R', '1');
         $this->pdf->Cell(16, 7, $total_peso_bruto, 'TBR', 0, 'R', '1');
         $this->pdf->Cell(15, 7, $total_peso_neto, 'TBR', 0, 'R', '1');
         $this->pdf->Cell(15, 7, $total_cuantia, 'TBR', 0, 'R', '1');
@@ -1411,7 +1401,10 @@ class Subir_Archivo extends CI_Controller
         foreach ($data['facturas'] as $row) {
             if ($row->tlc==1) {
                 $tlc="SI";
+            } else {
+                $tlc="NO";
             }
+
             $seguro= $row->seguro + $row->otros_gastos;
             $cip=$row->total + $row->flete + $row->seguro + $row->otros_gastos;
             $this->pdf->Cell(20);

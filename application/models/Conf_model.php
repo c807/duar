@@ -2,7 +2,7 @@
 class Conf_model extends CI_Model {
 	function __construct(){
 		parent :: __construct();
-		$_SESSION['pais_id']=2;// remover esto antes de subirlo a git
+		
 		if (isset($_SESSION['pais_id'])) {
 			$this->pais = $_SESSION['pais_id'];
 		} else {

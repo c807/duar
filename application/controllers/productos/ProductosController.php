@@ -158,7 +158,7 @@
                     die('Fallo al crear las carpeta de archivos...');
                 }
             }
-           
+            
             $ubicacion .= "/".$nombre;
             move_uploaded_file($_FILES['file']['tmp_name'], $ubicacion);
 
@@ -211,6 +211,9 @@
                         );
                     }
                 }
+
+
+
                 $this->ProductosModel->insertar($data);
                 unlink($ubicacion);
             } catch (Exception $e) {

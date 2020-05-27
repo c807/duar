@@ -75,7 +75,7 @@
                                         <?php if (isset($cantidad_productos)) {
                                             $_SESSION["no_clasificado"] = '';
                                             if ($cantidad_productos[0]->cantidad == 0)  { ?>
-                                            <a class="btn btn-primary"  href="<?php echo base_url('index.php/subir_archivo/mostrar_clasificados')?>" role="button">Ir a Generación de Archivo Excel</a>
+                                            <a class="btn btn-primary"  href="<?php echo base_url('index.php/subir_archivo/mostrar_clasificados')?>" role="button">Ir a Generación de Retaceo</a>
                                         <?php } else { ?>
                                             <button type="button" class="btn btn-success" onclick="enviar_correo(1)" >Enviar a Clasificar</button>
                                             

@@ -46,22 +46,8 @@ class Subir_archivos_model extends CI_Model
                                ->order_by('d.descripcion')
                                ->get('gacela.file as f')
                                ->result();
-                        
-                /*   echo "Cantidad de Registro: ";
-                  var_dump($query);
-                  die(); */
             }
         } else {
-
-
-               /*  $query = $this->db
-                              ->select("d.id , d.codigo_producto, d.descripcion")
-                              ->join('duarx.dpr as d' , 'd.id_file =  f.id', 'inner')
-                              //->join('duarx.producto_importador as du', 'du.codproducto = d.codigo_producto and du.importador = '.  $no_identificacion, 'left')
-                              ->where('f.id', $id_file)
-                              ->order_by('d.descripcion')
-                              ->get('gacela.file as f')
-                              ->result(); */
         }
 
         return $query;
@@ -85,8 +71,6 @@ class Subir_archivos_model extends CI_Model
                 ->row();
 
         return $query;
-        //var_dump(intval($query->cantidad));
-        //die();
     }
 
     public function insert($data)
@@ -94,11 +78,6 @@ class Subir_archivos_model extends CI_Model
         $this->db->insert('duarx.dpr', $data);
     }
 
-    /*   function insert_catalogo($data)
-
-      {
-        $this->db->insert('macfw.cuenta', $data);
-      } */
 
     public function crear_listado_polizas($data)
     {
@@ -344,7 +323,7 @@ class Subir_archivos_model extends CI_Model
         return $this->db
                      ->select('f.id as id, f.cliente_hijo_id as cliente_hijo_id , ch.no_identificacion as no_identificacion')
                      ->where('f.c807_file', $numero_file)
-                     ->join('gacela.cliente_hijo as ch', 'ch.cliente_hijo_tipo_id = f.cliente_hijo_id', 'inner')
+                     ->join('gacela.cliente_hijo as ch', 'ch.id = f.cliente_hijo_id', 'inner')
                      ->get('gacela.file  as f')
                      ->row();
     }
@@ -420,11 +399,12 @@ class Subir_archivos_model extends CI_Model
         return $query;
     }
 
-    public function verificar_partida($codigo)
+    public function verificar_partida($codigo,$importador)
     {
         $query = $this->db
-        ->select('partida')
+        ->select('partida,tlc,permiso')
         ->where('codproducto', $codigo)
+        ->where('importador', $importador)
         ->get('duarx.producto_importador')
         ->result();
         return $query;
@@ -432,9 +412,8 @@ class Subir_archivos_model extends CI_Model
 
     public function lista_retaceo($file)
     {
-        
         $query = $this->db
-        ->select('partida,sum(cuantia) AS cuantia, sum(total) as total, sum(peso_bruto) peso_bruto, sum(peso_neto) peso_neto, sum(bultos) bultos, pais_origen,tlc,partida,descripcion as nombre, codigo_producto, documento_transporte')
+        ->select('partida,sum(cuantia) AS cuantia, sum(total) as total, sum(peso_bruto) peso_bruto, sum(peso_neto) peso_neto, sum(bultos) bultos, pais_origen,tlc,partida,group_concat(DISTINCT descripcion) as nombre, codigo_producto, documento_transporte')
         ->where('id_file', $file)
         ->group_by('partida,tlc')
         ->get('duarx.dpr')
@@ -444,8 +423,7 @@ class Subir_archivos_model extends CI_Model
     }
     public function consulta_facturas($file)
     {
-        
-      $query = $this->db
+        $query = $this->db
      ->select('partida,sum(cuantia) AS cuantia, sum(total) as total, sum(peso_bruto) peso_bruto, sum(peso_neto) peso_neto, sum(bultos) bultos, sum(flete) flete, sum(seguro) seguro, sum(otros_gastos) otros_gastos, pais_origen,tlc,partida,descripcion as nombre,num_factura')
      ->where('id_file', $file)
      ->group_by('num_factura,tlc')
@@ -456,7 +434,6 @@ class Subir_archivos_model extends CI_Model
     }
     public function consulta_origenes($file)
     {
-       
         $query = $this->db
      ->select('partida,sum(cuantia) AS cuantia, sum(total) as total, sum(peso_bruto) peso_bruto, sum(peso_neto) peso_neto, sum(bultos) bultos, sum(flete) flete, sum(seguro) seguro, sum(otros_gastos) otros_gastos, pais_origen,tlc,partida,descripcion as nombre,num_factura, permiso')
      ->where('id_file', $file)
@@ -481,7 +458,6 @@ class Subir_archivos_model extends CI_Model
     
     public function consulta_file($file)
     {
-        
         $query = $this->db->select('*')
            ->where('id_file', $file)
            ->get('duarx.dpr')
@@ -546,6 +522,8 @@ class Subir_archivos_model extends CI_Model
         ->where('partida', $pa)
         ->update('duarx.dpr');
     }
+
+    
 }
 
 /* End of file ModelName.php */
