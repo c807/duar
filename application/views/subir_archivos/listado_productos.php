@@ -18,7 +18,7 @@
                         <tr>
                             <?php if ( $x == 0) { #solo imprime los encabezados
                                 foreach ($registros[$x]  as $item => $field) { ?>
-                                    <td><?php echo $item?></td>
+                                    <td><?php echo strtoupper($item)?></td>
                                 <?php } ?>
 
                                 </tr><tr>

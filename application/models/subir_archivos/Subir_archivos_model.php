@@ -321,11 +321,11 @@ class Subir_archivos_model extends CI_Model
     public function obtener_datos_file($numero_file)
     {
         return $this->db
-                     ->select('f.id as id, f.cliente_hijo_id as cliente_hijo_id , ch.no_identificacion as no_identificacion')
-                     ->where('f.c807_file', $numero_file)
-                     ->join('gacela.cliente_hijo as ch', 'ch.id = f.cliente_hijo_id', 'inner')
-                     ->get('gacela.file  as f')
-                     ->row();
+        ->select('f.id as id, c.nit as no_identificacion')
+        ->where('f.c807_file', $numero_file)
+        ->join('csd.cliente as c', 'c.cliente = f.cliente', 'inner')
+        ->get('gacela.file  as f')
+        ->row();
     }
 
     public function traer_paises($arreglo)
@@ -399,7 +399,7 @@ class Subir_archivos_model extends CI_Model
         return $query;
     }
 
-    public function verificar_partida($codigo,$importador)
+    public function verificar_partida($codigo, $importador)
     {
         $query = $this->db
         ->select('partida,tlc,permiso')
@@ -522,8 +522,6 @@ class Subir_archivos_model extends CI_Model
         ->where('partida', $pa)
         ->update('duarx.dpr');
     }
-
-    
 }
 
 /* End of file ModelName.php */
