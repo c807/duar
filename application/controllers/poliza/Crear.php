@@ -335,11 +335,11 @@ class Crear extends CI_Controller
        
         foreach ($data as $row) {
             $cadena=$row->documento_escaneado;
-            //  echo $row->documento;
+     
         }
-       
+     
        $archivo= getcwd()."/" .$ref.".pdf";
-
+    
         $pdf_decoded = base64_decode($cadena);
         //Write data back to pdf file
         $pdf = fopen( $archivo, 'w');
@@ -349,11 +349,6 @@ class Crear extends CI_Controller
         $mi_pdf =  $archivo;
 
         $file=$getcwd()."/".$mi_pdf;
-        // header('Content-type: application/pdf');
-        //header('Content-Disposition: inline; filename="'.$mi_pdf.'"');
-        //readfile($getcwd()."/".$mi_pdf);
-        //  $pdf->Output("factura.pdf",F);
-        //$mi_pdf = 'factura.pdf';
         header('Content-type: application/pdf');
         header('Content-Disposition: download; filename="'.$mi_pdf.'"');
         readfile($mi_pdf);

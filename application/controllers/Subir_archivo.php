@@ -39,7 +39,7 @@ class Subir_Archivo extends CI_Controller
         if (isset($_FILES["file"]["name"]) && isset($_POST['c807_file'])) {
             $id_file = $this->Subir_archivos_model->obtener_datos_file($_POST['c807_file']);
             $nit_importador= $id_file->no_identificacion;
-                      
+            $this->Subir_archivos_model->eliminar_dpr($id_file->id);         
             $contador = 0;
             if (!$id_file) {
                 $_SESSION["no_clasificado"] = 'Número de File: '. $_POST['c807_file'] .' no existe.';

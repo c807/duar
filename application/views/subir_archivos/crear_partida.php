@@ -26,7 +26,7 @@
                             <tr>
                                 <td><label for="proveedor<?php echo $id['id_reg']?>">Proveedor</label></td>
                                 <td colspan="2"><input type="text" name="proveedor<?php echo $id['id_reg']?>"
-                                        id="proveedor<?php echo $id['id_reg']?>" readonly class="form-control"></td>
+                                        id="proveedor<?php echo $id['id_reg']?>"     class="form-control"></td>
                             </tr>
                             <tr>
                                 <td><label for="importador<?php echo $id['id_reg']?>">Nit Importador</label></td>

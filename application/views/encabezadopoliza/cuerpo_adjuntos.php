@@ -1,6 +1,6 @@
 <?php
     if (isset($l_adjuntos)) {
-        foreach ($l_adjuntos as $row) { ?>
+        foreach ($l_adjuntos as $row) { $ref=trim($row->referencia);  $referencia="'$ref'";  ?>
 <tr>
     <td><?php echo $row->item; ?></td>
     <td><?php echo $row->tipodocumento; ?></td>
@@ -21,8 +21,12 @@
     </td>
 
     <td>
-        <button class="btn btn-default btn-xs" onclick="dowload_adjunto(<?php echo $row->documento; ?>,<?php echo $row->referencia; ?>)"><i
+
+    <button class="btn btn-default btn-xs" onclick="dowload_adjunto(<?php echo  $row->documento; ?> , <?php echo $referencia ; ?>)"><i
                 title="Ver documento adjunto" class="glyphicon glyphicon-arrow-down"></i></button>
+                <!--
+        <button class="btn btn-default btn-xs" onclick="dowload_adjunto(<?php echo $row->documento; ?> , <?php echo $row->referencia; ?>)"><i
+                title="Ver documento adjunto" class="glyphicon glyphicon-arrow-down"></i></button> -->
     </td>
 <td> 
 

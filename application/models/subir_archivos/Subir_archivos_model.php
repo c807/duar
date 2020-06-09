@@ -522,6 +522,12 @@ class Subir_archivos_model extends CI_Model
         ->where('partida', $pa)
         ->update('duarx.dpr');
     }
+
+
+    public function eliminar_dpr($id){
+        $this->db->where('id_file', $id);
+        $this->db->delete('duarx.dpr');
+    }
 }
 
 /* End of file ModelName.php */
