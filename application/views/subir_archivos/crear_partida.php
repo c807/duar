@@ -26,7 +26,7 @@
                             <tr>
                                 <td><label for="proveedor<?php echo $id['id_reg']?>">Proveedor</label></td>
                                 <td colspan="2"><input type="text" name="proveedor<?php echo $id['id_reg']?>"
-                                        id="proveedor<?php echo $id['id_reg']?>"     class="form-control"></td>
+                                        id="proveedor<?php echo $id['id_reg']?>" class="form-control"></td>
                             </tr>
                             <tr>
                                 <td><label for="importador<?php echo $id['id_reg']?>">Nit Importador</label></td>
@@ -70,13 +70,38 @@
                                 </td>
                                 <td colspan="4"><input type="text" name="descripcion_generica<?php echo $id['id_reg']?>"
                                         id="descripcion_generica<?php echo $id['id_reg']?>" class="form-control"
-                                        maxlength="45"></td>
+                                        maxlength="100">
+                                </td>
                             </tr>
 
                             <tr>
-                                <td><label for="funcion<?php echo $id['id_reg']?>">Función</label></td>
-                                <td colspan="4"><input type="text" name="funcion<?php echo $id['id_reg']?>"
-                                        id="funcion<?php echo $id['id_reg']?>" class="form-control"></td>
+                                <!--
+                                <td><label for="funcion<?php //echo $id['id_reg']?>">Función</label></td>
+                                <td colspan="4"><input type="text" name="funcion<?php //echo $id['id_reg']?>"
+                                        id="funcion<?php //echo $id['id_reg']?>" class="form-control"></td>
+                            -->
+                                <td> <label for="funcion">Función</label> </td>
+                                <td colspan="4"> <textarea class="form-control" rows="3" id="funcion" name="funcion"
+                                        placeholder="Introduzca función" required></textarea>
+
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td> <label for="observaciones">Observaciones</label> </td>
+
+                                <td colspan="6">
+                                    <textarea class="form-control" rows="3" id="observaciones" name="observaciones"
+                                        placeholder="Introduzca Observación" required></textarea>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td> <label for="marca">Marca</label> </td>
+                                <td colspan="4"><input type="text" name="marca<?php echo $id['id_reg']?>"
+                                        id="marca<?php echo $id['id_reg']?>" class="form-control" maxlength="100">
+                                </td>
+
                             </tr>
                             <tr>
                                 <td><label for="paises">Origen</label></td>

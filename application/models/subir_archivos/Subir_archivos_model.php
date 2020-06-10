@@ -161,7 +161,10 @@ class Subir_archivos_model extends CI_Model
         if (verDato($args, "usuario")) {
             $datos['usuario'] = $args["usuario"];
         }
-       
+        $datos['funcion'] = $args["funcion"];
+        $datos['observaciones'] = $args["observaciones"];
+        $datos['marca'] = $args["marca"];
+
         $datos['paisorigen'] = $args["paisorigen"];
         $datos['tlc'] = $args["tlc"];
         $datos['permiso'] = $args["permiso"];
