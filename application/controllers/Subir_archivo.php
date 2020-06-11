@@ -114,6 +114,9 @@ class Subir_Archivo extends CI_Controller
                             $peso_neto       = $worksheet->getCellByColumnAndRow(9, $row)->getValue();
                             $precio_unitario = $worksheet->getCellByColumnAndRow(10, $row)->getValue();
                             $total           = $worksheet->getCellByColumnAndRow(10, $row)->getValue();
+                            $flete           = $worksheet->getCellByColumnAndRow(11, $row)->getValue();
+                            $seguro          = $worksheet->getCellByColumnAndRow(12, $row)->getValue();
+                            $otros_gastos    = $worksheet->getCellByColumnAndRow(13, $row)->getValue();
                             $bultos          = $worksheet->getCellByColumnAndRow(14, $row)->getValue();
                             $tlc             = $worksheet->getCellByColumnAndRow(15, $row)->getValue();
                             $proveedor       = $worksheet->getCellByColumnAndRow(39, $row)->getValue();
@@ -122,9 +125,25 @@ class Subir_Archivo extends CI_Controller
                             $datos = $this->Subir_archivos_model->verificar_partida($codigo, $nit_importador);
                             $numero_partida=$datos[0]->partida;
                             $permiso=$datos[0]->permiso;
-                        
+                            $descripcion=$datos[0]->descripcion_generica;
                             if ($tlc == null) {
                                 $tlc = '0';
+                            }
+
+                            if ($permiso == null) {
+                                $permiso = '0';
+                            }
+                            if ($descripcion == null){
+                                $descripcion="NO ASIGNADA";
+                            }
+                            if ($flete == null){
+                                $flete=0;
+                            }
+                            if ($seguro == null){
+                                $seguro=0;
+                            }
+                            if ($otros_gastos == null){
+                                $otros_gastos=0;
                             }
                     
                             $data = array(
@@ -137,6 +156,9 @@ class Subir_Archivo extends CI_Controller
                                 'peso_neto'        => $peso_neto,
                                 'precio_unitario'  => $precio_unitario,
                                 'total'            => $total,
+                                'flete'            => $flete,
+                                'seguro'           => $seguro,
+                                'otros_gastos'     => $otros_gastos,
                                 'bultos'           => $bultos,
                                 'tlc'              => $tlc,
                                 'nombre_proveedor' => $proveedor,
@@ -145,7 +167,6 @@ class Subir_Archivo extends CI_Controller
                                 'permiso'          => $permiso
                             );
                           
-
                             $this->Subir_archivos_model->insert($data);
                             $contador += 1;
                         }

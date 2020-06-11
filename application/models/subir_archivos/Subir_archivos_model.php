@@ -405,7 +405,7 @@ class Subir_archivos_model extends CI_Model
     public function verificar_partida($codigo, $importador)
     {
         $query = $this->db
-        ->select('partida,tlc,permiso')
+        ->select('partida,tlc,permiso,descripcion_generica')
         ->where('codproducto', $codigo)
         ->where('importador', $importador)
         ->get('duarx.producto_importador')
@@ -416,7 +416,7 @@ class Subir_archivos_model extends CI_Model
     public function lista_retaceo($file)
     {
         $query = $this->db
-        ->select('partida,sum(cuantia) AS cuantia, sum(total) as total, sum(peso_bruto) peso_bruto, sum(peso_neto) peso_neto, sum(bultos) bultos, pais_origen,tlc,partida,group_concat(DISTINCT descripcion) as nombre, codigo_producto, documento_transporte')
+        ->select('partida,sum(cuantia) AS cuantia, sum(total+flete+seguro+otros_gastos) as total, sum(peso_bruto) peso_bruto, sum(peso_neto) peso_neto, sum(bultos) bultos, pais_origen,tlc,partida,group_concat(DISTINCT descripcion) as nombre, codigo_producto, documento_transporte')
         ->where('id_file', $file)
         ->group_by('partida,tlc')
         ->get('duarx.dpr')
