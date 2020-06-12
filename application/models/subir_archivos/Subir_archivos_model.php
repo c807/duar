@@ -179,6 +179,7 @@ class Subir_archivos_model extends CI_Model
         ->set('tlc', $data['tlc'])
         ->set('permiso', $data['permiso'])
         ->set('partida', $data['partida_arancelaria'])
+        ->set('descripcion', $data['descripcion_generica'])
         ->where('id', $id)
         ->update('duarx.dpr');
     }

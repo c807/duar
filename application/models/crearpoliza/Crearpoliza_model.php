@@ -123,7 +123,7 @@ class Crearpoliza_model extends CI_Model
 
     public function get_dua($id)
     {
-             $pro = $this->db->where('c807_file', $id)
+        $pro = $this->db->where('c807_file', $id)
                             ->get('encabezado')
                             ->row();
         return $pro;
@@ -247,4 +247,12 @@ class Crearpoliza_model extends CI_Model
         return $query;
     }
 
+    public function generar_xml()
+    {
+        $duaduana=322;
+        $query = $this->db->where('duaduana', $duaduana)
+        ->get('duarx.encabezado')
+        ->row();
+        return $query;
+    }
 }

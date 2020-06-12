@@ -37,7 +37,9 @@
                         <li><a href="#tab4"><span class="fa fa-bookmark"></span><span
                                     class="tab-text">Equipamiento</span></a>
                         </li>
+                        <li><a href="#tab5"><span class="fa fa-bookmark"></span><span class="tab-text">xml</span></a>
                     </ul>
+
 
                     <div class="secciones">
                         <article id="tab1">
@@ -607,8 +609,9 @@
                                             </div>
                                         </div>
                                     -->
-                                    
-                                    <input type="hidden"  id="file_number"  name="file_number" value="<?php echo  $_SESSION["numero_file"];?>">
+
+                                        <input type="hidden" id="file_number" name="file_number"
+                                            value="<?php echo  $_SESSION["numero_file"];?>">
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
@@ -870,13 +873,14 @@
                                         </div>
                                         <div class="col-md-4"> </div>
                                     </div>
-                                  
-                                   
+
+
                                 </form>
 
-                                <br><br> <button type="button" class="btn btn-primary" onclick="get_detalle_dpr()">Cargar detalle DPR</button>
-                               <br>
-                               <br>
+                                <br><br> <button type="button" class="btn btn-primary"
+                                    onclick="get_detalle_dpr()">Cargar detalle DPR</button>
+                                <br>
+                                <br>
 
                                 <div class="panel panel-default" id="panel_lista">
                                     <div class="panel-heading" id="titulo">
@@ -1134,6 +1138,16 @@
                                 </div>
                             </div>
                             <!--fin container documentos equipamientos -->
+
+                        </article>
+                        <article id="tab5">
+                            <div class="row">
+                                <div class="col-md-2 col-md-offset-5">
+                                    <button type="button" class="boton" onclick="generar_xml()">Generar XML</button>
+                                </div>
+
+                            </div>
+
 
                         </article>
                     </div>
@@ -1467,7 +1481,7 @@
     });
     </script>
 
-    ?>
+    
     <script>
     detalle_poliza();
     </script>

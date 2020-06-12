@@ -125,7 +125,7 @@ class Subir_Archivo extends CI_Controller
                             $datos = $this->Subir_archivos_model->verificar_partida($codigo, $nit_importador);
                             $numero_partida=$datos[0]->partida;
                             $permiso=$datos[0]->permiso;
-                            $descripcion=$datos[0]->descripcion_generica;
+                            $descripcion_generica=$datos[0]->descripcion_generica;
                             if ($tlc == null) {
                                 $tlc = '0';
                             }
@@ -133,9 +133,12 @@ class Subir_Archivo extends CI_Controller
                             if ($permiso == null) {
                                 $permiso = '0';
                             }
-                            if ($descripcion == null){
-                                $descripcion="NO ASIGNADA";
+                            if ($descripcion_generica == null){
+                              
+                            }else{
+                                $descripcion=$descripcion_generica;
                             }
+
                             if ($flete == null){
                                 $flete=0;
                             }
@@ -279,16 +282,14 @@ class Subir_Archivo extends CI_Controller
                     'usuario'              => $_SESSION["UserID"],
                     
             );
-           
             
             $dpr = array(
                 'tlc'                  => $tlc,
                 'partida_arancelaria'  => $_POST["partida_arancelaria".$id_reg],
                 'permiso'    => $permiso,
+                'descripcion_generica'    => $_POST["descripcion_generica".$id_reg],
                 
         );
-        
-           
                 
             $this->Subir_archivos_model->insertar_partida($datos);
             $this->Subir_archivos_model->actualizar_dpr($id_reg, $dpr);

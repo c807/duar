@@ -297,7 +297,7 @@ class Crear extends CI_Controller
     {
         $datos['l_items']    = $this->Crearpoliza_model->lista_items($id);
       
-       $this->load->view('encabezadopoliza/cuerpo', $datos);
+        $this->load->view('encabezadopoliza/cuerpo', $datos);
     }
 
     public function lista_adjuntos($item, $id)
@@ -325,7 +325,7 @@ class Crear extends CI_Controller
         $this->Crearpoliza_model->eliminar_item($id);
     }
 
-    public function dowload_adjunto($pdf,$ref)
+    public function dowload_adjunto($pdf, $ref)
     {
         // $consulta = $this->Crearpoliza_model->dowload_adjunto($pdf);
         $data['saldos'] = $this->Crearpoliza_model->dowload_adjunto($pdf);
@@ -335,14 +335,13 @@ class Crear extends CI_Controller
        
         foreach ($data as $row) {
             $cadena=$row->documento_escaneado;
-     
         }
      
-       $archivo= getcwd()."/" .$ref.".pdf";
+        $archivo= getcwd()."/" .$ref.".pdf";
     
         $pdf_decoded = base64_decode($cadena);
         //Write data back to pdf file
-        $pdf = fopen( $archivo, 'w');
+        $pdf = fopen($archivo, 'w');
         fwrite($pdf, $pdf_decoded);
         //close output file
         fclose($pdf);
@@ -352,8 +351,6 @@ class Crear extends CI_Controller
         header('Content-type: application/pdf');
         header('Content-Disposition: download; filename="'.$mi_pdf.'"');
         readfile($mi_pdf);
-
-   
     }
 
 
@@ -446,10 +443,59 @@ class Crear extends CI_Controller
     public function consulta_producto($id)
     {
         $dato = $this->Crearpoliza_model->consulta_producto($id);
-        // var_dump($dato);
         if ($dato) {
             echo json_encode($dato);
         }
     }
+
+    public function generar_xml()
+    {
+        $datos   = $this->Crearpoliza_model->generar_xml($id);
+        //print "hola".$datos->anio;
+        $xml = new XMLWriter();
+        $xml->openMemory();
+        $xml->setIndent(true);
+        $xml->setIndentString('	');
+        $xml->startDocument('version="1.0" encoding="UTF-8" standalone="no"');
+
+        $xml->startElement("ASYCUDA"); //elemento colegio
+   
+ 
+ 
+        $xml->startElement("Export_release"); //elemento curso
+        $xml->writeAttribute('nivel', "hola".$datos->anio);
+        $xml->writeElement("aulas", 3);
+        $xml->writeElement("profesores", "4");
+        $xml->writeElement("alumnos", "70");
+        $xml->writeElement("profesores de refuerzo", 1);
+ 
+ 
+        $xml->endElement(); //fin curso
+$xml->endElement(); //fin colegio
+ 
+$content = $xml->outputMemory();
+        ob_end_clean();
+        ob_start();
+        header('Content-Type: application/xml; charset=UTF-8');
+        header('Content-Encoding: UTF-8');
+        header("Content-Disposition: attachment;filename=ejemplo.xml");
+        header('Expires: 0');
+        header('Pragma: cache');
+        header('Cache-Control: private');
+        echo $content;
+     
+        /*  $xml = '<root>';
+          foreach ($datos as $row) {
+              $xml .= '<item>
+               <name>'.$row->anio.'</name>
+               <price>'.$row->aduana_registro.'</price>
+               <image>'.$row->declarante.'</image>
+             </item>';
+          }
+          $xml .= '</root>';
+          $this->output->set_content_type('text/xml');
+         $this->output->set_output($xml);*/
+    }
+    
     /*======================================================================*/
 }

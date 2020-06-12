@@ -596,4 +596,12 @@ function crear_pdf_sw(){
 	
 }
 
+function generar_xml(){
+	var url = base_url("index.php/poliza/crear/generar_xml/");
+	$.get(url, function(data) {
+		//$("#panel_lista_equipamiento").show();
+	   //document.getElementById("contenidoLista_equipamiento").innerHTML = data;
+	});
+}
+
 
