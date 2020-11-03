@@ -146,6 +146,14 @@ class Crearpoliza_model extends CI_Model
         return $query;
     }
 
+    public function listado_adjuntos($id)
+    {
+        $query = $this->db->where('duaduana', $id)
+           ->get('duarx.documento')
+           ->result();
+        return $query;
+    }
+
     public function consulta_adjunto($item)
     {
         $query = $this->db->where('documento', $item)
@@ -247,9 +255,8 @@ class Crearpoliza_model extends CI_Model
         return $query;
     }
 
-    public function generar_xml()
+    public function generar_xml($duaduana)
     {
-        $duaduana=322;
         $query = $this->db->where('duaduana', $duaduana)
         ->get('duarx.encabezado')
         ->row();

@@ -20,31 +20,29 @@
                 <i class="glyphicon glyphicon-search"></i>
             </button>
 
-            <button type="button" class="btn btn-primary btn-md pull-center" data-toggle="modal" data-target="#upModal">
+           <!-- <button type="button" class="btn btn-primary btn-md pull-center" data-toggle="modal" data-target="#upModal">
                 <i class="glyphicon glyphicon-open" title="Importar productos desde archivo  Excel"></i>
-                Productos</button>
+                Productos</button> -->
+                <button type="button" class="btn btn-primary btn-md pull-center"  onclick="modal_producto_importador(7)">
+                <i class="glyphicon glyphicon-open"></i>Productos</button> 
 
-            <button type="button" class="btn btn-success btn-md pull-center btnsuccess" data-toggle="modal"
+          <!--  <button type="button" class="btn btn-success btn-md pull-center btnsuccess" data-toggle="modal"
                 data-target="#crear_producto" data-whatever="AGREGAR PRODUCTO">
-                <i class="glyphicon glyphicon-plus" title="Agregar un nuevo producto"></i> Agregar</button>
+                <i class="glyphicon glyphicon-plus" title="Agregar un nuevo producto"></i> Agregar</button> -->
 
+                <button type="button" class="btn btn-success btn-md pull-center btnsuccess"  onclick="modal_producto_importador(1)">
+                <i class="glyphicon glyphicon-plus"></i>Agregar</button> 
 
-
-            <button type="button" class="btn btn-success btn-md pull-center btnsuccess" data-toggle="modal"
-                data-target="#buscar">
-                <i class="glyphicon glyphicon-list"></i></button>
-
-
+            <button type="button" class="btn btn-success btn-md pull-center btnsuccess"  onclick="modal_producto_importador(6)">
+                <i class="glyphicon glyphicon-list"></i></button> 
                 
         </div>
 
     </form>
-
     
 </body>
 
 </html>
-
 
 <script>
 

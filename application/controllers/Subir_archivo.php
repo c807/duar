@@ -6,17 +6,32 @@ class Subir_Archivo extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->library('PHPEXCEL/PHPExcel.php');
+     //   $this->load->library('PHPEXCEL/PHPExcel.php');
+     $this->load->library('PHPExcel.php');
         $this->load->model(array('subir_archivos/Subir_archivos_model'));
         $this->load->model('subir_archivos/Subir_archivos_model');
+        $this->load->model('Conf_model');
         
-
+        
         $this->datos = array();
         $this->datos["navtext"] = "DPR";
+
+        $this->load->library('PHPEXCEL/PHPExcel.php');
+     
+        $datos   = $this->Conf_model->info_accesos_dpr($_SESSION['UserID']);
+       
+        $_SESSION['roll']=$datos->ROLL;
+        $_SESSION['add']=$datos->AGREGAR;
+        $_SESSION['edit']=$datos->EDITAR;
+        $_SESSION['delete']=$datos->ELIMINAR;
+        $_SESSION['print']=$datos->IMPRIMIR;
+        $_SESSION['consulta']=$datos->CONSULTAR;
+        $_SESSION['cargar']=$datos->AGREGAR;
     }
 
     public function index()
     {
+        /* despues de importar archivo, ejecuta este bloque para mostrar detalles de la carga */
         if (isset($_GET["file"])) {
             $id_file = $this->Subir_archivos_model->obtener_datos_file($_GET['c807_file']);
 
@@ -39,7 +54,7 @@ class Subir_Archivo extends CI_Controller
         if (isset($_FILES["file"]["name"]) && isset($_POST['c807_file'])) {
             $id_file = $this->Subir_archivos_model->obtener_datos_file($_POST['c807_file']);
             $nit_importador= $id_file->no_identificacion;
-            $this->Subir_archivos_model->eliminar_dpr($id_file->id);         
+            $this->Subir_archivos_model->eliminar_dpr($id_file->id);
             $contador = 0;
             if (!$id_file) {
                 $_SESSION["no_clasificado"] = 'Número de File: '. $_POST['c807_file'] .' no existe.';
@@ -120,36 +135,48 @@ class Subir_Archivo extends CI_Controller
                             $bultos          = $worksheet->getCellByColumnAndRow(14, $row)->getValue();
                             $tlc             = $worksheet->getCellByColumnAndRow(15, $row)->getValue();
                             $proveedor       = $worksheet->getCellByColumnAndRow(39, $row)->getValue();
-                        
-                    
-                            $datos = $this->Subir_archivos_model->verificar_partida($codigo, $nit_importador);
-                            $numero_partida=$datos[0]->partida;
-                            $permiso=$datos[0]->permiso;
-                            $descripcion_generica=$datos[0]->descripcion_generica;
-                            if ($tlc == null) {
-                                $tlc = '0';
-                            }
+                            
+                            $codigo=trim($codigo);
 
-                            if ($permiso == null) {
-                                $permiso = '0';
-                            }
-                            if ($descripcion_generica == null){
-                              
-                            }else{
-                                $descripcion=$descripcion_generica;
-                            }
+                            if (is_null($codigo) || empty($codigo) || $codigo=="") {
+                            } else {
+                                $numero_partida="";
+                                $datos = $this->Subir_archivos_model->verificar_partida($codigo, $nit_importador, $_SESSION['pais_id']);
+                          
+                                $numero_partida=$datos[0]->partida;
+                               
+                                $permiso=$datos[0]->permiso;
+                                $estado=$datos[0]->idestado;
+                                $unidad=$datos[0]->idunidad;
+                                $fito=$datos[0]->fito;
+                                $adquisicion=$datos[0]->pais_adquisicion;
+                                $procedencia=$datos[0]->pais_procedencia;
 
-                            if ($flete == null){
-                                $flete=0;
-                            }
-                            if ($seguro == null){
-                                $seguro=0;
-                            }
-                            if ($otros_gastos == null){
-                                $otros_gastos=0;
-                            }
+                                $descripcion_generica=$datos[0]->descripcion_generica;
+                                if ($tlc == null) {
+                                    $tlc = '0';
+                                }
+
+                                if ($permiso == null) {
+                                    $permiso = '0';
+                                }
+                                if ($descripcion_generica == null) {
+                                } else {
+                                    $descripcion=$descripcion_generica;
+                                }
+
+                                if ($flete == null) {
+                                    $flete=0;
+                                }
+                                if ($seguro == null) {
+                                    $seguro=0;
+                                }
+                                if ($otros_gastos == null) {
+                                    $otros_gastos=0;
+                                }
                     
-                            $data = array(
+                                
+                                $data = array(
                                 'codigo_producto'  => $codigo,
                                 'descripcion'      => $descripcion,
                                 'cuantia'          => $unidades,
@@ -167,11 +194,21 @@ class Subir_Archivo extends CI_Controller
                                 'nombre_proveedor' => $proveedor,
                                 'id_file'          => $id_file->id,
                                 'partida'          => $numero_partida,
-                                'permiso'          => $permiso
+                                'permiso'          => $permiso,
+                                'pais_id'          => $_SESSION['pais_id'],
+                                'idestado'         => $estado,
+                                'idunidad'         => $unidad,
+                                'fito'             => $fito,
+                                'pais_adquisicion' => $adquisicion,
+                                'pais_procedencia' => $procedencia
+
+
+                                
                             );
                           
-                            $this->Subir_archivos_model->insert($data);
-                            $contador += 1;
+                                $this->Subir_archivos_model->insert($data);
+                                $contador += 1;
+                            }
                         }
                     }
 
@@ -199,11 +236,11 @@ class Subir_Archivo extends CI_Controller
         }
 
         $this->datos["c807_file"] = (isset($_GET['c807_file'])) ? $_GET['c807_file'] : '';
-
         $this->datos["vista"] = 'subir_archivos/clasificar_productos';
         $this->load->view("principal", $this->datos);
     }
-
+ 
+    
     public function no_clasificados($opcion)
     {
         $id_file = $this->Subir_archivos_model->obtener_datos_file($_POST['c807_file']);
@@ -215,6 +252,9 @@ class Subir_Archivo extends CI_Controller
             $this->datos['registros'] = $this->Subir_archivos_model->consulta($id_file->id, str_replace('', '', $id_file->no_identificacion), $opcion);
             $this->datos['num_file'] = $_POST['c807_file'];
             $this->datos['paises'] = $this->Conf_model->paises();
+            $this->datos['estados'] = $this->Conf_model->estados();
+            $this->datos['u_comercial'] = $this->Conf_model->u_comercial();
+            
             //$this->datos['preferencia'] = $this->Conf_model->preferencia();
             $_SESSION["no_clasificado"] = '';
             if ($opcion == 2) {
@@ -265,6 +305,14 @@ class Subir_Archivo extends CI_Controller
                 $permiso=0;
             }
            
+
+            $fito=0;
+            if ($_POST['fito'] == 'on') {
+                $fito=1;
+            } else {
+                $fito=0;
+            }
+           
             $datos = array(
                     'importador'           => str_replace('', '', $_POST["importador".$id_reg]),
                     'codigo_producto'      => $_POST["codigo_producto".$id_reg],
@@ -279,15 +327,26 @@ class Subir_Archivo extends CI_Controller
                     'paisorigen'           => $_POST["paises"],
                     'tlc'                  => $tlc,
                     'permiso'              => $permiso,
+                    'fito'                 => $fito,
+                    'idestado'             => $_POST["estados"],
+                    'idunidad'             => $_POST["u_comercial"],
+                    'pais_procedencia'     => $_POST["pais_procedencia"],
+                    'pais_adquisicion'     => $_POST["pais_adquisicion"],
                     'usuario'              => $_SESSION["UserID"],
+                  
                     
             );
-            
+           // var_dum($datos);
             $dpr = array(
-                'tlc'                  => $tlc,
-                'partida_arancelaria'  => $_POST["partida_arancelaria".$id_reg],
-                'permiso'    => $permiso,
+                'tlc'                     => $tlc,
+                'partida_arancelaria'     => $_POST["partida_arancelaria".$id_reg],
+                'permiso'                 => $permiso,
                 'descripcion_generica'    => $_POST["descripcion_generica".$id_reg],
+                'fito'                    => $fito,
+                'idestado'                => $_POST["estados"],
+                'idunidad'                => $_POST["u_comercial"],
+                'pais_adquisicion'        => $_POST["pais_adquisicion"],
+                'pais_procedencia'        => $_POST["pais_procedencia"],
                 
         );
                 
@@ -305,6 +364,138 @@ class Subir_Archivo extends CI_Controller
         $this->load->view('principal', $this->datos);
     }
 
+    
+    public function excel_intec($file, $doc)
+    {
+        
+        $datos['l_retaceo']    = $this->Subir_archivos_model->lista_retaceo($file);
+
+
+        	//Cargamos la librería de excel.
+        	$this->load->library('excel');
+			$this->excel->setActiveSheetIndex(0);
+	        $this->excel->getActiveSheet()->setTitle('Sheet1');
+	        //Contador de filas
+	        $contador = 1;
+	        //Le aplicamos ancho las columnas.
+	        $this->excel->getActiveSheet()->getColumnDimension('A')->setWidth(5);
+	        $this->excel->getActiveSheet()->getColumnDimension('B')->setWidth(20);
+	        $this->excel->getActiveSheet()->getColumnDimension('C')->setWidth(57);
+	        //Le aplicamos negrita a los títulos de la cabecera.
+	       // $this->excel->getActiveSheet()->getStyle("A{$contador}")->getFont()->setBold(true);
+	        //$this->excel->getActiveSheet()->getStyle("B{$contador}")->getFont()->setBold(true);
+	       // $this->excel->getActiveSheet()->getStyle("C{$contador}")->getFont()->setBold(true);
+	        //Definimos los títulos de la cabecera.
+	        $this->excel->getActiveSheet()->setCellValue("A{$contador}", 'TIPO');	        
+	        $this->excel->getActiveSheet()->setCellValue("B{$contador}", 'POS.ARANCEL');
+            $this->excel->getActiveSheet()->setCellValue("C{$contador}", 'DESCRIPCION');
+
+            $this->excel->getActiveSheet()->setCellValue("D{$contador}", 'ORIGEN');	        
+	        $this->excel->getActiveSheet()->setCellValue("E{$contador}", 'PROC/DESTINO');
+            $this->excel->getActiveSheet()->setCellValue("F{$contador}", 'ADQUISICION');
+            $this->excel->getActiveSheet()->setCellValue("G{$contador}", 'ESTADO'); 
+            $this->excel->getActiveSheet()->setCellValue("H{$contador}", 'BULTOS'); 
+            $this->excel->getActiveSheet()->setCellValue("I{$contador}", 'UNIDAD COM.'); 
+            $this->excel->getActiveSheet()->setCellValue("J{$contador}", 'CANT. COM.');
+            $this->excel->getActiveSheet()->setCellValue("K{$contador}", 'UNIDAD EST.');
+            $this->excel->getActiveSheet()->setCellValue("L{$contador}", 'CANT. EST.');
+            $this->excel->getActiveSheet()->setCellValue("M{$contador}", 'PESO NETO');
+            $this->excel->getActiveSheet()->setCellValue("N{$contador}", 'PESO BRUTO');
+            $this->excel->getActiveSheet()->setCellValue("O{$contador}", 'FOB');
+            $this->excel->getActiveSheet()->setCellValue("P{$contador}", 'FLETE');
+            $this->excel->getActiveSheet()->setCellValue("Q{$contador}", 'SEGURO');
+            $this->excel->getActiveSheet()->setCellValue("R{$contador}", 'O.GASTOS');
+            $this->excel->getActiveSheet()->setCellValue("S{$contador}", 'ALMACENAJE');
+            $this->excel->getActiveSheet()->setCellValue("T{$contador}", 'AJUSTE INC.');
+            $this->excel->getActiveSheet()->setCellValue("U{$contador}", 'AJUSTE DED.');
+            $this->excel->getActiveSheet()->setCellValue("V{$contador}", 'CONVENIO');
+            $this->excel->getActiveSheet()->setCellValue("W{$contador}", 'CUOTA ARAN.');
+            $this->excel->getActiveSheet()->setCellValue("X{$contador}", 'ID. MATRIZ');
+            $this->excel->getActiveSheet()->setCellValue("Y{$contador}", 'DEC. CANCELAR');
+            $this->excel->getActiveSheet()->setCellValue("Z{$contador}", 'ITEM CANCELAR');
+            $this->excel->getActiveSheet()->setCellValue("AA{$contador}", 'TITULO MAN COUR.');
+            $this->excel->getActiveSheet()->setCellValue("AB{$contador}", 'CERTIF. IMP.');
+            $this->excel->getActiveSheet()->setCellValue("AC{$contador}", 'EXONERACION');
+            $this->excel->getActiveSheet()->setCellValue("AD{$contador}", 'GRUPO');
+            $this->excel->getActiveSheet()->setCellValue("AE{$contador}", '001');
+
+
+            foreach ($datos['l_retaceo'] as $fila) {
+            
+	        	$contador++;
+	        	//Informacion de las filas de la consulta.
+				$this->excel->getActiveSheet()->setCellValue("A{$contador}","N");
+		        $this->excel->getActiveSheet()->setCellValue("B{$contador}", $fila->partida);
+                $this->excel->getActiveSheet()->setCellValue("C{$contador}", $fila->nombre);
+                $this->excel->getActiveSheet()->setCellValue("D{$contador}", $fila->pais_origen);
+                $this->excel->getActiveSheet()->setCellValue("E{$contador}", $fila->pais_procedencia);
+                $this->excel->getActiveSheet()->setCellValue("F{$contador}", $fila->pais_adquisicion);
+                $this->excel->getActiveSheet()->setCellValue("G{$contador}", $fila->idestado);
+                $this->excel->getActiveSheet()->setCellValue("H{$contador}", " ");
+                $this->excel->getActiveSheet()->setCellValue("I{$contador}", $fila->idunidad);
+                $this->excel->getActiveSheet()->setCellValue("J{$contador}", $fila->cuantia);
+                $this->excel->getActiveSheet()->setCellValue("K{$contador}", $fila->idunidad);
+                $this->excel->getActiveSheet()->setCellValue("L{$contador}", $fila->cuantia);
+                $this->excel->getActiveSheet()->setCellValue("M{$contador}", " ");
+                $this->excel->getActiveSheet()->setCellValue("N{$contador}"," ");
+                $this->excel->getActiveSheet()->setCellValue("O{$contador}", $fila->total);
+
+                
+            }
+           
+	        //Le ponemos un nombre al archivo que se va a generar.
+            //$archivo = "INTEC_".$file.'.xls';
+            $archivo="INTEC-".$_GET['c807_file'].'.xls';
+	        header('Content-Type: application/vnd.ms-excel');
+	        header('Content-Disposition: attachment;filename="'.$archivo.'"');
+	        header('Cache-Control: max-age=0');
+	        $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel5'); 
+	        //Hacemos una salida al navegador con el archivo Excel.
+	        $objWriter->save('php://output');
+
+      /*
+        
+        $objPHPExcel = new PHPExcel();
+
+ 
+        
+
+        
+        
+        $contador=1;
+        $objPHPExcel->setActiveSheetIndex(0);
+        $objPHPExcel->getActiveSheet()->getStyle("A{$contador}")->getFont()->setBold(true);
+        $objPHPExcel->getActiveSheet()->getStyle("B{$contador}")->getFont()->setBold(true);
+        $objPHPExcel->getActiveSheet()->getStyle("C{$contador}")->getFont()->setBold(true);
+        //Definimos los títulos de la cabecera.
+        $objPHPExcel->getActiveSheet()->setCellValue("A{$contador}", 'Número de teléfono');
+        $objPHPExcel->getActiveSheet()->setCellValue("B{$contador}", 'Fecha');
+        $objPHPExcel->getActiveSheet()->setCellValue("C{$contador}", 'Mensaje');
+
+      
+       // $worksheet->getCellByColumnAndRow(0, 1)->getValue();
+      
+       
+      
+        $archivo = "elmer.xls";
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="'.$archivo.'"');
+        header('Cache-Control: max-age=0');
+
+        header('Content-Transfer-Encoding: binary');
+       // header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        $objWriter = PHPExcel_IOFactory::createWriter($this->$objPHPExcel, 'Excel5');
+
+        //Hacemos una salida al navegador con el archivo Excel.
+        $objWriter->save('php://output');
+           
+           
+      */
+    }
+
+
+    
 
     public function generar_excel()
     {
@@ -1299,6 +1490,9 @@ class Subir_Archivo extends CI_Controller
         }
       
         $this->load->view('subir_archivos/cuerpo', $datos);
+
+        
+        
     }
 
 

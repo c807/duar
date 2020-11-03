@@ -9,7 +9,7 @@
             parent::__construct();
             $this->load->database();
             $this->load->model('productos/ProductosModel');
-            $this->load->library('PHPEXCEL/PHPExcel.php');
+            $this->load->library('PHPExcel.php');
             $this->load->library('session');
         }
     
@@ -30,49 +30,70 @@
                 $permiso=1;
             }
             
+            $fito=0;
+            if (isset($_POST["fito"])>0) {
+                $fito=1;
+            }
+
             $id=$_POST["producimport"];
             if ($id) {
             } else {
-                $codigo=$this->ProductosModel->buscar_producto($_POST["codproducto"], $_POST["paises"]);
+                $codigo=$this->ProductosModel->buscar_producto($_POST["codproducto"], $_POST["paises"], $_SESSION['pais_id']);
             }
             
            
             if ($codigo==1) {
-                echo 1;
+                // echo 1;
+                echo "existe";
             } else {
-                echo 0;
-
                 $data = array(
 
-                'importador'  => trim($_POST["importador"]),
+                'importador'           => trim($_POST["importador"]),
 
-                'codproducto'  => $_POST["codproducto"],
+                'codproducto'          => $_POST["codproducto"],
 
-                'descripcion'        => $_POST["descripcion"],
+                'descripcion'          => $_POST["descripcion"],
 
                 'descripcion_generica' => $_POST["descripcion_generica"],
 
-                'funcion' => $_POST["funcion"],
+                'funcion'              => $_POST["funcion"],
 
-                'partida' => $_POST["partida"],
+                'partida'              => $_POST["partida"],
 
-                'observaciones' => $_POST["observaciones"],
+                'observaciones'        => $_POST["observaciones"],
 
-                'nombre_proveedor' => $_POST["proveedor"],
+                'nombre_proveedor'     => $_POST["proveedor"],
 
-                'permiso' => $permiso,
+                'permiso'              => $permiso,
 
-                'tlc' => $tlc,
+                'tlc'                  => $tlc,
 
-                'paisorigen' => $_POST["paises"],
+                'fito'                 => $fito,
 
-                'marca' => $_POST["marca"]
+                'paisorigen'           => $_POST["paises"],
 
-              
+                'marca'                => $_POST["marca"],
 
+                'pais_id'              =>  $_SESSION['pais_id'],
+
+                'idunidad'             => $_POST["u_comercial"],
+                
+                'idestado'             => $_POST["estados"],
+
+                'pais_procedencia'      => $_POST["pais_procedencia"],
+                
+                'pais_adquisicion'      => $_POST["pais_adquisicion"]
+         
             );
 
-                $this->ProductosModel->guardar_producto($id, $data);
+
+
+                $result= $this->ProductosModel->guardar_producto($id, $data);
+                if ($result>0) {
+                    echo "true";
+                } else {
+                    echo "false";
+                }
             }
         }
       
@@ -90,7 +111,6 @@
            
             $ubicacion .= "/".$nombre;
             move_uploaded_file($_FILES['file']['tmp_name'], $ubicacion);
-
          
             try {
                 $objPHPExcel = PHPExcel_IOFactory::load($ubicacion);
@@ -113,18 +133,23 @@
                         $proveedor = $worksheet->getCellByColumnAndRow(9, $row)->getValue();
                         $origen = $worksheet->getCellByColumnAndRow(10, $row)->getValue();
                         $marca = $worksheet->getCellByColumnAndRow(11, $row)->getValue();
+                        $fito =$worksheet->getCellByColumnAndRow(12, $row)->getValue();
+                        $idunidad =$worksheet->getCellByColumnAndRow(13, $row)->getValue();
+                        $idestado= $worksheet->getCellByColumnAndRow(14, $row)->getValue();
+                        $procedencia= $worksheet->getCellByColumnAndRow(15, $row)->getValue();
+                        $adquisicion= $worksheet->getCellByColumnAndRow(16, $row)->getValue();
+                      
 
-
-                        $codigo=$this->ProductosModel->buscar_producto($codproducto, $origen);
+                        $codigo=$this->ProductosModel->buscar_producto($codproducto, $origen, $_SESSION['pais_id']);
                               
                         if ($codigo==1) {
                             $data[] = array(
 
-                              'codproducto' 	=>	$codproducto ,
+                              'codproducto' 	=> $codproducto ,
                               
-                              'descripcion'   =>$descripcion ,
+                              'descripcion'     => $descripcion ,
               
-                              'paisorigen' =>  $origen
+                              'paisorigen'      => $origen
                               
                           );
                             $bandera="S";
@@ -180,40 +205,56 @@
                         $proveedor = $worksheet->getCellByColumnAndRow(9, $row)->getValue();
                         $origen = $worksheet->getCellByColumnAndRow(10, $row)->getValue();
                         $marca = $worksheet->getCellByColumnAndRow(11, $row)->getValue();
-                     
+                        $fito =$worksheet->getCellByColumnAndRow(12, $row)->getValue();
+                        $idunidad =$worksheet->getCellByColumnAndRow(13, $row)->getValue();
+                        $idestado= $worksheet->getCellByColumnAndRow(14, $row)->getValue();
+                        $procedencia= $worksheet->getCellByColumnAndRow(15, $row)->getValue();
+                        $adquisicion= $worksheet->getCellByColumnAndRow(16, $row)->getValue();
+                       // $codproducto=trim($codproducto);
+
                        
-                        $data[] = array(
+                            $data[] = array(
 
-                            'importador'		=>	$importador,
+                            'importador'		   => $importador,
 
-                            'codproducto'			=>	$codproducto,
+                            'codproducto'		   => $codproducto,
                             
-                            'descripcion'        =>$descripcion,
+                            'descripcion'          => $descripcion,
             
                             'descripcion_generica' => $descripcion_generica,
             
-                            'funcion' => $funcion,
+                            'funcion'              => $funcion,
             
-                            'partida' => $partida,
+                            'partida'              => $partida,
             
-                            'observaciones' => $observaciones,
+                            'observaciones'        => $observaciones,
             
-                            'permiso' => $permiso,
+                            'permiso'              => $permiso,
             
-                            'tlc' => $tlc,
+                            'tlc'                  => $tlc,
             
-                            'nombre_proveedor' =>  $proveedor,
+                            'nombre_proveedor'     => $proveedor,
 
-                            'paisorigen' =>  $origen,
+                            'paisorigen'           => $origen,
 
-                            'marca' => $marca
+                            'marca'                => $marca,
+
+                            'fito'                 => $fito,
+
+                            'idestado'             => $idestado,
+
+                            'idunidad'             => $idunidad,
+
+                            'pais_id'              => $_SESSION['pais_id'],
+
+                            'pais_procedencia'     => $procedencia,
+
+                            'pais_adquisicion'     => $adquisicion
                             
                         );
+                        
                     }
                 }
-
-
-
                 $this->ProductosModel->insertar($data);
                 unlink($ubicacion);
             } catch (Exception $e) {
@@ -226,13 +267,14 @@
         {
             $codigo=$_POST['txtcodigo'];
             $nombre=$_POST['txtnombre'];
+            $id=$_POST['txtidproducto'];
         
-            $this->ProductosModel->borrar_producto($codigo);
+            $this->ProductosModel->borrar_producto($id);
         }
 
         public function consulta($id)
         {
-            $this->datos['productos'] =  $this->ProductosModel->consulta($id);
+            $this->datos['productos'] =  $this->ProductosModel->consulta($id, $_SESSION['pais_id']);
                     
             $this->load->view('importador/lista', $this->datos);
         }

@@ -20,6 +20,7 @@ class Subir_archivos_model extends CI_Model
                                       ->join('duarx.producto_importador as du', "du.codproducto = d.codigo_producto and du.importador = '$no_identificacion'", 'left')
                                       ->where('du.partida IS  NULL')
                                       ->where('f.id', $id_file)
+                                      ->where('d.pais_id',  $_SESSION['pais_id'])
                                       ->order_by('d.num_factura, d.id')
                                       ->get('gacela.file as f')
                                      ->result();
@@ -31,7 +32,7 @@ class Subir_archivos_model extends CI_Model
                                       ->join('duarx.dpr as d', 'd.id_file =  f.id', 'inner')
                                       ->join('duarx.producto_importador as du', "du.codproducto = d.codigo_producto and du.importador = '$no_identificacion'", 'left')
                                       ->where('f.id', $id_file)
-                                      //->where('du.partida', '8708990000')
+                                      ->where('d.pais_id',  $_SESSION['pais_id'])    
                                       ->order_by('d.id')
                                       ->get('gacela.file as f')
                                       ->result();
@@ -43,6 +44,7 @@ class Subir_archivos_model extends CI_Model
                                ->join('duarx.producto_importador as du', "du.codproducto = d.codigo_producto and du.importador = '$no_identificacion'", 'left')
                                ->where('du.partida IS  NULL')
                                ->where('f.id', $id_file)
+                               ->where('d.pais_id',  $_SESSION['pais_id']) 
                                ->order_by('d.descripcion')
                                ->get('gacela.file as f')
                                ->result();
@@ -51,21 +53,14 @@ class Subir_archivos_model extends CI_Model
         }
 
         return $query;
-        //echo $this->db->last_query();exit();
     }
 
     public function existe_factura($data)
     {
-        //con id_file obtener el codgo de cliente
-        //Verificar que producto en ese cliente no exista
-
-        //$importador = $this->obtener_datos_file($data['numero_file']);
         $importador = $this->obtener_datos_file($data['num_file']);
-        
         $query = $this->db
                 ->select('count(*) as cantidad')
                 ->where('id_file', $importador->id)
-              //  ->where('codigo_producto',$data['codigo_producto'])
                 ->where('num_factura', $data['num_factura'])
                 ->get('duarx.dpr')
                 ->row();
@@ -168,9 +163,14 @@ class Subir_archivos_model extends CI_Model
         $datos['paisorigen'] = $args["paisorigen"];
         $datos['tlc'] = $args["tlc"];
         $datos['permiso'] = $args["permiso"];
+        $datos['fito'] = $args["fito"];
+        $datos['idestado'] = $args["idestado"];
+        $datos['idunidad'] = $args["idunidad"];
+        $datos['pais_id'] = $_SESSION['pais_id'];
+        $datos['pais_adquisicion'] = $args["pais_adquisicion"];
+        $datos['pais_procedencia'] = $args['pais_procedencia'];
 
-
-        
+     
         $this->db->insert('duarx.producto_importador', $datos);
     }
     public function actualizar_dpr($id, $data)
@@ -180,6 +180,11 @@ class Subir_archivos_model extends CI_Model
         ->set('permiso', $data['permiso'])
         ->set('partida', $data['partida_arancelaria'])
         ->set('descripcion', $data['descripcion_generica'])
+        ->set('fito', $data['fito'])
+        ->set('idestado', $data['idestado'])
+        ->set('idunidad', $data['idunidad'])
+        ->set('pais_adquisicion', $data['pais_adquisicion'])
+        ->set('pais_procedencia', $data['pais_procedencia'])
         ->where('id', $id)
         ->update('duarx.dpr');
     }
@@ -403,12 +408,13 @@ class Subir_archivos_model extends CI_Model
         return $query;
     }
 
-    public function verificar_partida($codigo, $importador)
+    public function verificar_partida($codigo, $importador, $pais_id)
     {
         $query = $this->db
-        ->select('partida,tlc,permiso,descripcion_generica')
+        ->select('partida, tlc, permiso, descripcion_generica, idestado, idunidad, fito, pais_adquisicion, pais_procedencia')
         ->where('codproducto', $codigo)
         ->where('importador', $importador)
+        ->where('pais_id', $pais_id)
         ->get('duarx.producto_importador')
         ->result();
         return $query;
@@ -417,7 +423,7 @@ class Subir_archivos_model extends CI_Model
     public function lista_retaceo($file)
     {
         $query = $this->db
-        ->select('partida,sum(cuantia) AS cuantia, sum(total+flete+seguro+otros_gastos) as total, sum(peso_bruto) peso_bruto, sum(peso_neto) peso_neto, sum(bultos) bultos, pais_origen,tlc,partida,group_concat(DISTINCT descripcion) as nombre, codigo_producto, documento_transporte')
+        ->select('partida, sum(cuantia) AS cuantia, sum(total+flete+seguro+otros_gastos) as total, sum(peso_bruto) peso_bruto, sum(peso_neto) peso_neto, sum(bultos) bultos, pais_origen,tlc,partida,group_concat(DISTINCT descripcion) as nombre, codigo_producto, documento_transporte,idestado,idunidad,fito,sum(total),pais_adquisicion, pais_procedencia')
         ->where('id_file', $file)
         ->group_by('partida,tlc')
         ->get('duarx.dpr')
@@ -528,8 +534,10 @@ class Subir_archivos_model extends CI_Model
     }
 
 
-    public function eliminar_dpr($id){
+    public function eliminar_dpr($id)
+    {
         $this->db->where('id_file', $id);
+        $this->db->where('pais_id', $_SESSION['pais_id']);
         $this->db->delete('duarx.dpr');
     }
 }

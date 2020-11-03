@@ -12,9 +12,10 @@ if ( ! function_exists('login'))
 {
 	function login()
 	{
-		
+		//$_SESSION['UserID']=1211;
 		if (isset($_SESSION['UserID']) && !empty($_SESSION['UserID'])) {
 			return true;
+			
 		} else {
 			return false;
 		}

@@ -36,6 +36,7 @@
                     <th>Función</th>
                     <th>TLC</th>
                     <th>Permiso</th>
+                    <th>Fito</th>
                     <th>Partida</th>
                     <th>Origen</th>
                     <th colspan="2">Acciones</th>
@@ -104,23 +105,17 @@
                 <div class="modal-header hdmodal buttonclose">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 id="opcion" class="modal-title border-bottom pb-3 mb-4"><strong>AGREGAR PRODUCTO </strong></h4>
-
                 </div>
                 <div class="row-fluid  message" id="message"></div>
                 <div class="modal-body">
-
                     <form enctype="multipart/form-data" class="add_producto" id="add_producto"
                         action="javascript:gestion_productos('c')">
-
+                        <input type="hidden" name="pais_id"  id="pais_id" value="<?php echo $_SESSION['pais_id']?>" readonly >
                         <div class="container-fluid">
                             <input type="hidden" class="form-control " name="producimport" id="producimport" />
                             <div class="row">
-                                <div class="col-sm-6">
-
-                                </div>
-
+                                <div class="col-sm-6"></div>
                             </div>
-
 
                             <div class="row">
 
@@ -142,19 +137,13 @@
                                         </div>
                                     </div>
 
-
-
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label">Descripción F.</label>
                                         <div class="col-sm-8">
-
                                             <textarea class="form-control" rows="3" id="descripcion" name="descripcion"
                                                 placeholder="Introduzca descripción según factura" required></textarea>
-
                                         </div>
                                     </div>
-
-
 
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label">Función</label>
@@ -163,7 +152,6 @@
                                                 placeholder="Introduzca función" required></textarea>
                                         </div>
                                     </div>
-
 
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label">Observaciones</label>
@@ -194,14 +182,12 @@
                                         </div>
                                     </div>
 
-
                                     <div class="form-group row">
                                         <label for="paises" class="col-sm-4 control-label">Origen</label>
                                         <div class="col-sm-8">
                                             <?php $this->load->view('paises'); ?>
                                         </div>
                                     </div>
-
 
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label  ">Marca</label>
@@ -210,6 +196,35 @@
                                                 placeholder="Introduzca Marca" required />
                                         </div>
                                     </div>
+
+                                    <div class="form-group row hn">
+                                        <label for="estados" class="col-sm-4 control-label">Estado</label>
+                                        <div class="col-sm-8">
+                                            <?php $this->load->view('catalogos/estados'); ?>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row hn">
+                                        <label for="u_comercial" class="col-sm-4 control-label hd">U.Comercial</label>
+                                        <div class="col-sm-8 hd">
+                                            <?php $this->load->view('catalogos/unidad_comercial'); ?>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row hn">
+                                        <label for="" class="col-sm-4 control-label">Proc/Destino</label>
+                                        <div class="col-sm-8">
+                                            <?php $this->load->view('catalogos/procedencia'); ?>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row hn">
+                                        <label for="" class="col-sm-4 control-label">Adquisición</label>
+                                        <div class="col-sm-8">
+                                            <?php $this->load->view('catalogos/adquisicion'); ?>
+                                        </div>
+                                    </div>
+
 
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label">Descripción G.</label>
@@ -220,21 +235,33 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group row">
-                                        <label class="col-sm-4 control-label  "></label>
-                                        <div class=" checkbox col-sm-4">
+                                </div>
+                                <!--fin segunda Columna -->
+
+                                <div class="form-group row">
+                                    <div class="col-sm-2"></div>
+                                    <div class="col-sm-2">
+                                        <div class=" checkbox ">
                                             <label><input type="checkbox" value="" name="permiso"
                                                     id="permiso">PERMISO</label>
                                         </div>
-                                        <label class="col-sm-0 control-label  "></label>
-                                        <div class=" checkbox col-sm-4">
-
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class=" checkbox">
                                             <label><input type="checkbox" value="" name="tlc" id="tlc"
                                                     class="pull-right">TLC</label>
                                         </div>
                                     </div>
+
+                                    <div class="col-sm-2 hn">
+                                        <div class=" checkbox">
+                                            <label><input type="checkbox" value="" name="fito" id="fito"
+                                                    class="pull-right">Fito</label>
+                                        </div>
+                                    </div>
+
+
                                 </div>
-                                <!--fin segunda Columna -->
                             </div>
 
                             <div class="row">
@@ -276,7 +303,7 @@
             <!-- Modal body -->
             <div class="modal-body">
                 <form enctype="multipart/form-data" class="del_producto">
-
+                <input type="text" class="form-control w-50 text-left" id="txtidproducto" name="txtidproducto" readonly>
                     <div class="form-group  has-success">
                         <label for="txtcodigo" class="control-label">Código</label>
                         <input type="text" class="form-control w-50 text-left" id="txtcodigo" name="txtcodigo" readonly>
@@ -540,16 +567,6 @@
 <!---fin  modal busqueda personalizada -->
 
 <script type="text/javascript">
-$('#borrar_producto').on('show.bs.modal', function(e) {
-    var bookId = $(e.relatedTarget).data('book-id');
-    var bookId1 = $(e.relatedTarget).data('book-id1');
+ocultar_elementos_dpr();
 
-
-    $(e.currentTarget).find('input[name="txtcodigo"]').val(bookId);
-    $(e.currentTarget).find('input[name="txtnombre"]').val(bookId1);
-
-
-
-});
 </script>
-

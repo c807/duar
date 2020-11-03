@@ -1,85 +1,87 @@
 <?php
 class Importador extends CI_Controller
 {
+    public function __construct()
+    {
+        parent:: __construct();
+        $this->load->model("Importador_model");
+    }
 
-	function __construct()
-	{
-		parent:: __construct();
-		$this->load->model("Importador_model");
-		
-	}
+    public function index()
+    {
+    }
 
-	function index(){}
+    public function productos()
+    {
+        $this->datos['navtext']   = "Producto Importador";
+        $this->datos['vista']     = "importador/contenido";
+        $this->datos['form']      = "importador/form";
+        $this->datos['action']    = base_url('index.php/mantenimiento/importador/buscar');
+        $this->datos['paises'] = $this->Conf_model->paises();
+        $this->datos['estados'] = $this->Conf_model->estados();
+        $this->datos['u_comercial'] = $this->Conf_model->u_comercial();
+        $this->datos['importador'] = $this->Conf_model->empresas();
+        $this->datos['tipobulto'] = $this->Conf_model->tipoBulto();
+        $this->load->view("principal", $this->datos);
+    }
 
-	function productos() {
-		
-		$this->datos['navtext']   = "Producto Importador";
-		$this->datos['vista']     = "importador/contenido";
-		$this->datos['form']      = "importador/form";
-		$this->datos['action']    = base_url('index.php/mantenimiento/importador/buscar');
-		$this->datos['paises'] = $this->Conf_model->paises();
-		$this->datos['importador'] = $this->Conf_model->empresas();
-		$this->datos['tipobulto'] = $this->Conf_model->tipoBulto();
-		//$this->datos['productos'] = $this->Importador_model->verproductos();
+    public function buscar()
+    {
+        $this->datos['productos'] =  $this->Importador_model->verproductos($_POST, $_SESSION['pais_id']);
+      //  var_dump($this->datos );
+        $this->load->view('importador/lista', $this->datos);
+    }
 
-	
+    public function formeditar($id)
+    {
+        $this->load->library('mante/Improducto');
 
-		$this->load->view("principal", $this->datos);
-	}
+        $imp = new Improducto();
+        $imp->set_select(
+            array(
+                    'paises' => $this->Conf_model->paises(),
+                    'tipbul' => $this->Conf_model->tipoBulto()
+                 )
+        );
 
-	function buscar(){
-		//$this->datos['vista']     = "importador/contenido";
-		$this->datos['productos'] =  $this->Importador_model->verproductos($_POST);
-		
-		//var_dump($_POST);
-		$this->load->view('importador/lista', $this->datos);
-		
-	}
+        $imp->set_dtproducto($this->Importador_model->verlineaproducto(array('prodimpor' => $id)));
+        $this->datos['informacion'] = $this->Importador_model->verlineaproducto(array('prodimpor' => $id));
+        $this->datos['action'] = base_url('index.php/mantenimiento/importador/guardar');
 
-	function formeditar($id){
-		$this->load->library('mante/Improducto');
+        $this->load->view('importador/editar', array_merge($this->datos, $imp->crear()));
+    }
 
-		$imp = new Improducto();
-		$imp->set_select(
-					array(
-						'paises' => $this->Conf_model->paises(),
-						'tipbul' => $this->Conf_model->tipoBulto()
-					)
-				);
+    public function guardar()
+    {
+        if (verDato($_GET, 'producimport')) {
+            if (verDato($_GET, 'tlc')) {
+                $_GET['tlc'] = 1;
+            } else {
+                $_GET['tlc'] = 0;
+            }
 
-		$imp->set_dtproducto($this->Importador_model->verlineaproducto(array('prodimpor' => $id)));
-		$this->datos['informacion'] = $this->Importador_model->verlineaproducto(array('prodimpor' => $id));
-		$this->datos['action'] = base_url('index.php/mantenimiento/importador/guardar');
+            if (verDato($_GET, 'permiso')) {
+                $_GET['permiso'] = 1;
+            } else {
+                $_GET['permiso'] = 0;
+            }
+            if (verDato($_GET, 'fito')) {
+                $_GET['fito'] = 1;
+            } else {
+                $_GET['fito'] = 0;
+            }
+            $_GET['pais_id'] =  $_SESSION['pais_id'];
+            if ($this->Importador_model->guardardatos($_GET, $_SESSION['pais_id'])) {
+                $res = array('msj' => "Actualización de datos correcto", 'res' => $_GET['producimport']);
+            } else {
+                $res = $this->Importador_model->get_mensaje();
+            }
+        }
 
-		$this->load->view('importador/editar', array_merge($this->datos, $imp->crear()));
-	}
+        enviarJson($res);
+    }
 
-	function guardar() {
-
-		if (verDato($_GET, 'producimport')) {
-			if (verDato($_GET, 'tlc')){
-				$_GET['tlc'] = 1;
-			} else {
-				$_GET['tlc'] = 0;
-			}
-
-			if (verDato($_GET, 'permiso')){
-				$_GET['permiso'] = 1;
-			} else {
-				$_GET['permiso'] = 0;
-			}
-			if ($this->Importador_model->guardardatos($_GET)) {
-				$res = array('msj' => "Actualización de datos correcto", 'res' => $_GET['producimport']);
-			} else {
-				$res = $this->Importador_model->get_mensaje();
-			}
-		}
-
-		enviarJson($res);
-	}
-
-	function empresas(){
-
-	}
+    public function empresas()
+    {
+    }
 }
-?>

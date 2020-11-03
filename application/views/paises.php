@@ -7,7 +7,3 @@
     <?php endforeach ?>
 
 </select>
-
-<script>
-
-</script>

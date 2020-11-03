@@ -3,7 +3,7 @@ class Importador_model extends CI_Model
 {
     protected $resultado = array();
 
-    public function verproductos($ars)
+    public function verproductos($ars, $pais_id)
     {
         $ejecutar=0;
         
@@ -52,7 +52,7 @@ class Importador_model extends CI_Model
             }
         }
         
-            
+        //  $this->db->where('a.pais_id', $pais_id)  ;
         if ($ejecutar==1) {
             return $this->db->select('
 								b.nombre,
@@ -69,7 +69,12 @@ class Importador_model extends CI_Model
 								a.marca,
 								a.funcion,
 								a.descripcion_generica,
-								a.permiso,
+                                a.permiso,
+                                a.fito,
+                                a.idestado,
+                                a.idunidad,
+                                a.pais_procedencia,
+                                a.pais_adquisicion,
 								a.observaciones,
 								a.nombre_proveedor,
 								a.importador,
@@ -77,6 +82,7 @@ class Importador_model extends CI_Model
 								')
                         ->join('gacela.cliente_hijo b', 'a.importador = b.no_identificacion')
                         ->join('pricing.pais d', 'a.paisorigen = d.id_pais')
+                        ->where('a.pais_id', $pais_id)
                         ->get('producto_importador a')
                          ->result();
         }
@@ -99,7 +105,12 @@ class Importador_model extends CI_Model
 								a.marca,
 								a.tipo_bulto,
 								a.funcion,
-								a.permiso,
+                                a.permiso,
+                                a.fito,
+                                a.idestado,
+                                a.idunidad,
+                                a.pais_procedencia,
+                                a.pais_adquisicion,
 								a.descripcion_generica,
 								a.observaciones,
 								a.nombre_proveedor,
@@ -124,20 +135,14 @@ class Importador_model extends CI_Model
         return $this->resultado;
     }
 
-    public function guardardatos($ars)
+    public function guardardatos($ars, $pais_id)
     {
         if (verDato($ars, 'producimport')) {
             $this->db->where('producimport', $ars['producimport']);
-            /*
-                        if ($this->db->update('producto_importador', $ars)) {
-                            return $ars['producimport'];
-                        } else {
-                            $this->set_mensaje("No se puede realizar la actualización ",$ars['producimport']);
-                        }*/
+            $this->db->where('pais_id', $ars['$pais_id']);
             $this->db->update('producto_importador', $ars);
         } else {
             $this->db->insert('producto_importador', $ars);
-            //$this->set_mensaje("Faltan datos principales para editar",$ars['producimport']);
         }
 
         return false;

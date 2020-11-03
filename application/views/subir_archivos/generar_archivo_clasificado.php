@@ -9,6 +9,7 @@
         </div>
         <div class="panel-body">
             <form enctype="multipart/form-data" class="retaceo" id="retaceo">
+                <input type="hidden" name="pais_id" id="pais_id" value="<?php echo $_SESSION['pais_id']?>" readonly>
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <tbody>
@@ -28,7 +29,7 @@
                     <button type="button" class="boton" onclick="lista_retaceo()">Retaceo</button>
                     <button type="button" class="boton" onclick="cuadro_duca()">Crear PDF</button>
                     <button type="button" class="boton" onclick="lista_cambiar_origen()">Cambiar Origen</button>
-
+                    <button type="button" class="boton hn" onclick="excel_intec()" >Archivo INTEC</button>
 
                 </div>
                 <?php echo form_close();?>
@@ -125,20 +126,20 @@
                     <div class="" id="titulo">
                     </div>
                     <div class="panel-body">
-                    <input type="hidden" class="form-control input-sm" id="id">
+                        <input type="hidden" class="form-control input-sm" id="id">
                         <div class="form-group form-group-sm">
                             <div class="col-md-2 text-left">
                                 <label for="origen" class="control-label">Origen</label>
                             </div>
                             <div class="col-md-12">
-                            <?php $this->load->view('paises'); ?>
+                                <?php $this->load->view('paises'); ?>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary"   onclick="guardar_origen()" >Guardar</button>
+                <button type="button" class="btn btn-primary" onclick="guardar_origen()">Guardar</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
             </div>
         </div>
@@ -156,4 +157,5 @@ $(document).ready(function() {
 
 <script>
 mostrar_origen()
+ocultar_elementos_dpr();
 </script>

@@ -29,6 +29,7 @@ function no_clasificadas($opcion) {
 }
 
 function mostrar_partida($id_Reg, $cod_importador) {
+
 	$("#id_reg").val($id_Reg);
 	$("#id").val($id_Reg);
 	//alert($("#actualizar_partida") + $id_Reg);
@@ -51,6 +52,7 @@ function mostrar_partida($id_Reg, $cod_importador) {
 		$("#id_reg" + $id_Reg).val(data.id);
 		$("#id").val($id_Reg);
 		$("#partida_arancelaria" + $id_Reg).val("");
+		ocultar_elementos_dpr();
 	});
 }
 
@@ -74,6 +76,48 @@ function generar_archivo() {
 	generar_excel();
 }
 
+ function excel_intec(){
+	var verifica = verificar_input_retaceo();
+	if (verifica === 0) {
+		return false;
+	}
+	var file = $("#c807_file").val();
+	var documento = $("#doc_transporte").val();
+	var id_file;
+	var url = base_url("index.php/Subir_archivo/get_id_file/" + file);
+	$.getJSON(url, { producto: file.value }, function (data) {
+		id_file = data.id;
+
+		var url = base_url(
+			"index.php/Subir_archivo/excel_intec/" + id_file + "/" + documento
+		);
+		
+		window.location.href =url+	"?" +$("#c807_file").serialize();
+		$.notify("Archivo de Excel Generado.", "success");
+	});
+
+
+
+
+
+//	var url = base_url(
+	//	"index.php/Subir_archivo/excel_intec/" + id_file + "/" + documento	);
+	//	"index.php/Subir_archivo/lista_retaceo/" + id_file + "/" + documento
+	
+//	window.location.href =url;
+	
+
+//		$.notify("Archivo de Excel Generado.", "success");
+//
+
+}
+/* esto funciona
+function excel_intec(){ 
+	var url =base_url_erp("index.php/Subir_archivo/excel_intec/");
+	window.location.href =url;
+		$.notify("Archivo de Excel Generado.", "success");
+}
+*/
 function generar_excel() {
 	var url = base_url_erp("index.php/Subir_archivo/generar_excel/");
 
@@ -90,13 +134,13 @@ function generar_excel() {
 	if ($doc_tra.length == 0) {
 		$mensaje += ", documento de transporte";
 	}
-	if ($t_bultos.length == 0) {
+	/*if ($t_bultos.length == 0) {
 		$mensaje += ", total bultos";
-	}
+	
 	if ($t_kilos.length == 0) {
 		$mensaje += ", total kilos.";
 	}
-
+}*/
 	if ($mensaje.length > 0) {
 		$mesnsaje = "numero de File.";
 		$.notify("Falta digitar " + $mensaje, "error");
@@ -328,6 +372,7 @@ function get_detalle_dpr() {
 		});
 	});
 }
+
 
 function lista_cambiar_origen() {
 	var verifica = verificar_input_retaceo();
