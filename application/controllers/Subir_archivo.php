@@ -6,8 +6,6 @@ class Subir_Archivo extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-     //   $this->load->library('PHPEXCEL/PHPExcel.php');
-     $this->load->library('PHPExcel.php');
         $this->load->model(array('subir_archivos/Subir_archivos_model'));
         $this->load->model('subir_archivos/Subir_archivos_model');
         $this->load->model('Conf_model');

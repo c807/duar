@@ -11,7 +11,6 @@ class Crear extends CI_Controller
                         'Conf_model'
                         );
             $this->load->model($modelos);
-            $this->load->library('PHPExcel.php');
             $datos   = $this->Conf_model->info_accesos_pa($_SESSION['UserID']);
            
             $_SESSION['roll']=$datos->ROLL;

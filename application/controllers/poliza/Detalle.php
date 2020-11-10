@@ -199,10 +199,6 @@ class Detalle extends CI_Controller {
 
 		$det = new Detalle_model();
 		$det->set_duaduana($duaduana);
-
-		$this->load->library('PHPEXCEL/PHPExcel.php');
-		#require_once(getcwd().'/../dua/dua/application/libraries/PHPExcel/PHPExcel.php');
-    	#require_once(getcwd().'/../dua/dua/application/libraries/PHPExcel/PHPExcel/IOFactory.php');
 		$exito = 0;
 
 		$cargar    = PHPExcel_IOFactory::identify($link);

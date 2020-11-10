@@ -58,7 +58,7 @@ $autoload['packages'] = array(session_start());
 |
 |	$autoload['libraries'] = array('user_agent' => 'ua');
 */
-$autoload['libraries'] = array('database');
+$autoload['libraries'] = array('database', 'bk/PHPEXCEL/PHPExcel');
 
 /*
 | -------------------------------------------------------------------

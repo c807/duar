@@ -14,8 +14,6 @@ class Reporte extends CI_Controller {
 	}
 
 	function descargar($idfile){
-		require_once(APPPATH.'libraries/PHPEXCEL/PHPExcel.php');
-    	require_once(APPPATH.'libraries/PHPEXCEL/PHPExcel/IOFactory.php');
 		$objPHPExcel = PHPExcel_IOFactory::load(APPPATH."../public/fls/formato_poliza.xls");
 		$informacion = $this->repor->encabezado($idfile);
 
@@ -113,8 +111,8 @@ class Reporte extends CI_Controller {
 	}
 
 	function verarchivo($idfile){
-		require_once(APPPATH.'libraries/PHPEXCEL/PHPExcel.php');
-    	require_once(APPPATH.'libraries/PHPEXCEL/PHPExcel/IOFactory.php');
+		# require_once(APPPATH.'libraries/PHPEXCEL/PHPExcel.php');
+    	# require_once(APPPATH.'libraries/PHPEXCEL/PHPExcel/IOFactory.php');
 		$objPHPExcel = PHPExcel_IOFactory::load(APPPATH."../public/fls/poliza.xls");
 
 		$informacion = $this->repor->encabezado($idfile);
