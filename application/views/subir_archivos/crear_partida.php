@@ -60,6 +60,7 @@
                                         <td><label for="partida_arancelaria<?php echo $id['id_reg']?>">Partida
                                                 Arancelaria</label>
                                         </td>
+                                        
                                         <td><input type="text" name="partida_arancelaria<?php echo $id['id_reg']?>"
                                                 id="partida_arancelaria<?php echo $id['id_reg']?>" class="form-control"
                                                 maxlength="16"></td>

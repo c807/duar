@@ -10,7 +10,7 @@ class ProductosController extends CI_Controller
         parent::__construct();
         # $this->load->database();
         $this->load->model('productos/ProductosModel');
-        # $this->load->library('session');
+        # $this->load->library('session');  
     }
 
     public function index()
@@ -39,7 +39,7 @@ class ProductosController extends CI_Controller
         $id=$_POST["producimport"];
         if ($id) {
         } else {
-            $codigo=$this->ProductosModel->buscar_producto($_POST["codproducto"], $_POST["paises"], $_SESSION['pais_id']);
+            $codigo=$this->ProductosModel->buscar_producto($_POST["codproducto"], $_POST["paises"], $_SESSION['pais_id'], $_POST["importador"]);
         }
         
        
@@ -141,7 +141,7 @@ class ProductosController extends CI_Controller
                     $adquisicion= $worksheet->getCellByColumnAndRow(16, $row)->getValue();
                   
 
-                    $codigo=$this->ProductosModel->buscar_producto($codproducto, $origen, $_SESSION['pais_id']);
+                    $codigo=$this->ProductosModel->buscar_producto($codproducto, $origen, $_SESSION['pais_id'], $importador);
                           
                     if ($codigo==1) {
                         $data[] = array(
@@ -273,9 +273,10 @@ class ProductosController extends CI_Controller
         $this->ProductosModel->borrar_producto($id);
     }
 
-    public function consulta($id)
+    public function consulta($id, $importador)
     {
-        $this->datos['productos'] =  $this->ProductosModel->consulta($id, $_SESSION['pais_id']);
+     
+        $this->datos['productos'] =  $this->ProductosModel->consulta($id, $_SESSION['pais_id'], $importador);
                 
         $this->load->view('importador/lista', $this->datos);
     }

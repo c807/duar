@@ -22,7 +22,7 @@ function gestion_productos(opcion) {
 			processData: false,
 			success: function (response) {
 				var accion = "";
-				if (response =="existe") {
+				if (response == "existe") {
 					$("#message").html(
 						'<div class="alert alert-success alertred "><button type="button" class="close">x</button><strong>Código de producto ya esta registrado en BDD</strong></div>'
 					);
@@ -31,8 +31,8 @@ function gestion_productos(opcion) {
 					alert_hide();
 					return false;
 				}
-				if (response=="true") {
-					if ($("#producimport").val().length == 0 ) {
+				if (response == "true") {
+					if ($("#producimport").val().length == 0) {
 						//$("#importador").val("");
 						$("#codproducto").val("");
 						$("#descripcion").val("");
@@ -52,23 +52,28 @@ function gestion_productos(opcion) {
 
 					document.getElementById("msg").innerHTML = "";
 					document.getElementById("lista_duplicados").innerHTML = "";
-				}else{
+				} else {
 					$("#message").html(
 						'<div class="alert alert-success alertred "><button type="button" class="close">x</button><strong>Error: No ha sido posible guardar producto</strong></div>'
 					);
 				}
-				var id = $("#producimport").val();
-				var url = base_url(
-					"index.php/productos/ProductosController/consulta/" + id
-				);
+				if ($("#producimport").val() > 0) {
+					var id = $("#producimport").val();
+					var url = base_url(
+						"index.php/productos/ProductosController/consulta/" +
+							id +
+							"/" +
+							$("#importador").val()
+					);
+					$.post(url, function (data) {
+						document.getElementById("listaprod").innerHTML = data;
+					});
+				}
 
-				$.post(url, function (data) {
-					document.getElementById("listaprod").innerHTML = data;
-				});
+				
 			},
 		});
 	}
-	
 }
 
 function subir_productos() {
@@ -127,7 +132,6 @@ function borrar_productos() {
 			document.getElementById("listaprod").innerHTML = "";
 		},
 	});
-	
 }
 function mostrarModal(titulo) {
 	$("#modalTitle").html(titulo);
@@ -135,7 +139,6 @@ function mostrarModal(titulo) {
 	$("#crear_producto").modal("show");
 }
 function mostrar(valor) {
-	
 	modal_producto_importador(valor);
 	$("#crear_producto").on("show.bs.modal", function (e) {
 		var bookId = $(e.relatedTarget).data("book-id");
@@ -191,15 +194,14 @@ function mostrar(valor) {
 		$(e.currentTarget).find('input[name="proveedor"]').val(bookId10);
 		$(e.currentTarget).find('input[name="marca"]').val(bookId14);
 
-	
 		$("#paises").val(bookId16);
 		$("#paises").change();
 		$("#importador").val(bookId1);
 		$("#importador").change();
-		
+
 		$("#estados").val(bookId18);
 		$("#estados").change();
-		
+
 		$("#u_comercial").val(bookId19);
 		$("#u_comercial").change();
 
@@ -214,7 +216,7 @@ function mostrar(valor) {
 
 		$("#estados").val(bookId18).trigger("chosen:updated.chosen");
 		$("#u_comercial").val(bookId19).trigger("chosen:updated.chosen");
-		
+
 		$("#paises").val(bookId16).trigger("chosen:updated.chosen");
 		$("#importador").val(bookId1).trigger("chosen:updated.chosen");
 		$(".chosen").chosen({ width: "100%" });
@@ -223,7 +225,6 @@ function mostrar(valor) {
 	ocultar_elementos_dpr();
 }
 function mostrarficha() {
-	
 	$("#verficha").on("show.bs.modal", function (e) {
 		var bookId = $(e.relatedTarget).data("book-id");
 		var bookId1 = $(e.relatedTarget).data("book-id1");
@@ -293,15 +294,13 @@ function mostrarficha() {
 	});
 }
 
-
 function datos_borrar(valor) {
-
 	modal_producto_importador(valor);
 	$("#borrar_producto").on("show.bs.modal", function (e) {
-		var bookId = $(e.relatedTarget).data('book-id');
-		var bookId1 = $(e.relatedTarget).data('book-id1');
-		var bookId2 = $(e.relatedTarget).data('book-id2');
-	
+		var bookId = $(e.relatedTarget).data("book-id");
+		var bookId1 = $(e.relatedTarget).data("book-id1");
+		var bookId2 = $(e.relatedTarget).data("book-id2");
+
 		$(e.currentTarget).find('input[name="txtcodigo"]').val(bookId);
 		$(e.currentTarget).find('input[name="txtnombre"]').val(bookId1);
 		$(e.currentTarget).find('input[name="txtidproducto"]').val(bookId2);
@@ -325,28 +324,24 @@ function CerrarModal() {
 	$("body").removeClass("modal-open");
 	$(".modal-backdrop").remove();
 }
-function cerrar_modal_delete(){
+function cerrar_modal_delete() {
 	$("#borrar_producto").modal("hide");
 	$("body").removeClass("modal-open");
 	$(".modal-backdrop").remove();
 }
 function modal_producto_importador(valor) {
-	
-	
 	var url = base_url("index.php/poliza/crear/verifica_permiso/" + valor);
 	$.getJSON(url, { usuario: valor.value }, function (data) {
-		data.permiso=1;
+		//data.permiso = 0;
 		if (data.permiso == 0) {
-						
-			if (valor==2){
+			if (valor == 2) {
 				CerrarModal();
 			}
-			if (valor==3){
+			if (valor == 3) {
 				cerrar_modal_delete();
 			}
 
 			$.notify("No esta autorizado para realizar esta operación", "error");
-			
 		} else {
 			if (valor == 1) {
 				// agregar producto
@@ -354,11 +349,9 @@ function modal_producto_importador(valor) {
 			}
 
 			if (valor == 2) {
-				
 			}
-			
+
 			if (valor == 3) {
-				
 			}
 
 			if (valor == 6) {
@@ -374,11 +367,9 @@ function modal_producto_importador(valor) {
 	});
 }
 
-function ocultar_elementos_dpr(){
-	pais=$('#pais_id').val();
-	if (pais==2){
+function ocultar_elementos_dpr() {
+	pais = $("#pais_id").val();
+	if (pais == 2) {
 		$(".hn").hide();
-
 	}
-
 }

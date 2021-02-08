@@ -12,7 +12,6 @@ class Crear extends CI_Controller
                         );
             $this->load->model($modelos);
             $datos   = $this->Conf_model->info_accesos_pa($_SESSION['UserID']);
-           
             $_SESSION['roll']=$datos->ROLL;
             $_SESSION['add']=$datos->AGREGAR;
             $_SESSION['edit']=$datos->EDITAR;
@@ -1923,19 +1922,7 @@ class Crear extends CI_Controller
 
     public function verifica_permiso($opcion)
     {
-       // $datos = $this->Conf_modal->info_accesos();
-      
-
-      //  var_dump($datos);
        
-       /* $_SESSION['roll']=$datos->ROLL;
-        $_SESSION['add']=$datos->AGREGAR;
-        $_SESSION['edit']=$datos->EDITAR;
-        $_SESSION['delete']=$datos->ELIMINAR;
-        $_SESSION['print']=$datos->IMPRIMIR;
-        $_SESSION['consulta']=$datos->CONSULTAR; */
-
-       // echo  "here i am". $_SESSION['roll'];
         if ($opcion==1  || $opcion==7)  {
             $permiso=$_SESSION['add'];
         }

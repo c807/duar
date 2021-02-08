@@ -14,7 +14,7 @@ class Subir_Archivo extends CI_Controller
         $this->datos = array();
         $this->datos["navtext"] = "DPR";
 
-        $this->load->library('PHPEXCEL/PHPExcel.php');
+      //  $this->load->library('PHPEXCEL/PHPExcel.php');
      
         $datos   = $this->Conf_model->info_accesos_dpr($_SESSION['UserID']);
        
@@ -141,6 +141,8 @@ class Subir_Archivo extends CI_Controller
                                 $numero_partida="";
                                 $datos = $this->Subir_archivos_model->verificar_partida($codigo, $nit_importador, $_SESSION['pais_id']);
                           
+                                
+                              
                                 $numero_partida=$datos[0]->partida;
                                
                                 $permiso=$datos[0]->permiso;
@@ -211,7 +213,7 @@ class Subir_Archivo extends CI_Controller
                     }
 
                     $data = array('id_file' => $id_file->id);
-                    $this->Subir_archivos_model->crear_listado_polizas($data);
+                  //  $this->Subir_archivos_model->crear_listado_polizas($data);
                    
                     $_SESSION["no_clasificado"] = 'Datos Procesados al file '. $_POST['c807_file'];
                     unlink($link);
@@ -365,135 +367,85 @@ class Subir_Archivo extends CI_Controller
     
     public function excel_intec($file, $doc)
     {
-        
+      
         $datos['l_retaceo']    = $this->Subir_archivos_model->lista_retaceo($file);
-
-
-        	//Cargamos la librería de excel.
-        	$this->load->library('excel');
-			$this->excel->setActiveSheetIndex(0);
-	        $this->excel->getActiveSheet()->setTitle('Sheet1');
-	        //Contador de filas
-	        $contador = 1;
-	        //Le aplicamos ancho las columnas.
-	        $this->excel->getActiveSheet()->getColumnDimension('A')->setWidth(5);
-	        $this->excel->getActiveSheet()->getColumnDimension('B')->setWidth(20);
-	        $this->excel->getActiveSheet()->getColumnDimension('C')->setWidth(57);
-	        //Le aplicamos negrita a los títulos de la cabecera.
-	       // $this->excel->getActiveSheet()->getStyle("A{$contador}")->getFont()->setBold(true);
-	        //$this->excel->getActiveSheet()->getStyle("B{$contador}")->getFont()->setBold(true);
-	       // $this->excel->getActiveSheet()->getStyle("C{$contador}")->getFont()->setBold(true);
-	        //Definimos los títulos de la cabecera.
-	        $this->excel->getActiveSheet()->setCellValue("A{$contador}", 'TIPO');	        
-	        $this->excel->getActiveSheet()->setCellValue("B{$contador}", 'POS.ARANCEL');
-            $this->excel->getActiveSheet()->setCellValue("C{$contador}", 'DESCRIPCION');
-
-            $this->excel->getActiveSheet()->setCellValue("D{$contador}", 'ORIGEN');	        
-	        $this->excel->getActiveSheet()->setCellValue("E{$contador}", 'PROC/DESTINO');
-            $this->excel->getActiveSheet()->setCellValue("F{$contador}", 'ADQUISICION');
-            $this->excel->getActiveSheet()->setCellValue("G{$contador}", 'ESTADO'); 
-            $this->excel->getActiveSheet()->setCellValue("H{$contador}", 'BULTOS'); 
-            $this->excel->getActiveSheet()->setCellValue("I{$contador}", 'UNIDAD COM.'); 
-            $this->excel->getActiveSheet()->setCellValue("J{$contador}", 'CANT. COM.');
-            $this->excel->getActiveSheet()->setCellValue("K{$contador}", 'UNIDAD EST.');
-            $this->excel->getActiveSheet()->setCellValue("L{$contador}", 'CANT. EST.');
-            $this->excel->getActiveSheet()->setCellValue("M{$contador}", 'PESO NETO');
-            $this->excel->getActiveSheet()->setCellValue("N{$contador}", 'PESO BRUTO');
-            $this->excel->getActiveSheet()->setCellValue("O{$contador}", 'FOB');
-            $this->excel->getActiveSheet()->setCellValue("P{$contador}", 'FLETE');
-            $this->excel->getActiveSheet()->setCellValue("Q{$contador}", 'SEGURO');
-            $this->excel->getActiveSheet()->setCellValue("R{$contador}", 'O.GASTOS');
-            $this->excel->getActiveSheet()->setCellValue("S{$contador}", 'ALMACENAJE');
-            $this->excel->getActiveSheet()->setCellValue("T{$contador}", 'AJUSTE INC.');
-            $this->excel->getActiveSheet()->setCellValue("U{$contador}", 'AJUSTE DED.');
-            $this->excel->getActiveSheet()->setCellValue("V{$contador}", 'CONVENIO');
-            $this->excel->getActiveSheet()->setCellValue("W{$contador}", 'CUOTA ARAN.');
-            $this->excel->getActiveSheet()->setCellValue("X{$contador}", 'ID. MATRIZ');
-            $this->excel->getActiveSheet()->setCellValue("Y{$contador}", 'DEC. CANCELAR');
-            $this->excel->getActiveSheet()->setCellValue("Z{$contador}", 'ITEM CANCELAR');
-            $this->excel->getActiveSheet()->setCellValue("AA{$contador}", 'TITULO MAN COUR.');
-            $this->excel->getActiveSheet()->setCellValue("AB{$contador}", 'CERTIF. IMP.');
-            $this->excel->getActiveSheet()->setCellValue("AC{$contador}", 'EXONERACION');
-            $this->excel->getActiveSheet()->setCellValue("AD{$contador}", 'GRUPO');
-            $this->excel->getActiveSheet()->setCellValue("AE{$contador}", '001');
-
-
-            foreach ($datos['l_retaceo'] as $fila) {
-            
-	        	$contador++;
-	        	//Informacion de las filas de la consulta.
-				$this->excel->getActiveSheet()->setCellValue("A{$contador}","N");
-		        $this->excel->getActiveSheet()->setCellValue("B{$contador}", $fila->partida);
-                $this->excel->getActiveSheet()->setCellValue("C{$contador}", $fila->nombre);
-                $this->excel->getActiveSheet()->setCellValue("D{$contador}", $fila->pais_origen);
-                $this->excel->getActiveSheet()->setCellValue("E{$contador}", $fila->pais_procedencia);
-                $this->excel->getActiveSheet()->setCellValue("F{$contador}", $fila->pais_adquisicion);
-                $this->excel->getActiveSheet()->setCellValue("G{$contador}", $fila->idestado);
-                $this->excel->getActiveSheet()->setCellValue("H{$contador}", " ");
-                $this->excel->getActiveSheet()->setCellValue("I{$contador}", $fila->idunidad);
-                $this->excel->getActiveSheet()->setCellValue("J{$contador}", $fila->cuantia);
-                $this->excel->getActiveSheet()->setCellValue("K{$contador}", $fila->idunidad);
-                $this->excel->getActiveSheet()->setCellValue("L{$contador}", $fila->cuantia);
-                $this->excel->getActiveSheet()->setCellValue("M{$contador}", " ");
-                $this->excel->getActiveSheet()->setCellValue("N{$contador}"," ");
-                $this->excel->getActiveSheet()->setCellValue("O{$contador}", $fila->total);
-
-                
-            }
-           
-	        //Le ponemos un nombre al archivo que se va a generar.
-            //$archivo = "INTEC_".$file.'.xls';
-            $archivo="INTEC-".$_GET['c807_file'].'.xls';
-	        header('Content-Type: application/vnd.ms-excel');
-	        header('Content-Disposition: attachment;filename="'.$archivo.'"');
-	        header('Cache-Control: max-age=0');
-	        $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel5'); 
-	        //Hacemos una salida al navegador con el archivo Excel.
-	        $objWriter->save('php://output');
-
-      /*
-        
-        $objPHPExcel = new PHPExcel();
-
- 
-        
-
-        
-        
-        $contador=1;
-        $objPHPExcel->setActiveSheetIndex(0);
-        $objPHPExcel->getActiveSheet()->getStyle("A{$contador}")->getFont()->setBold(true);
-        $objPHPExcel->getActiveSheet()->getStyle("B{$contador}")->getFont()->setBold(true);
-        $objPHPExcel->getActiveSheet()->getStyle("C{$contador}")->getFont()->setBold(true);
-        //Definimos los títulos de la cabecera.
-        $objPHPExcel->getActiveSheet()->setCellValue("A{$contador}", 'Número de teléfono');
-        $objPHPExcel->getActiveSheet()->setCellValue("B{$contador}", 'Fecha');
-        $objPHPExcel->getActiveSheet()->setCellValue("C{$contador}", 'Mensaje');
-
-      
-       // $worksheet->getCellByColumnAndRow(0, 1)->getValue();
-      
        
-      
-        $archivo = "elmer.xls";
+        $objPHPExcel = new PHPExcel();
+        $objPHPExcel->getProperties()
+                  ->setCreator("Duar - C807")
+                  ->setTitle("Office 2007 XLSX Test Document")
+                  ->setSubject("Office 2007 XLSX Test Document")
+                  ->setDescription("Test document for Office 2007 XLSX, generated using PHP classes.")
+                  ->setKeywords("office 2007 openxml php")
+                  ->setCategory("Poliza");  
+                                   
+        $contador=1;
+        $objPHPExcel->getActiveSheet()->setCellValue("A{$contador}", 'TIPO');	        
+        $objPHPExcel->getActiveSheet()->setCellValue("B{$contador}", 'POS.ARANCEL');
+        $objPHPExcel->getActiveSheet()->setCellValue("C{$contador}", 'DESCRIPCION');
+        $objPHPExcel->getActiveSheet()->setCellValue("D{$contador}", 'ORIGEN');	        
+        $objPHPExcel->getActiveSheet()->setCellValue("E{$contador}", 'PROC/DESTINO');
+        $objPHPExcel->getActiveSheet()->setCellValue("F{$contador}", 'ADQUISICION');
+        $objPHPExcel->getActiveSheet()->setCellValue("G{$contador}", 'ESTADO'); 
+        $objPHPExcel->getActiveSheet()->setCellValue("H{$contador}", 'BULTOS'); 
+        $objPHPExcel->getActiveSheet()->setCellValue("I{$contador}", 'UNIDAD COM.'); 
+        $objPHPExcel->getActiveSheet()->setCellValue("J{$contador}", 'CANT. COM.');
+        $objPHPExcel->getActiveSheet()->setCellValue("K{$contador}", 'UNIDAD EST.');
+        $objPHPExcel->getActiveSheet()->setCellValue("L{$contador}", 'CANT. EST.');
+        $objPHPExcel->getActiveSheet()->setCellValue("M{$contador}", 'PESO NETO');
+        $objPHPExcel->getActiveSheet()->setCellValue("N{$contador}", 'PESO BRUTO');
+        $objPHPExcel->getActiveSheet()->setCellValue("O{$contador}", 'FOB');
+        $objPHPExcel->getActiveSheet()->setCellValue("P{$contador}", 'FLETE');
+        $objPHPExcel->getActiveSheet()->setCellValue("Q{$contador}", 'SEGURO');
+        $objPHPExcel->getActiveSheet()->setCellValue("R{$contador}", 'O.GASTOS');
+        $objPHPExcel->getActiveSheet()->setCellValue("S{$contador}", 'ALMACENAJE');
+        $objPHPExcel->getActiveSheet()->setCellValue("T{$contador}", 'AJUSTE INC.');
+        $objPHPExcel->getActiveSheet()->setCellValue("U{$contador}", 'AJUSTE DED.');
+        $objPHPExcel->getActiveSheet()->setCellValue("V{$contador}", 'CONVENIO');
+        $objPHPExcel->getActiveSheet()->setCellValue("W{$contador}", 'CUOTA ARAN.');
+        $objPHPExcel->getActiveSheet()->setCellValue("X{$contador}", 'ID. MATRIZ');
+        $objPHPExcel->getActiveSheet()->setCellValue("Y{$contador}", 'DEC. CANCELAR');
+        $objPHPExcel->getActiveSheet()->setCellValue("Z{$contador}", 'ITEM CANCELAR');
+        $objPHPExcel->getActiveSheet()->setCellValue("AA{$contador}", 'TITULO MAN COUR.');
+        $objPHPExcel->getActiveSheet()->setCellValue("AB{$contador}", 'CERTIF. IMP.');
+        $objPHPExcel->getActiveSheet()->setCellValue("AC{$contador}", 'EXONERACION');
+        $objPHPExcel->getActiveSheet()->setCellValue("AD{$contador}", 'GRUPO');
+        $objPHPExcel->getActiveSheet()->setCellValue("AE{$contador}", '001');
+
+        foreach ($datos['l_retaceo'] as $fila) {
+            
+	      	$contador++;
+	      	$objPHPExcel->getActiveSheet()->setCellValue("A{$contador}","N");
+		    $objPHPExcel->getActiveSheet()->setCellValue("B{$contador}", $fila->partida);
+            $objPHPExcel->getActiveSheet()->setCellValue("C{$contador}", $fila->nombre);
+            $objPHPExcel->getActiveSheet()->setCellValue("D{$contador}", $fila->pais_origen);
+            $objPHPExcel->getActiveSheet()->setCellValue("E{$contador}", $fila->pais_procedencia);
+            $objPHPExcel->getActiveSheet()->setCellValue("F{$contador}", $fila->pais_adquisicion);
+            $objPHPExcel->getActiveSheet()->setCellValue("G{$contador}", $fila->idestado);
+            $objPHPExcel->getActiveSheet()->setCellValue("H{$contador}", " ");
+            $objPHPExcel->getActiveSheet()->setCellValue("I{$contador}", $fila->idunidad);
+            $objPHPExcel->getActiveSheet()->setCellValue("J{$contador}", $fila->cuantia);
+            $objPHPExcel->getActiveSheet()->setCellValue("K{$contador}", $fila->idunidad);
+            $objPHPExcel->getActiveSheet()->setCellValue("L{$contador}", $fila->cuantia);
+            $objPHPExcel->getActiveSheet()->setCellValue("M{$contador}", " ");
+            $objPHPExcel->getActiveSheet()->setCellValue("N{$contador}"," ");
+            $objPHPExcel->getActiveSheet()->setCellValue("O{$contador}", $fila->total);
+        }
+        $objPHPExcel->getActiveSheet()->setTitle('Hoja1');
+        $objPHPExcel->setActiveSheetIndex(0);
         header('Content-Type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment;filename="'.$archivo.'"');
+        header('Content-Disposition: attachment;filename='.$_GET ["c807_file"].'.xls');
         header('Cache-Control: max-age=0');
-
-        header('Content-Transfer-Encoding: binary');
-       // header('Cache-Control: must-revalidate');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+        header('Cache-Control: cache, must-revalidate');
         header('Pragma: public');
-        $objWriter = PHPExcel_IOFactory::createWriter($this->$objPHPExcel, 'Excel5');
-
-        //Hacemos una salida al navegador con el archivo Excel.
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        ob_end_clean();
         $objWriter->save('php://output');
-           
-           
-      */
+     
     }
-
-
-    
 
     public function generar_excel()
     {
@@ -555,23 +507,7 @@ class Subir_Archivo extends CI_Controller
                     }
                 }
 
-                //Traer todas las descripcion de los productos
-                //se usar la descripcion generica digitada por el clasificador
-                /* 	$descripcion = "";
-                    $det_descripcion = "";
-                    foreach ($registros as $item ) {
-                        $this->datos['partida'] = $item->partida;
-                        $this->datos['tlc'] = $item->tlc;
-                        $descripcion = $this->Subir_archivos_model->traer_descripcion_productos($this->datos);
-
-                        foreach($descripcion as $value) {
-                            $det_descripcion = $det_descripcion . $value->descripcion . ",";
-                        }
-
-                        $item->descripcion = $det_descripcion;
-                        $det_descripcion = "";
-                    } */
-
+               
                 $bulto_por_partida = $_GET["tot_bultos"] / count($registros);
                 $peso_por_partida  = $_GET["tot_kilos"] / count($registros);
 
@@ -600,12 +536,7 @@ class Subir_Archivo extends CI_Controller
                         }
 
                         if ($item == 'numero_de_bultos') {
-                            //$registros[$x]->numero_de_bultos = $bulto_por_partida;
-
-                            //segun el cuador de prorrateo de excel
-                            //$registros[$x]->numero_de_bultos  = $cuantia_Paquete;
-                            //$cuantia_paq_calculado += $cuantia_Paquete;
-                            //$cuantia_Paquete = 0;
+                          
                         }
 
                         if ($item == 'fob') {
@@ -630,13 +561,7 @@ class Subir_Archivo extends CI_Controller
                         }
 
                         if ($item == 'peso_bruto') {
-                            //$registros[$x]->peso_bruto = $peso_por_partida;
-
-                            //segun el cuadro de excel de prorrateo
-                            //$registros[$x]->peso_bruto  = $fob_Paquete;
-                            //$registros[$x]->peso_neto   = $fob_Paquete;
-                            //$peso_bruto_calculado       += $fob_Paquete;
-                            //$fob_Paquete = 0;
+                          
                         }
 
                         if ($item == 'flete') {
@@ -686,38 +611,6 @@ class Subir_Archivo extends CI_Controller
                
 
 
-
-                /* if ($_GET["tot_bultos"] > $cuantia_paq_calculado) {
-                    $registros[0]->numero_de_bultos = $registros[0]->numero_de_bultos + $_GET["tot_bultos"] - $cuantia_paq_calculado;
-                }else{
-                    $registros[0]->numero_de_bultos = $registros[0]->numero_de_bultos + $_GET["tot_bultos"] - $cuantia_paq_calculado;
-                }
-
-                if ($_GET["tot_kilos"] > $peso_bruto_calculado) {
-                    $registros[0]->peso_bruto = $registros[0]->peso_bruto + $_GET["tot_kilos"] - $peso_bruto_calculado;
-                    $registros[0]->peso_neto  = $registros[0]->peso_neto  + $_GET["tot_kilos"] - $peso_bruto_calculado;
-                }else{
-                    $registros[0]->peso_bruto = $registros[0]->peso_bruto - $_GET["tot_kilos"] + $peso_bruto_calculado;
-                    $registros[0]->peso_neto  = $registros[0]->peso_neto  - $_GET["tot_kilos"] + $peso_bruto_calculado;
-                }
-
-                if ($_GET["flete"] > $flete_paq_calculado) {
-                    $registros[0]->flete = $registros[0]->flete + $_GET["flete"] - $flete_paq_calculado;
-                }else{
-                    $registros[0]->flete = $registros[0]->flete - $_GET["flete"] + $flete_paq_calculado;
-                }
-
-                if ($_GET["seguro"] > $seguro_paq_calculado) {
-                    $registros[0]->seguro = $registros[0]->seguro + $_GET["seguro"] - $seguro_paq_calculado;
-                }else{
-                    $registros[0]->seguro = $registros[0]->seguro - $_GET["seguro"] + $seguro_paq_calculado;
-                }
-
-                if ($_GET["otros"] > $otros_paq_calculado) {
-                    $registros[0]->otros = $registros[0]->otros + $_GET["otros"] - $otros_paq_calculado;
-                }else{
-                    $registros[0]->otros = $registros[0]->otros - $_GET["otros"] + $otros_paq_calculado;
-                }  */
 
                 //Actualizar Numero de Fila en el excel
                 for ($x = 0; $x < count($registros); $x++) {
@@ -785,9 +678,6 @@ class Subir_Archivo extends CI_Controller
             $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
             ob_end_clean();
             $objWriter->save('php://output');
-
-
-
             exit;
         } else {
             $this->datos["vista"] = "subir_archivos/generar_archivo_clasificado";
@@ -856,23 +746,6 @@ class Subir_Archivo extends CI_Controller
                     }
                 }
 
-                //Traer todas las descripcion de los productos
-                //se usar la descripcion generica digitada por el clasificador
-                /* 	$descripcion = "";
-                    $det_descripcion = "";
-                    foreach ($registros as $item ) {
-                        $this->datos['partida'] = $item->partida;
-                        $this->datos['tlc'] = $item->tlc;
-                        $descripcion = $this->Subir_archivos_model->traer_descripcion_productos($this->datos);
-
-                        foreach($descripcion as $value) {
-                            $det_descripcion = $det_descripcion . $value->descripcion . ",";
-                        }
-
-                        $item->descripcion = $det_descripcion;
-                        $det_descripcion = "";
-                    } */
-
                 $bulto_por_partida = $_GET["tot_bultos"] / count($registros);
                 $peso_por_partida  = $_GET["tot_kilos"] / count($registros);
 
@@ -901,12 +774,7 @@ class Subir_Archivo extends CI_Controller
                         }
 
                         if ($item == 'numero_de_bultos') {
-                            //$registros[$x]->numero_de_bultos = $bulto_por_partida;
-
-                            //segun el cuador de prorrateo de excel
-                            //$registros[$x]->numero_de_bultos  = $cuantia_Paquete;
-                            //$cuantia_paq_calculado += $cuantia_Paquete;
-                            //$cuantia_Paquete = 0;
+                            
                         }
 
                         if ($item == 'fob') {
@@ -931,13 +799,7 @@ class Subir_Archivo extends CI_Controller
                         }
 
                         if ($item == 'peso_bruto') {
-                            //$registros[$x]->peso_bruto = $peso_por_partida;
-
-                            //segun el cuadro de excel de prorrateo
-                            //$registros[$x]->peso_bruto  = $fob_Paquete;
-                            //$registros[$x]->peso_neto   = $fob_Paquete;
-                            //$peso_bruto_calculado       += $fob_Paquete;
-                            //$fob_Paquete = 0;
+                           
                         }
 
                         if ($item == 'flete') {
@@ -975,173 +837,8 @@ class Subir_Archivo extends CI_Controller
                 }
 
 
-                //Ajustar datos de Prorrateo
-
-                //$registros[0]->numero_de_bultos = $registros[0]->numero_de_bultos + $_GET["tot_bultos"] - $cuantia_paq_calculado;
                 $registros[0]->grossmass       = $registros[0]->grossmass + $_GET["tot_kilos"] - $peso_bruto_calculado;
                 $registros[0]->netweight       = $registros[0]->netweight + $_GET["tot_kilos"] - $peso_bruto_calculado;
-                /*
-                                $registros[0]->flete            = $registros[0]->flete - $_GET["flete"] + $flete_paq_calculado;
-                                $registros[0]->seguro           = $registros[0]->seguro + $_GET["seguro"] - $seguro_paq_calculado;
-                                $registros[0]->otros            = $registros[0]->otros + $_GET["otros"] - $otros_paq_calculado; */
-
-
-
-
-                //Actualizar Numero de Fila en el excel
-                for ($x = 0; $x < count($registros); $x++) {
-                    foreach ($registros[$x]  as $item => $field) {
-                        if ($item == 'itemnumber') {
-                            $registros[$x]->itemnumber = $x+1;
-                        }
-                    }
-                }
-
-                //Actualizar Linea de Agrupacion de DPR
-                $num_linea = 0;
-                $tlc       = 0;
-                $partida   = "";
-                for ($x = 0; $x < count($registros); $x++) {
-                    foreach ($registros[$x]  as $item => $field) {
-                        if ($item == 'tlc') {
-                            $tlc = $field;
-                        }
-                        if ($item == 'partida') {
-                            $partida = $field;
-                        }
-                        if ($item == 'itemnumber') {
-                            $num_linea = $field;
-                            //Actualziar pasar numero de file y partida y numero de linea
-                            //$field es el codigo de partida arancelaria
-                            $this->Subir_archivos_model->actualizar_linea_agrupacion($_GET["c807_file"], $partida, $num_linea, $tlc);
-                        }
-                    }
-                }
-
-
-                for ($x = 0; $x < count($registros); $x++) {
-                    if ($x == 0) {
-                        $datos = array();
-                        foreach ($registros[$x]  as $item => $field) {
-                            $datos[] = $item;
-                        }
-                        $objPHPExcel->getActiveSheet()->fromArray($datos, null, "A{$pos}");
-                        $pos += 1;
-                    }
-
-                    $datos = array();
-                    foreach ($registros[$x]  as $item => $field) {
-                        $datos[] = $field;
-                    }
-                    $objPHPExcel->getActiveSheet()->fromArray($datos, null, "A{$pos}");
-                    $pos += 1;
-                }
-            }
-
-
-            $objPHPExcel->getActiveSheet()->setTitle('Hoja1');
-            $objPHPExcel->setActiveSheetIndex(0);
-
-            header('Content-Type: application/vnd.ms-excel');
-            header('Content-Disposition: attachment;filename='.$_GET ["c807_file"].'.xls');
-            header('Cache-Control: max-age=0');
-            header('Cache-Control: max-age=1');
-            header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-            header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
-            header('Cache-Control: cache, must-revalidate');
-            header('Pragma: public');
-
-            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-            ob_end_clean();
-            $objWriter->save('php://output');
-
-
-
-            exit;
-        } else {
-            $this->datos["vista"] = "subir_archivos/generar_archivo_clasificado";
-            $this->load->view('principal', $this->datos);
-        }
-    }
-
-    public function generar_excel_dva()
-    {
-        if (isset($_GET["c807_file"]) &&  isset($_GET["doc_transporte"]) && isset($_GET["tot_bultos"]) && isset($_GET["tot_kilos"])
-           && strlen(trim($_GET["c807_file"])) > 0  && strlen(trim($_GET["doc_transporte"])) > 0  && strlen(trim($_GET["tot_bultos"])) > 0
-           && strlen(trim($_GET["tot_kilos"])) > 0) {
-            $this->datos['cliente'] = $this->Subir_archivos_model->obtener_datos_file($_GET ["c807_file"]);
-            
-            $registros   = $this->Subir_archivos_model->generar_excel_dva($_GET ["c807_file"], $_GET['doc_transporte']);
-
-            $objPHPExcel = new PHPExcel();
-
-            $objPHPExcel->getProperties()
-                        ->setCreator("IMPALA - C807")
-                        ->setLastModifiedBy("Maarten Balliauw")
-                        ->setTitle("Office 2007 XLSX Test Document")
-                        ->setSubject("Office 2007 XLSX Test Document")
-                        ->setDescription("Test document for Office 2007 XLSX, generated using PHP classes.")
-                        ->setKeywords("office 2007 openxml php")
-                        ->setCategory("Poliza");
-
-            $pos = 1;
-            if ($registros) {
-                $total_Cuantia = 0;
-                $total_fob     = 0;
-
-                for ($x = 0; $x < count($registros); $x++) {
-                    foreach ($registros[$x]  as $item => $field) {
-                        if ($item == 'supplementaryunits') {
-                            $total_Cuantia += $field;
-                        }
-                        if ($item == 'fob') {
-                            $total_fob += $field;
-                        }
-                    }
-                }
-
-                for ($x = 0; $x < count($registros); $x++) {
-                    foreach ($registros[$x]  as $item => $field) {
-                        if ($item == 'partida') {
-                            $this->datos['partida'] = $field;
-                        }
-                        if ($item == 'countryoforigin') {
-                            $det_Paises = '';
-
-                            if (isset($this->datos['partida'])) {
-                                $paises = $this->Subir_archivos_model->traer_paises($this->datos);
-
-                                
-
-                                for ($i=0; $i < count($paises) ; $i++) {
-                                    foreach ($paises[$i] as $key => $value) {
-                                        $det_Paises = $det_Paises . $value . ",";
-                                    }
-                                }
-                            }
-
-                            $registros[$x]->countryoforigin = $det_Paises;
-                        }
-                    }
-                }
-
-                //Traer todas las descripcion de los productos
-                //se usar la descripcion generica digitada por el clasificador
-                /* 	$descripcion = "";
-                    $det_descripcion = "";
-                    foreach ($registros as $item ) {
-                        $this->datos['partida'] = $item->partida;
-                        $this->datos['tlc'] = $item->tlc;
-                        $descripcion = $this->Subir_archivos_model->traer_descripcion_productos($this->datos);
-
-                        foreach($descripcion as $value) {
-                            $det_descripcion = $det_descripcion . $value->descripcion . ",";
-                        }
-
-                        $item->descripcion = $det_descripcion;
-                        $det_descripcion = "";
-                    } */
-
                 $bulto_por_partida = $_GET["tot_bultos"] / count($registros);
                 $peso_por_partida  = $_GET["tot_kilos"] / count($registros);
 
@@ -1170,12 +867,7 @@ class Subir_Archivo extends CI_Controller
                         }
 
                         if ($item == 'numero_de_bultos') {
-                            //$registros[$x]->numero_de_bultos = $bulto_por_partida;
-
-                            //segun el cuador de prorrateo de excel
-                            //$registros[$x]->numero_de_bultos  = $cuantia_Paquete;
-                            //$cuantia_paq_calculado += $cuantia_Paquete;
-                            //$cuantia_Paquete = 0;
+                           
                         }
 
                         if ($item == 'fob') {
@@ -1200,13 +892,7 @@ class Subir_Archivo extends CI_Controller
                         }
 
                         if ($item == 'peso_bruto') {
-                            //$registros[$x]->peso_bruto = $peso_por_partida;
-
-                            //segun el cuadro de excel de prorrateo
-                            //$registros[$x]->peso_bruto  = $fob_Paquete;
-                            //$registros[$x]->peso_neto   = $fob_Paquete;
-                            //$peso_bruto_calculado       += $fob_Paquete;
-                            //$fob_Paquete = 0;
+                          
                         }
 
                         if ($item == 'flete') {
@@ -1244,20 +930,8 @@ class Subir_Archivo extends CI_Controller
                 }
 
 
-                //Ajustar datos de Prorrateo
-
-                //$registros[0]->numero_de_bultos = $registros[0]->numero_de_bultos + $_GET["tot_bultos"] - $cuantia_paq_calculado;
                 $registros[0]->grossmass       = $registros[0]->grossmass + $_GET["tot_kilos"] - $peso_bruto_calculado;
                 $registros[0]->netweight       = $registros[0]->netweight + $_GET["tot_kilos"] - $peso_bruto_calculado;
-                /*
-                                $registros[0]->flete            = $registros[0]->flete - $_GET["flete"] + $flete_paq_calculado;
-                                $registros[0]->seguro           = $registros[0]->seguro + $_GET["seguro"] - $seguro_paq_calculado;
-                                $registros[0]->otros            = $registros[0]->otros + $_GET["otros"] - $otros_paq_calculado; */
-
-
-
-
-                //Actualizar Numero de Fila en el excel
                 for ($x = 0; $x < count($registros); $x++) {
                     foreach ($registros[$x]  as $item => $field) {
                         if ($item == 'itemnumber') {
@@ -1265,29 +939,6 @@ class Subir_Archivo extends CI_Controller
                         }
                     }
                 }
-
-                //Actualizar Linea de Agrupacion de DPR
-                //en DVA NO aplica este clasificacion para rayado
-                /* 		$num_linea = 0;
-                        $tlc       = 0;
-                        $partida   = "";
-                        for ($x = 0; $x < count($registros); $x++) {
-                            foreach ($registros[$x]  as $item => $field) {
-                                if ($item == 'tlc') {
-                                    $tlc = $field;
-                                }
-                                if ($item == 'partida') {
-                                    $partida = $field;
-                                }
-                                if ($item == 'itemnumber') {
-                                    $num_linea = $field;
-                                    //Actualziar pasar numero de file y partida y numero de linea
-                                    //$field es el codigo de partida arancelaria
-                                    $this->Subir_archivos_model->actualizar_linea_agrupacion($_GET["c807_file"] , $partida , $num_linea, $tlc);
-                                }
-                            }
-                        } */
-
 
                 for ($x = 0; $x < count($registros); $x++) {
                     if ($x == 0) {
@@ -1451,12 +1102,12 @@ class Subir_Archivo extends CI_Controller
 
         $user = $this->Conf_model->dtusuario($_SESSION["UserID"]);
 
-        enviarCorreo(array(
+      /*  enviarCorreo(array(
             'de'     => array($user->mail, $user->nombre),
             'para'   => $para,
             'asunto' => $asunto,
             'texto'  => $texto
-          ), 2);
+          ), 2);*/
 
         #  mail($para, $asunto, $texto, "From: $user->mail" );
         //$this->enviar_email($correo);
@@ -1486,13 +1137,82 @@ class Subir_Archivo extends CI_Controller
             $this->Subir_archivos_model->rayar($incremento, $item->partida, $doc);
             $incremento = $incremento + 1;
         }
-      
         $this->load->view('subir_archivos/cuerpo', $datos);
-
-        
-        
     }
 
+    public function dpr_clasificado($file, $doc)
+    {
+        $datos['dpr']    = $this->Subir_archivos_model->dpr_clasificado($file);
+         
+        $objPHPExcel = new PHPExcel();
+        $objPHPExcel->getProperties()
+                  ->setCreator("Duar - C807")
+                  ->setTitle("Office 2007 XLSX Test Document")
+                  ->setSubject("Office 2007 XLSX Test Document")
+                  ->setDescription("Test document for Office 2007 XLSX, generated using PHP classes.")
+                  ->setKeywords("office 2007 openxml php")
+                  ->setCategory("Poliza");  
+                                   
+        $contador=1;
+        $objPHPExcel->getActiveSheet()->setCellValue("A{$contador}", 'Código de Producto');	        
+        $objPHPExcel->getActiveSheet()->setCellValue("B{$contador}", 'Descripción');
+        $objPHPExcel->getActiveSheet()->setCellValue("C{$contador}", 'Pais Origen');
+        $objPHPExcel->getActiveSheet()->setCellValue("D{$contador}", 'Peso kl');	        
+        $objPHPExcel->getActiveSheet()->setCellValue("E{$contador}", 'Cuantia');
+        $objPHPExcel->getActiveSheet()->setCellValue("F{$contador}", 'Precio Unitario');
+        $objPHPExcel->getActiveSheet()->setCellValue("G{$contador}", 'Total'); 
+        $objPHPExcel->getActiveSheet()->setCellValue("H{$contador}", 'Factura'); 
+        $objPHPExcel->getActiveSheet()->setCellValue("I{$contador}", 'TLC'); 
+        $objPHPExcel->getActiveSheet()->setCellValue("J{$contador}", 'Partida');
+        $objPHPExcel->getActiveSheet()->setCellValue("K{$contador}", 'DAI');
+        $objPHPExcel->getActiveSheet()->setCellValue("L{$contador}", 'Peso Neto');
+        $objPHPExcel->getActiveSheet()->setCellValue("M{$contador}", 'Proveedor');
+        $objPHPExcel->getActiveSheet()->setCellValue("N{$contador}", 'Flete');
+        $objPHPExcel->getActiveSheet()->setCellValue("O{$contador}", 'Seguro');
+        $objPHPExcel->getActiveSheet()->setCellValue("P{$contador}", 'Otros Gastos');
+        $objPHPExcel->getActiveSheet()->setCellValue("Q{$contador}", 'Permiso');
+       
+        
+        foreach ($datos['dpr'] as $fila) {
+            
+	      	$contador++;
+	      	$objPHPExcel->getActiveSheet()->setCellValue("A{$contador}", $fila->codigo_producto);
+		    $objPHPExcel->getActiveSheet()->setCellValue("B{$contador}", $fila->descripcion);
+            $objPHPExcel->getActiveSheet()->setCellValue("C{$contador}", $fila->pais_origen);
+            $objPHPExcel->getActiveSheet()->setCellValue("D{$contador}", "0");
+            $objPHPExcel->getActiveSheet()->setCellValue("E{$contador}", $fila->cuantia);
+            $objPHPExcel->getActiveSheet()->setCellValue("F{$contador}", $fila->precio_unitario);
+            $objPHPExcel->getActiveSheet()->setCellValue("G{$contador}", $fila->total);
+            $objPHPExcel->getActiveSheet()->setCellValue("H{$contador}", $fila->num_factura);
+            $objPHPExcel->getActiveSheet()->setCellValue("I{$contador}", $fila->tlc);
+            $objPHPExcel->getActiveSheet()->setCellValue("J{$contador}", $fila->partida);
+            $objPHPExcel->getActiveSheet()->setCellValue("K{$contador}", "0"); 
+            $objPHPExcel->getActiveSheet()->setCellValue("L{$contador}", $fila->peso_neto);
+            $objPHPExcel->getActiveSheet()->setCellValue("M{$contador}", $fila->proveedor);
+            $objPHPExcel->getActiveSheet()->setCellValue("N{$contador}", $fila->flete);
+            $objPHPExcel->getActiveSheet()->setCellValue("O{$contador}", $fila->seguro);
+            $objPHPExcel->getActiveSheet()->setCellValue("P{$contador}", $fila->otros_gastos);
+            $objPHPExcel->getActiveSheet()->setCellValue("Q{$contador}", $fila->permiso);
+           
+
+        }
+        $objPHPExcel->getActiveSheet()->setTitle('Hoja1');
+        $objPHPExcel->setActiveSheetIndex(0);
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename='."DPR ".$_GET ["c807_file"].'.xls');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        ob_end_clean();
+        $objWriter->save('php://output');
+     
+        
+       
+    }
 
     public function cuadro_duca($file)
     {

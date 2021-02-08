@@ -30,6 +30,7 @@
                     <button type="button" class="boton" onclick="cuadro_duca()">Crear PDF</button>
                     <button type="button" class="boton" onclick="lista_cambiar_origen()">Cambiar Origen</button>
                     <button type="button" class="boton hn" onclick="excel_intec()" >Archivo INTEC</button>
+                    <button type="button" class="boton" onclick="excel_dpr_clasificado()" >DPR Clasificado</button>
 
                 </div>
                 <?php echo form_close();?>

@@ -12,6 +12,7 @@ class Subir_archivos_model extends CI_Model
 
     public function consulta($id_file, $no_identificacion = null, $opcion = null)
     {
+      
         if (isset($no_identificacion)) {
             if ($opcion == 1) {
                 $query = $this->db
@@ -431,6 +432,18 @@ class Subir_archivos_model extends CI_Model
 
         return $query;
     }
+
+    public function dpr_clasificado($file)
+    {
+        $query = $this->db
+        ->select('*')
+        ->where('id_file', $file)
+        ->get('duarx.dpr')
+        ->result();
+
+        return $query;
+    }
+
     public function consulta_facturas($file)
     {
         $query = $this->db

@@ -57,13 +57,15 @@ function mostrar_partida($id_Reg, $cod_importador) {
 }
 
 function crear_partida($id_Reg) {
+	
+	
 	var url = base_url_erp("index.php/Subir_archivo/grabar_partida/" + $id_Reg);
 	datos = $("#partida" + $id_Reg).serialize();
 	$.post(url, datos, function (data) {
 		if (data.mensaje) {
 			alert(data.mensaje);
 		} else {
-			// $.notify("Partida Arancelaria creada." , "success" );
+			$.notify("Partida Arancelaria guardada." , "success" );
 			$("#actualizar_partida".$id_Reg).hide("slow");
 			no_clasificadas(1);
 		}
@@ -95,29 +97,29 @@ function generar_archivo() {
 		window.location.href =url+	"?" +$("#c807_file").serialize();
 		$.notify("Archivo de Excel Generado.", "success");
 	});
-
-
-
-
-
-//	var url = base_url(
-	//	"index.php/Subir_archivo/excel_intec/" + id_file + "/" + documento	);
-	//	"index.php/Subir_archivo/lista_retaceo/" + id_file + "/" + documento
-	
-//	window.location.href =url;
-	
-
-//		$.notify("Archivo de Excel Generado.", "success");
-//
-
 }
-/* esto funciona
-function excel_intec(){ 
-	var url =base_url_erp("index.php/Subir_archivo/excel_intec/");
-	window.location.href =url;
-		$.notify("Archivo de Excel Generado.", "success");
+
+function excel_dpr_clasificado(){
+	var verifica = verificar_input_retaceo();
+	if (verifica === 0) {
+		return false;
+	}
+	var file = $("#c807_file").val();
+	var documento = $("#doc_transporte").val();
+	var id_file;
+	var url = base_url("index.php/Subir_archivo/get_id_file/" + file);
+	$.getJSON(url, { producto: file.value }, function (data) {
+		id_file = data.id;
+
+		var url = base_url(
+			"index.php/Subir_archivo/dpr_clasificado/" + id_file + "/" + documento
+		);
+		
+		window.location.href =url+	"?" +$("#c807_file").serialize();
+		$.notify("Archivo de Excel DPR clasificado, generado.", "success");
+	});
 }
-*/
+
 function generar_excel() {
 	var url = base_url_erp("index.php/Subir_archivo/generar_excel/");
 
@@ -134,13 +136,6 @@ function generar_excel() {
 	if ($doc_tra.length == 0) {
 		$mensaje += ", documento de transporte";
 	}
-	/*if ($t_bultos.length == 0) {
-		$mensaje += ", total bultos";
-	
-	if ($t_kilos.length == 0) {
-		$mensaje += ", total kilos.";
-	}
-}*/
 	if ($mensaje.length > 0) {
 		$mesnsaje = "numero de File.";
 		$.notify("Falta digitar " + $mensaje, "error");

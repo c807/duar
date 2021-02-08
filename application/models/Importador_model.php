@@ -6,7 +6,8 @@ class Importador_model extends CI_Model
     public function verproductos($ars, $pais_id)
     {
         $ejecutar=0;
-        
+         echo "<br>";
+     
         if ($ars['opcionbuscar']==1) {
             $this->db->where('a.importador', $ars['importador'], 'after');
             $ejecutar=1;
@@ -77,7 +78,8 @@ class Importador_model extends CI_Model
                                 a.pais_adquisicion,
 								a.observaciones,
 								a.nombre_proveedor,
-								a.importador,
+                                a.importador,
+                                a.pais_id,
 								d.nombre nombre_pais
 								')
                         ->join('gacela.cliente_hijo b', 'a.importador = b.no_identificacion')

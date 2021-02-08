@@ -4,8 +4,8 @@ class Conf_model extends CI_Model
     public function __construct()
     {
         parent :: __construct();
-        // $_SESSION['pais_id']=2; //El Salvador
-       // $_SESSION['pais_id']=3; //Honduras
+       //  $_SESSION['pais_id']=2; //El Salvador
+       //$_SESSION['pais_id']=3; //Honduras
         if (isset($_SESSION['pais_id'])) {
             $this->pais = $_SESSION['pais_id'];
         } else {

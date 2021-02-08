@@ -4,12 +4,13 @@
     
     class ProductosModel extends CI_Model
     {
-        public function buscar_producto($codigo, $origen, $pais_id)
+        public function buscar_producto($codigo, $origen, $pais_id, $importador)
         {
             $query = $this->db->get_where('producto_importador', array(
                     'codproducto' => $codigo,
                     'paisorigen'  => $origen,
-                    'pais_id'     => $pais_id
+                    'pais_id'     => $pais_id,
+                    'importador'  => $importador
 
                 ));
                 
@@ -43,36 +44,39 @@
             $this->db->delete('producto_importador');
         }
   
-        public function consulta($id, $pais_id)
+        public function consulta($id, $pais_id,$importador)
         {
             $this->db->where('a.producimport', $id, 'after');
             return $this->db->select('
-                                    b.nombre,
-                                    a.producimport,
-                                    a.descripcion,
-                                    a.codproducto,
-                                    if(a.tlc = 1, 1,0) as tlc,
-                                    a.partida,
-                                    a.paisorigen,
-                                    a.fecha,
-                                    a.no_bultos,
-                                    a.peso_neto,
-                                    a.numeros,
-                                    a.marca,
-                                    a.funcion,
-                                    a.descripcion_generica,
-                                    a.permiso,
-                                    a.fito,
-                                    a.pais_procedencia,
-                                    a.pais_adquisicion,
-                                    a.observaciones,
-                                    a.nombre_proveedor,
-                                    a.importador,
-                                    d.nombre nombre_pais
+                                b.nombre,
+								a.producimport,
+								a.descripcion,
+								a.codproducto,
+								if(a.tlc = 1, 1,0) as tlc,
+								a.partida,
+								a.paisorigen,
+								a.fecha,
+								a.no_bultos,
+								a.peso_neto,
+								a.numeros,
+								a.marca,
+								a.funcion,
+								a.descripcion_generica,
+                                a.permiso,
+                                a.fito,
+                                a.idestado,
+                                a.idunidad,
+                                a.pais_procedencia,
+                                a.pais_adquisicion,
+								a.observaciones,
+								a.nombre_proveedor,
+								a.importador,
+								d.nombre nombre_pais
                                   ')
                             ->join('gacela.cliente_hijo b', 'a.importador = b.no_identificacion')
                             ->join('pricing.pais d', 'a.paisorigen = d.id_pais')
                             ->where('a.pais_id', $pais_id)
+                            ->where('a.importador', $importador)
                             ->get('producto_importador a')
                             ->result();
         }

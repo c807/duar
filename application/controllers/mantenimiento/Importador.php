@@ -5,6 +5,9 @@ class Importador extends CI_Controller
     {
         parent:: __construct();
         $this->load->model("Importador_model");
+      //  ini_set('display_errors', 1);
+      //  ini_set('display_startup_errors', 1);
+       // error_reporting(E_ALL);
     }
 
     public function index()
@@ -27,8 +30,9 @@ class Importador extends CI_Controller
 
     public function buscar()
     {
+        
         $this->datos['productos'] =  $this->Importador_model->verproductos($_POST, $_SESSION['pais_id']);
-      //  var_dump($this->datos );
+      
         $this->load->view('importador/lista', $this->datos);
     }
 

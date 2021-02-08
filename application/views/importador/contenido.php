@@ -23,31 +23,32 @@
 
         </div>
         <div class="row-fluid  message" id="messagedel"></div>
+        <div class="table-responsive">
+            <table class="table table-hovered" id="tbl">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Importador</th>
+                        <th>Proveedor</th>
+                        <th>Código</th>
+                        <th>Producto</th>
+                        <th>Descripción Generica</th>
+                        <th>Función</th>
+                        <th>TLC</th>
+                        <th>Permiso</th>
+                        <th>Fito</th>
+                        <th>Partida</th>
+                        <th>Origen</th>
+                        <th colspan="4">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="listaprod">
+                    <?php $this->load->view('importador/lista'); ?>
+                </tbody>
 
-        <table class="table table-responsive table-hovered" id="tbl">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Importador</th>
-                    <th>Proveedor</th>
-                    <th>Código</th>
-                    <th>Producto</th>
-                    <th>Descripción Generica</th>
-                    <th>Función</th>
-                    <th>TLC</th>
-                    <th>Permiso</th>
-                    <th>Fito</th>
-                    <th>Partida</th>
-                    <th>Origen</th>
-                    <th colspan="2">Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="listaprod">
-                <?php $this->load->view('importador/lista'); ?>
-            </tbody>
+            </table>
 
-        </table>
-
+        </div>
         <table class="table table-responsive table-hovered" id="tbld">
 
 
@@ -110,7 +111,8 @@
                 <div class="modal-body">
                     <form enctype="multipart/form-data" class="add_producto" id="add_producto"
                         action="javascript:gestion_productos('c')">
-                        <input type="hidden" name="pais_id"  id="pais_id" value="<?php echo $_SESSION['pais_id']?>" readonly >
+                        <input type="hidden" name="pais_id" id="pais_id" value="<?php echo $_SESSION['pais_id']?>"
+                            readonly>
                         <div class="container-fluid">
                             <input type="hidden" class="form-control " name="producimport" id="producimport" />
                             <div class="row">
@@ -303,7 +305,8 @@
             <!-- Modal body -->
             <div class="modal-body">
                 <form enctype="multipart/form-data" class="del_producto">
-                <input type="text" class="form-control w-50 text-left" id="txtidproducto" name="txtidproducto" readonly>
+                    <input type="text" class="form-control w-50 text-left" id="txtidproducto" name="txtidproducto"
+                        readonly>
                     <div class="form-group  has-success">
                         <label for="txtcodigo" class="control-label">Código</label>
                         <input type="text" class="form-control w-50 text-left" id="txtcodigo" name="txtcodigo" readonly>
@@ -568,5 +571,4 @@
 
 <script type="text/javascript">
 ocultar_elementos_dpr();
-
 </script>
