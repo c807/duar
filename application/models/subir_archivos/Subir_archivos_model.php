@@ -330,12 +330,27 @@ class Subir_archivos_model extends CI_Model
 
     public function obtener_datos_file($numero_file)
     {
-        return $this->db
-        ->select('f.id as id, c.nit as no_identificacion')
-        ->where('f.c807_file', $numero_file)
-        ->join('csd.cliente as c', 'c.cliente = f.cliente', 'inner')
-        ->get('gacela.file  as f')
-        ->row();
+        if ( $_SESSION['pais_id']==2)//El Salvador
+        {
+            return $this->db
+            ->select('f.id as id, c.nit as no_identificacion')
+            ->where('f.c807_file', $numero_file)
+            ->join('csd.cliente as c', 'c.cliente = f.cliente', 'inner')
+            ->get('gacela.file  as f')
+            ->row();
+        }
+
+        if ( $_SESSION['pais_id']==3)//Honduras
+        {
+            return $this->db
+            ->select('f.id as id, c.no_identificacion as no_identificacion')
+            ->where('f.c807_file', $numero_file)
+            ->join('gacela.cliente_hijo  c', 'c.id = f.cliente_hijo_id', 'inner')
+            ->get('gacela.file  f')
+            ->row();
+        }
+
+      
     }
 
     public function traer_paises($arreglo)
