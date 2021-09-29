@@ -3,22 +3,22 @@ class Crear extends CI_Controller
 {
     public function __construct()
     {
-        parent:: __construct();
+        parent::__construct();
         if (login()) {
             $modelos = array(
-                        'crearpoliza/Crearpoliza_model',
-                        'crearpoliza/Detalle_model',
-                        'Conf_model'
-                        );
+                'crearpoliza/Crearpoliza_model',
+                'crearpoliza/Detalle_model',
+                'Conf_model'
+            );
             $this->load->model($modelos);
             $datos   = $this->Conf_model->info_accesos_pa($_SESSION['UserID']);
-            $_SESSION['roll']=$datos->ROLL;
-            $_SESSION['add']=$datos->AGREGAR;
-            $_SESSION['edit']=$datos->EDITAR;
-            $_SESSION['delete']=$datos->ELIMINAR;
-            $_SESSION['print']=$datos->IMPRIMIR;
-            $_SESSION['consulta']=$datos->CONSULTAR;
-            $_SESSION['cargar']=$datos->AGREGAR;
+            $_SESSION['roll'] = $datos->ROLL;
+            $_SESSION['add'] = $datos->AGREGAR;
+            $_SESSION['edit'] = $datos->EDITAR;
+            $_SESSION['delete'] = $datos->ELIMINAR;
+            $_SESSION['print'] = $datos->IMPRIMIR;
+            $_SESSION['consulta'] = $datos->CONSULTAR;
+            $_SESSION['cargar'] = $datos->AGREGAR;
         } else {
             redirect(login_url());
         }
@@ -31,7 +31,7 @@ class Crear extends CI_Controller
     public function declaracion($file)
     {
         $cre = new Crearpoliza_model(array('file' => $file));
-        
+
 
         $this->datos['navtext'] = "Póliza File # {$file}";
         $this->datos['modelos'] = $cre->modelos();
@@ -50,28 +50,30 @@ class Crear extends CI_Controller
         $this->datos['equipamiento'] = $cre->Conf_model->equipamiento();
         $this->datos['tipocontenedor'] = $cre->Conf_model->tipocontenedor();
         $this->datos['tipocarga'] = $cre->Conf_model->tipocarga();
-        
+
+
         //var_dump($cre);
-        
+
         $existef  = 0;
         $duaduana = 0;
         $iddua    = 0;
         $xfile    = $file;
-        $numero_file=$file;
+        $numero_file = $file;
         if ($cre->duar) {
             $existef = 1;
             $xfile   = $cre->duar->c807_file;
             $iddua   = $cre->duar->duaduana;
         }
         echo "<br>";
-        $_SESSION['numero_file']=$file;
-        $_SESSION['dua']=$iddua;
-        
+        $_SESSION['numero_file'] = $file;
+        $_SESSION['dua'] = $iddua;
+
         $this->datos['vermod']   = $existef;
         $this->datos['file']     = $xfile;
         $this->datos['duaduana'] = $iddua;
+        $this->datos['duaduana'] = $iddua;
         $this->datos['vista']    = "encabezadopoliza/contenido";
-        $this->datos['soli']	 = true;
+        $this->datos['soli']     = true;
         $conf = new Conf_model();
 
         $this->datos['xnombre'] = $conf->dtusuario($_SESSION['UserID'])->nombre;
@@ -92,8 +94,8 @@ class Crear extends CI_Controller
                 echo json_encode($this->Conf_model->agencia($_GET['codigo']));
                 break;
             case 3:
-            echo json_encode($this->Conf_model->tipocarga($_GET['codigo']));
-                    break;
+                echo json_encode($this->Conf_model->tipocarga($_GET['codigo']));
+                break;
             default:
                 return false;
                 break;
@@ -133,7 +135,7 @@ class Crear extends CI_Controller
                 'paises'   => $conf->paises(),
                 'agentes'  => $conf->agentes(),
                 'agencia'  => $agencia
-                )
+            )
         );
 
         $this->load->view('encabezadopoliza/cuerpo', $form->mostrar());
@@ -158,9 +160,9 @@ class Crear extends CI_Controller
 
         echo json_encode(
             array(
-                    'msj' => $msj,
-                    'res' => $res
-                    )
+                'msj' => $msj,
+                'res' => $res
+            )
         );
     }
 
@@ -175,7 +177,7 @@ class Crear extends CI_Controller
 
     public function guardar_seg_general()
     {
-        $id_dua=$_POST['id_dua'];
+        $id_dua = $_POST['id_dua'];
         $data = array(
             'aduana_registro'        =>  $_POST['aduana_registro'],
             'manifiesto'             =>  $_POST['manifiesto'],
@@ -205,22 +207,24 @@ class Crear extends CI_Controller
             'pais_transporte'        =>  $_POST['pais_transporte'],
             'lugar_carga'            =>  $_POST['lugar_carga'],
             'presentacion'           =>  $_POST['presentacion'],
-            'info_adicional'         =>  $_POST['info_adicional']
+            'info_adicional'         =>  $_POST['info_adicional'],
+            'pais_reg_tm'            =>  $_POST['pais_reg_tm'],
+            'registro_nac_medio'     =>  $_POST['registro_nac_medio']
 
         );
-      
+
         $data['c807_file'] =  $_SESSION['numero_file'];
-        $id_dua=$_POST['id_dua'];
-        $dua_id=$this->Crearpoliza_model->guardar_seg_general($id_dua, $data);
+        $id_dua = $_POST['id_dua'];
+        $dua_id = $this->Crearpoliza_model->guardar_seg_general($id_dua, $data);
         $data['duaduana'] = $dua_id;
-        $_SESSION['dua']=$dua_id;
+        $_SESSION['dua'] = $dua_id;
     }
-    
+
     public function guardar_items()
     {
         $det = new Detalle_model();
-        $id_dua=$_POST['id_dua'];
-        $id=$det->numitem($_SESSION['dua']);
+        $id_dua = $_POST['id_dua'];
+        $id = $det->numitem($_SESSION['dua']);
         $data = array(
             'item'                    =>  $id,
             'duaduana'                =>  $_SESSION['dua'],
@@ -248,16 +252,16 @@ class Crear extends CI_Controller
             'deducciones'             =>  $_POST['deducciones_item']
 
         );
-     
+
         //  $id_dua=$_POST['id_dua'];
-        $id_detalle=$_POST['id_detalle'];
-        $dua_id=$this->Crearpoliza_model->guardar_items($id_detalle, $data);
+        $id_detalle = $_POST['id_detalle'];
+        $dua_id = $this->Crearpoliza_model->guardar_items($id_detalle, $data);
     }
 
 
-    public function guardar_adjunto()
+    public function guardar_adjunto($id, $dua)
     {
-        $nombre=$_FILES["file"]["name"];
+        $nombre = $_FILES["file"]["name"];
         $ubicacion = sys_base("duar/public/dmup");
 
         if (!file_exists($ubicacion)) {
@@ -265,8 +269,22 @@ class Crear extends CI_Controller
                 die('Fallo al crear las carpeta de archivos...');
             }
         }
-       
-        $ubicacion .= "/".$nombre;
+        $ubicacion .= "/" . $nombre;
+        if ($id == 0) {
+
+            $item = $_POST['item_adjunto'];
+            $id_dua = $_POST['item_adjunto'];
+        } else {
+            $id_dua = $dua;
+            // $ubicacion .= "/".$nombre."_".$id;
+            $item = $id;
+        }
+
+        $cadena=$nombre;
+        $t=strlen($cadena);
+        $num = 0 - $t;
+        $rest = substr($cadena, $num, -4); // devuelve "de"
+       $nombre=$rest;
         //echo $ubicacion;
         // var_dump($_FILES);
         move_uploaded_file($_FILES['file']['tmp_name'], $ubicacion);
@@ -274,8 +292,8 @@ class Crear extends CI_Controller
 
         // echo $encode;
         $data = array(
-            'item'                          =>  $_POST['item_adjunto'],
-            'duaduana'                      =>  $_POST['dua_adjunto'],
+            'item'                          =>  $item,
+            'duaduana'                      =>  $id_dua,
             'tipodocumento'                 =>  $_POST['doc_adjunto'],
             'referencia'                    =>  $_POST['referencia_doc'],
             'fecha_documento'               =>  $_POST['fecha_doc'],
@@ -284,15 +302,16 @@ class Crear extends CI_Controller
             'id_entidad'                    =>  $_POST['codigo_entidad'],
             'otra_entidad'                  =>  $_POST['otra_entidad'],
             'monto_autorizado'              =>  $_POST['monto_autorizado'],
-            'documento_escaneado'           =>  $encode
-           
-           
+            'documento_escaneado'           =>  $encode,
+            'nombre_documento'              =>  $nombre
+
+
 
         );
-        $id= $_POST['id_doc'];
-        $dua_id=$this->Crearpoliza_model->guardar_adjunto($id, $data);
+        $id = $_POST['id_doc'];
+        $dua_id = $this->Crearpoliza_model->guardar_adjunto($id, $data);
     }
-    
+
     public function get_dua($id)
     {
         $file = $this->Crearpoliza_model->get_dua($id);
@@ -304,14 +323,13 @@ class Crear extends CI_Controller
     public function lista_items($id)
     {
         $datos['l_items']    = $this->Crearpoliza_model->lista_items($id);
-      
+        $this->datos['tipodocumento'] = $this->Conf_model->tipodocumento();
         $this->load->view('encabezadopoliza/cuerpo', $datos);
     }
 
     public function lista_adjuntos($item, $id)
     {
         $datos['l_adjuntos']    = $this->Crearpoliza_model->lista_adjuntos($item, $id);
-        
         $this->load->view('encabezadopoliza/cuerpo_adjuntos', $datos);
     }
 
@@ -337,16 +355,16 @@ class Crear extends CI_Controller
     {
         // $consulta = $this->Crearpoliza_model->dowload_adjunto($pdf);
         $data['saldos'] = $this->Crearpoliza_model->dowload_adjunto($pdf);
-         
-        include getcwd()."/" ;
-        
-       
+
+        include getcwd() . "/";
+
+
         foreach ($data as $row) {
-            $cadena=$row->documento_escaneado;
+            $cadena = $row->documento_escaneado;
         }
-     
-        $archivo= getcwd()."/" .$ref.".pdf";
-    
+
+        $archivo = getcwd() . "/" . $ref . ".pdf";
+
         $pdf_decoded = base64_decode($cadena);
         //Write data back to pdf file
         $pdf = fopen($archivo, 'w');
@@ -355,9 +373,9 @@ class Crear extends CI_Controller
         fclose($pdf);
         $mi_pdf =  $archivo;
 
-        $file=$getcwd()."/".$mi_pdf;
+        $file = $getcwd() . "/" . $mi_pdf;
         header('Content-type: application/pdf');
-        header('Content-Disposition: download; filename="'.$mi_pdf.'"');
+        header('Content-Disposition: download; filename="' . $mi_pdf . '"');
         readfile($mi_pdf);
     }
 
@@ -367,7 +385,7 @@ class Crear extends CI_Controller
     /* Guarda informacion de equipamiento */
     public function guardar_equipamiento()
     {
-        $nombre=$_FILES["file"]["name"];
+        $nombre = $_FILES["file"]["name"];
         $ubicacion = sys_base("duar/public/pdf");
 
         if (!file_exists($ubicacion)) {
@@ -375,29 +393,33 @@ class Crear extends CI_Controller
                 die('Fallo al crear las carpeta de archivos...');
             }
         }
-   
-        $ubicacion .= "/".$nombre;
-        
+
+        $ubicacion .= "/" . $nombre;
+
         move_uploaded_file($_FILES['file']['tmp_name'], $ubicacion);
         $encode = chunk_split(base64_encode(file_get_contents($ubicacion)));
-
+        $container = " ";
+        if (isset($_POST['tipo_contenedor'])) {
+            $container = $_POST['tipo_contenedor'];
+        }
+        echo "fffffffffffffffffffffffffffffffffffffffffffffffffff" . $container;
         // echo $encode;
         $data = array(
-        'item'                    =>  $_POST['item_eq'],
-        'duaduana'                =>  $_SESSION['dua'],
-        'idequipamiento'          =>  $_POST['equipamiento'],
-        'tamano_equipo'           =>  $_POST['tamano_equipo'],
-        'id_equipamiento'         =>  $_POST['id_equipamiento'],
-        'contenedor'              =>  $_POST['contenedor'],
-        'numero_paquetes'         =>  $_POST['num_paq_eq'],
-        'id_contenedor'           =>  $_POST['tipo_contenedor'],
-        'id_carga'                =>  $_POST['tipo_carga'],
-        'tara'                    =>  $_POST['tara'],
-        'peso_mercancias'         =>  $_POST['peso_mercancias'],
-       
-    );
-        $id= $_POST['id_doc_eq'];
-        $dua_id=$this->Crearpoliza_model->guardar_equipamiento($id, $data);
+            'item'                    =>  $_POST['item_eq'],
+            'duaduana'                =>  $_SESSION['dua'],
+            'idequipamiento'          =>  $_POST['equipamiento'],
+            'tamano_equipo'           =>  $_POST['tamano_equipo'],
+            'id_equipamiento'         =>  $_POST['id_equipamiento'],
+            'contenedor'              =>  $_POST['contenedor'],
+            'numero_paquetes'         =>  $_POST['num_paq_eq'],
+            'id_contenedor'           =>  $container,
+            'id_carga'                =>  $_POST['tipo_carga'],
+            'tara'                    =>  $_POST['tara'],
+            'peso_mercancias'         =>  $_POST['peso_mercancias'],
+
+        );
+        $id = $_POST['id_doc_eq'];
+        $dua_id = $this->Crearpoliza_model->guardar_equipamiento($id, $data);
     }
 
     public function lista_equipamiento($id)
@@ -422,7 +444,7 @@ class Crear extends CI_Controller
         }
     }
 
-    
+
     public function eliminar_equipamiento($id)
     {
         $this->Crearpoliza_model->eliminar_equipamiento($id);
@@ -441,13 +463,13 @@ class Crear extends CI_Controller
     public function consulta_dm($id)
     {
         $dato = $this->Crearpoliza_model->consulta_dm($id);
-       
+
         if ($dato) {
             echo json_encode($dato);
         }
     }
 
-    
+
     public function consulta_producto($id)
     {
         $dato = $this->Crearpoliza_model->consulta_producto($id);
@@ -465,6 +487,10 @@ class Crear extends CI_Controller
         $datos_docs['doc']    = $this->Crearpoliza_model->listado_adjuntos($id);
         $datos_eq['eq']    = $this->Crearpoliza_model->lista_equipamiento($id);
 
+
+
+
+        exit;
         $xml = new XMLWriter();
         $xml->openMemory();
         $xml->setIndent(true);
@@ -472,15 +498,15 @@ class Crear extends CI_Controller
         $xml->startDocument('version="1.0" encoding="UTF-8" standalone="no"');
 
         $xml->startElement("ASYCUDA"); //elemento colegio
-           $xml->startElement("Export_release"); //elemento curso
-            
-                $xml->writeElement("Date_of_exit", "4");
+        $xml->startElement("Export_release"); //elemento curso
+
+        $xml->writeElement("Date_of_exit", "4");
         $xml->writeElement("Time_of_exit", "70");
         $xml->writeElement("Actual_office_of_exit_code", 1);
         $xml->writeElement("Actual_office_of_exit_name", "nombre");
         $xml->writeElement("Exit_reference", "referencia");
         $xml->writeElement("Comments", "Comments");
-    
+
         $xml->endElement(); //fin export_release
 
         $xml->startElement("Assessment_notice");
@@ -496,7 +522,7 @@ class Crear extends CI_Controller
         $xml->writeElement("Number_of_the_form", "valor");
         $xml->writeElement("Total_number_of_forms", "valor");
         $xml->endElement(); //fin Forms
-        
+
         $xml->startElement("Nbers");
         $xml->writeElement("Number_of_loading_lists", "valor");
         $xml->writeElement("Total_number_of_items", 1);
@@ -538,8 +564,8 @@ class Crear extends CI_Controller
         $xml->writeElement("Number", "valor");
         $xml->writeElement("Date", "valor");
         $xml->endElement(); // fin receipt
-       
-      
+
+
 
         $xml->startElement("Traders");
         $xml->startElement("Exporter");
@@ -592,7 +618,7 @@ class Crear extends CI_Controller
 
         $xml->startElement("Transport");
         $xml->startElement("Means_of_transport");
-                    
+
         $xml->startElement("Departure_arrival_information");
         $xml->writeElement("Identity", "valor");
         $xml->writeElement("Nationality", "valor");
@@ -603,7 +629,7 @@ class Crear extends CI_Controller
         $xml->writeElement("Nationality", "valor");
         $xml->writeElement("Mode", $datos->mod_transp);
         $xml->endElement(); // Border_information
-                    
+
         $xml->writeElement("Inland_mode_of_transport", "valor");
 
         $xml->endElement(); // Means_of_transport
@@ -666,17 +692,17 @@ class Crear extends CI_Controller
         $xml->startElement("Total_manual_taxes");
         $xml->startElement("null");
         $xml->endElement();
-        $xml->endElement();//fin Total_manual_taxes
-                    
+        $xml->endElement(); //fin Total_manual_taxes
+
         $xml->startElement("Global_taxes");
         $xml->startElement("null");
         $xml->endElement();
-        $xml->endElement();//fin Global_taxes
+        $xml->endElement(); //fin Global_taxes
 
         $xml->startElement("Totals_taxes");
         $xml->startElement("null");
         $xml->endElement();
-        $xml->endElement();//fin Totals_taxes
+        $xml->endElement(); //fin Totals_taxes
 
         $xml->endElement(); // Amounts
 
@@ -697,7 +723,7 @@ class Crear extends CI_Controller
         $xml->endElement(); // Date
 
         $xml->startElement("Excluded_country");
-                        
+
         $xml->startElement("Code");
         $xml->startElement("null");
         $xml->endElement();
@@ -713,7 +739,7 @@ class Crear extends CI_Controller
         $xml->endElement(); // Guarantee
 
         $xml->endElement(); // Financial
-          
+
         $xml->startElement("Warehouse");
         $xml->startElement("Identification");
         $xml->startElement("null");
@@ -724,12 +750,12 @@ class Crear extends CI_Controller
         $xml->startElement("null");
         $xml->endElement();
         $xml->endElement(); //fin Delay
-            $xml->endElement(); // fin  Warehouse
-            
+        $xml->endElement(); // fin  Warehouse
 
-            $xml->startElement("Transit");
+
+        $xml->startElement("Transit");
         $xml->startElement("Principal");
-                
+
         $xml->startElement("Code");
         $xml->startElement("null");
         $xml->endElement();
@@ -744,11 +770,11 @@ class Crear extends CI_Controller
         $xml->startElement("null");
         $xml->endElement();
         $xml->endElement(); //fin Representative
-               
+
         $xml->endElement(); //fin Principal
 
         $xml->startElement("Signature");
-                    
+
         $xml->startElement("Place");
         $xml->startElement("null");
         $xml->endElement();
@@ -763,7 +789,7 @@ class Crear extends CI_Controller
 
 
         $xml->startElement("Destination");
-                    
+
         $xml->startElement("Office");
         $xml->startElement("null");
         $xml->endElement();
@@ -777,7 +803,7 @@ class Crear extends CI_Controller
         $xml->endElement(); //fin Destination
 
         $xml->startElement("Seals");
-                    
+
         $xml->startElement("Number");
         $xml->startElement("null");
         $xml->endElement();
@@ -789,7 +815,7 @@ class Crear extends CI_Controller
         $xml->endElement(); // fin Identity
 
         $xml->endElement(); //fin Seals
-               
+
         $xml->startElement("Result_of_control");
         $xml->startElement("null");
         $xml->endElement();
@@ -806,10 +832,10 @@ class Crear extends CI_Controller
         $xml->endElement(); // fin Officer_name
 
         $xml->endElement(); // fin  Transit
-          
+
         $xml->startElement("Valuation");
         $xml->writeElement("Calculation_working_mode", "valor");
-               
+
         $xml->startElement("Weight");
 
         $xml->startElement("Gross_weight");
@@ -850,7 +876,7 @@ class Crear extends CI_Controller
         $xml->endElement(); // fin Currency_rate
 
         $xml->endElement(); // fin Gs_Invoice
-                
+
         $xml->startElement("Gs_external_freight");
 
         $xml->startElement("Amount_national_currency");
@@ -1002,7 +1028,7 @@ class Crear extends CI_Controller
         $xml->endElement();
         $xml->endElement(); // fin FAUCA_Productor_Empresa
 
-                
+
         $xml->startElement("FAUCA_ProductorEx_Nombre");
         $xml->startElement("null");
         $xml->endElement();
@@ -1023,7 +1049,7 @@ class Crear extends CI_Controller
         $xml->startElement("Item");
         foreach ($datos_items['items']  as $item) {
             $xml->writeElement("Amount_foreign_currency", 1);
-               
+
             $xml->startElement("Packages");
             $xml->writeElement("Number_of_packages", $item->no_bultos);
             $xml->writeElement("Amount_foreign_currency", $item->marcas_uno);
@@ -1041,12 +1067,12 @@ class Crear extends CI_Controller
             $xml->startElement("HScode");
             $xml->writeElement("Commodity_code", "valor");
             $xml->writeElement("Precision_1", "valor");
-                        
+
             $xml->startElement("Precision_2");
             $xml->startElement("null");
             $xml->endElement();
             $xml->endElement(); // fin Precision_2
-                        
+
             $xml->startElement("Precision_3");
             $xml->startElement("null");
             $xml->endElement();
@@ -1086,9 +1112,9 @@ class Crear extends CI_Controller
             $xml->startElement("null");
             $xml->endElement();
             $xml->endElement(); // fin QuotaItem
-                        $xml->endElement(); // fin ItmNbr
+            $xml->endElement(); // fin ItmNbr
 
-                    $xml->endElement(); // fin Quota
+            $xml->endElement(); // fin Quota
 
             $xml->startElement("Supplementary_unit");
 
@@ -1148,7 +1174,7 @@ class Crear extends CI_Controller
             $xml->endElement(); // fin Supplementary_unit
 
             $xml->writeElement("Item_price", $item->precio_item); //me que en line 600
-                                      
+
             $xml->startElement("Valuation_method_code");
             $xml->startElement("null");
             $xml->endElement();
@@ -1173,7 +1199,7 @@ class Crear extends CI_Controller
 
             $xml->startElement("Goods_description");
             $xml->writeElement("Country_of_origin_code", $item->origen);
-                    
+
             $xml->startElement("Country_of_origin_region");
             $xml->startElement("null");
             $xml->endElement();
@@ -1185,13 +1211,13 @@ class Crear extends CI_Controller
             $xml->endElement(); // fin Description_of_goods
 
             $xml->writeElement("Commercial_Description", $item->desc_sac);
-                  
+
 
             $xml->endElement(); // fin Goods_description
 
             $xml->startElement("Previous_doc");
             $xml->writeElement("Summary_declaration", $item->desc_sac);
-                    
+
             $xml->startElement("Summary_declaration_sl");
             $xml->startElement("null");
             $xml->endElement();
@@ -1285,7 +1311,7 @@ class Crear extends CI_Controller
             $xml->startElement("null");
             $xml->endElement();
             $xml->endElement(); // fin Duty_tax_rate
-                        
+
             $xml->startElement("Duty_tax_amount");
             $xml->startElement("null");
             $xml->endElement();
@@ -1324,7 +1350,7 @@ class Crear extends CI_Controller
             $xml->startElement("null");
             $xml->endElement();
             $xml->endElement(); // fin Duty_tax_rate
-                        
+
             $xml->startElement("Duty_tax_amount");
             $xml->startElement("null");
             $xml->endElement();
@@ -1342,45 +1368,6 @@ class Crear extends CI_Controller
 
             $xml->endElement(); // fin Taxation_line
 
-                   
-            $xml->startElement("Taxation_line");
-
-            $xml->startElement("Duty_tax_code");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_code
-
-            $xml->startElement("Duty_tax_code");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_code
-
-            $xml->startElement("Duty_tax_Base");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_Base
-
-            $xml->startElement("Duty_tax_rate");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_rate
-                        
-            $xml->startElement("Duty_tax_amount");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_amount
-
-            $xml->startElement("Duty_tax_MP");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_MP
-
-            $xml->startElement("Duty_tax_Type_of_calculation");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_Type_of_calculation
-
-            $xml->endElement(); // fin Taxation_line
 
             $xml->startElement("Taxation_line");
 
@@ -1403,7 +1390,7 @@ class Crear extends CI_Controller
             $xml->startElement("null");
             $xml->endElement();
             $xml->endElement(); // fin Duty_tax_rate
-                        
+
             $xml->startElement("Duty_tax_amount");
             $xml->startElement("null");
             $xml->endElement();
@@ -1442,47 +1429,7 @@ class Crear extends CI_Controller
             $xml->startElement("null");
             $xml->endElement();
             $xml->endElement(); // fin Duty_tax_rate
-                        
-            $xml->startElement("Duty_tax_amount");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_amount
 
-            $xml->startElement("Duty_tax_MP");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_MP
-
-            $xml->startElement("Duty_tax_Type_of_calculation");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_Type_of_calculation
-
-            $xml->endElement(); // fin Taxation_line
-
-                   
-            $xml->startElement("Taxation_line");
-
-            $xml->startElement("Duty_tax_code");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_code
-
-            $xml->startElement("Duty_tax_code");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_code
-
-            $xml->startElement("Duty_tax_Base");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_Base
-
-            $xml->startElement("Duty_tax_rate");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_rate
-                        
             $xml->startElement("Duty_tax_amount");
             $xml->startElement("null");
             $xml->endElement();
@@ -1521,7 +1468,7 @@ class Crear extends CI_Controller
             $xml->startElement("null");
             $xml->endElement();
             $xml->endElement(); // fin Duty_tax_rate
-                        
+
             $xml->startElement("Duty_tax_amount");
             $xml->startElement("null");
             $xml->endElement();
@@ -1539,7 +1486,7 @@ class Crear extends CI_Controller
 
             $xml->endElement(); // fin Taxation_line
 
-                   
+
             $xml->startElement("Taxation_line");
 
             $xml->startElement("Duty_tax_code");
@@ -1561,7 +1508,7 @@ class Crear extends CI_Controller
             $xml->startElement("null");
             $xml->endElement();
             $xml->endElement(); // fin Duty_tax_rate
-                        
+
             $xml->startElement("Duty_tax_amount");
             $xml->startElement("null");
             $xml->endElement();
@@ -1578,7 +1525,86 @@ class Crear extends CI_Controller
             $xml->endElement(); // fin Duty_tax_Type_of_calculation
 
             $xml->endElement(); // fin Taxation_line
-               
+
+            $xml->startElement("Taxation_line");
+
+            $xml->startElement("Duty_tax_code");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_code
+
+            $xml->startElement("Duty_tax_code");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_code
+
+            $xml->startElement("Duty_tax_Base");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_Base
+
+            $xml->startElement("Duty_tax_rate");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_rate
+
+            $xml->startElement("Duty_tax_amount");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_amount
+
+            $xml->startElement("Duty_tax_MP");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_MP
+
+            $xml->startElement("Duty_tax_Type_of_calculation");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_Type_of_calculation
+
+            $xml->endElement(); // fin Taxation_line
+
+
+            $xml->startElement("Taxation_line");
+
+            $xml->startElement("Duty_tax_code");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_code
+
+            $xml->startElement("Duty_tax_code");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_code
+
+            $xml->startElement("Duty_tax_Base");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_Base
+
+            $xml->startElement("Duty_tax_rate");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_rate
+
+            $xml->startElement("Duty_tax_amount");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_amount
+
+            $xml->startElement("Duty_tax_MP");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_MP
+
+            $xml->startElement("Duty_tax_Type_of_calculation");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_Type_of_calculation
+
+            $xml->endElement(); // fin Taxation_line
+
             $xml->endElement(); // fin Taxation
 
             $xml->startElement("Valuation_item");
@@ -1611,7 +1637,7 @@ class Crear extends CI_Controller
             $xml->endElement(); // fin Alpha_coeficient_of_apportionment
 
             $xml->startElement("Item_Invoice");
-                        
+
             $xml->startElement("Amount_national_currency");
             $xml->startElement("null");
             $xml->endElement();
@@ -1637,7 +1663,7 @@ class Crear extends CI_Controller
             $xml->endElement(); // fin Item_Invoice
 
             $xml->startElement("item_external_freight");
-                        
+
             $xml->startElement("Amount_national_currency");
             $xml->startElement("null");
             $xml->endElement();
@@ -1666,7 +1692,7 @@ class Crear extends CI_Controller
             $xml->endElement(); // fin item_external_freight
 
             $xml->startElement("item_insurance");
-                     
+
             $xml->startElement("Amount_national_currency");
             $xml->startElement("null");
             $xml->endElement();
@@ -1696,7 +1722,7 @@ class Crear extends CI_Controller
             $xml->endElement(); // fin item_insurance
 
             $xml->startElement("item_other_cost");
-                    
+
             $xml->startElement("Amount_national_currency");
             $xml->startElement("null");
             $xml->endElement();
@@ -1754,7 +1780,7 @@ class Crear extends CI_Controller
             $xml->endElement(); // fin item_deduction
 
             $xml->startElement("Market_valuer");
-                        
+
             $xml->startElement("Rate");
             $xml->startElement("null");
             $xml->endElement();
@@ -1846,15 +1872,15 @@ class Crear extends CI_Controller
                 $xml->endElement(); // fin Attached_documents
             } //fin  foreach doc
         } // fin foreach items
-            $xml->endElement(); //fin Item
+        $xml->endElement(); //fin Item
 
-            $xml->startElement("Temp");
+        $xml->startElement("Temp");
         $xml->startElement("Scanned_Documents_CDATA");
         //incrustar adjuntos aqui
-                $xml->endElement(); //fin Scanned_Documents_CDATA
-            $xml->endElement(); // fin Temp
+        $xml->endElement(); //fin Scanned_Documents_CDATA
+        $xml->endElement(); // fin Temp
 
-            $xml->startElement("Container");
+        $xml->startElement("Container");
         foreach ($datos_eq['eq'] as $eq) {
             $xml->startElement("Item");
             $xml->writeElement("Attached_document_reference", $eq->item);
@@ -1876,18 +1902,18 @@ class Crear extends CI_Controller
 
             $xml->writeElement("Empty_full_indicator", $eq->idcarga);
             $xml->writeElement("Gross_weight", "0.0");
-                    
+
             $xml->startElement("Package");
             $xml->writeElement("Packages_number", $eq->numero_paquetes);
             $xml->writeElement("Packages_weight", $eq->peso_mercancias);
             $xml->endElement(); // fin Package
         }
-                
+
         $xml->endElement(); // fin Container
 
-    
+
         $xml->endElement(); //fin asycuda
- 
+
         $content = $xml->outputMemory();
         ob_end_clean();
         ob_start();
@@ -1898,7 +1924,7 @@ class Crear extends CI_Controller
         header('Pragma: cache');
         header('Cache-Control: private');
         echo $content;
-     
+
         /*  $xml = '<root>';
           foreach ($datos as $row) {
               $xml .= '<item>
@@ -1911,44 +1937,64 @@ class Crear extends CI_Controller
           $this->output->set_content_type('text/xml');
          $this->output->set_output($xml);*/
     }
-    
+
     /*======================================================================*/
 
     public function info_accesos()
     {
         $datos   = $this->Conf_modal->info_accesos();
-        
     }
 
     public function verifica_permiso($opcion)
     {
-       
-        if ($opcion==1  || $opcion==7)  {
-            $permiso=$_SESSION['add'];
-        }
-      
-        
-        if ($opcion==2)  {
-            $permiso=$_SESSION['edit'];
-        }
-        
-        if ($opcion==3)  {
-           $permiso= $_SESSION['delete'];
+
+        if ($opcion == 1  || $opcion == 7) {
+            $permiso = $_SESSION['add'];
         }
 
-        
-        if ($opcion==6) {
-            $permiso=$_SESSION['consulta'];
+
+        if ($opcion == 2) {
+            $permiso = $_SESSION['edit'];
         }
 
-        if ($opcion==7) {
-            $permiso=$_SESSION['add'];
+        if ($opcion == 3) {
+            $permiso = $_SESSION['delete'];
         }
- 
+
+
+        if ($opcion == 6) {
+            $permiso = $_SESSION['consulta'];
+        }
+
+        if ($opcion == 7) {
+            $permiso = $_SESSION['add'];
+        }
+
         $data = array(
             'permiso'        => $permiso
         );
 
         echo json_encode($data);
+    }
+
+    public function cargar_adjunto_masivo()
+    {
+        $nombre = $_FILES["file_up"]["name"];
+        $ubicacion = sys_base("duar/public/dmup");
+
+        if (!file_exists($ubicacion)) {
+            if (!mkdir($ubicacion, 0777, true)) {
+                die('Fallo al crear las carpeta de archivos...');
+            }
+        }
+
+        $ubicacion .= "/" . $nombre;
+        //echo $ubicacion;
+        // var_dump($_FILES);
+        move_uploaded_file($_FILES['file_up']['tmp_name'], $ubicacion);
+        $encode = chunk_split(base64_encode(file_get_contents($ubicacion)));
+
+        //  $id= $_POST['id_doc'];
+        $dua_id = $this->Crearpoliza_model->guardar_adjunto($id, $data);
     }
 }

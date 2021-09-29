@@ -121,6 +121,14 @@ class Crearpoliza_model extends CI_Model
         }
     }
 
+    public function cargar_adjunto_masivo($id, $data)
+    {
+           $this->db->where('duaduana', $id);
+           $this->db->update('ruta_documento', $data);
+       
+    }
+    
+
     public function get_dua($id)
     {
         $pro = $this->db->where('c807_file', $id)

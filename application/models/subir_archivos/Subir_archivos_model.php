@@ -339,7 +339,8 @@ class Subir_archivos_model extends CI_Model
             ->get('gacela.file  as f')
             ->row();
         }
-
+        
+        
         if ( $_SESSION['pais_id']==3)//Honduras
         {
             return $this->db
@@ -439,7 +440,7 @@ class Subir_archivos_model extends CI_Model
     public function lista_retaceo($file)
     {
         $query = $this->db
-        ->select('partida, sum(cuantia) AS cuantia, sum(total+flete+seguro+otros_gastos) as total, sum(peso_bruto) peso_bruto, sum(peso_neto) peso_neto, sum(bultos) bultos, pais_origen,tlc,partida,group_concat(DISTINCT descripcion) as nombre, codigo_producto, documento_transporte,idestado,idunidad,fito,sum(total),pais_adquisicion, pais_procedencia')
+        ->select('partida, sum(cuantia) AS cuantia, sum(total+flete+seguro+otros_gastos) as total, sum(peso_bruto) peso_bruto, sum(peso_neto) peso_neto, sum(bultos) bultos, pais_origen,tlc,partida,group_concat(DISTINCT descripcion) as nombre, codigo_producto, documento_transporte,idestado,idunidad,fito,sum(total),pais_adquisicion, pais_procedencia, ref_tlc, marcas_uno, marcas_dos, cuota, u_suplementarias_uno, u_suplementarias_dos, referencia_licencia, embalaje')
         ->where('id_file', $file)
         ->group_by('partida,tlc')
         ->get('duarx.dpr')

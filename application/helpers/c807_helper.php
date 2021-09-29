@@ -12,7 +12,7 @@ if ( ! function_exists('login'))
 {
 	function login()
 	{
-		//$_SESSION['UserID']=1211;
+		//$_SESSION['UserID']=1211; //debe estar inhabilitado
 		if (isset($_SESSION['UserID']) && !empty($_SESSION['UserID'])) {
 			return true;
 			

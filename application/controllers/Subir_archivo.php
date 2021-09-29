@@ -49,6 +49,7 @@ class Subir_Archivo extends CI_Controller
 
     public function import()
     {
+        
         if (isset($_FILES["file"]["name"]) && isset($_POST['c807_file'])) {
             $id_file = $this->Subir_archivos_model->obtener_datos_file($_POST['c807_file']);
             $nit_importador= $id_file->no_identificacion;
@@ -133,7 +134,18 @@ class Subir_Archivo extends CI_Controller
                             $bultos          = $worksheet->getCellByColumnAndRow(14, $row)->getValue();
                             $tlc             = $worksheet->getCellByColumnAndRow(15, $row)->getValue();
                             $proveedor       = $worksheet->getCellByColumnAndRow(39, $row)->getValue();
-                            
+                            $preferencia_tlc = $worksheet->getCellByColumnAndRow(40, $row)->getValue(); //Columna AO
+                            $mn1             = $worksheet->getCellByColumnAndRow(41, $row)->getValue(); // marcas y numeros 1
+                            $mn2             = $worksheet->getCellByColumnAndRow(42, $row)->getValue(); // marcas y numeros 2
+                            $embalaje        = $worksheet->getCellByColumnAndRow(43, $row)->getValue(); //tipo_bulto
+                            $cuota           = $worksheet->getCellByColumnAndRow(44, $row)->getValue(); 
+                            $us1             = $worksheet->getCellByColumnAndRow(45, $row)->getValue(); //unidades suplementarias 1
+                            $us2             = $worksheet->getCellByColumnAndRow(46, $row)->getValue(); //unidades suplementarias 2
+                            $ref_licencia    = $worksheet->getCellByColumnAndRow(47, $row)->getValue(); 
+
+
+
+
                             $codigo=trim($codigo);
 
                             if (is_null($codigo) || empty($codigo) || $codigo=="") {
@@ -151,8 +163,18 @@ class Subir_Archivo extends CI_Controller
                                 $fito=$datos[0]->fito;
                                 $adquisicion=$datos[0]->pais_adquisicion;
                                 $procedencia=$datos[0]->pais_procedencia;
+                                
+                                if($_SESSION['pais_id']==2){ //El Salvador
+                                    $descripcion_generica=$datos[0]->descripcion_generica;
+                                }
+                                
+                                if($_SESSION['pais_id']==3){ //Honduras
+                                    $descripcion_generica=$datos[0]->descripcion;
+                                }
+                                
 
-                                $descripcion_generica=$datos[0]->descripcion_generica;
+                                
+
                                 if ($tlc == null) {
                                     $tlc = '0';
                                 }
@@ -200,9 +222,15 @@ class Subir_Archivo extends CI_Controller
                                 'idunidad'         => $unidad,
                                 'fito'             => $fito,
                                 'pais_adquisicion' => $adquisicion,
-                                'pais_procedencia' => $procedencia
-
-
+                                'pais_procedencia' => $procedencia,
+                                'ref_tlc'          => $preferencia_tlc,
+                                'marcas_uno'       => $mn1,
+                                'marcas_dos'       => $mn2,
+                                'embalaje'         => $embalaje,
+                                'cuota'            => $cuota,
+                                'u_suplementarias_uno' => $us1,
+                                'u_suplementarias_dos' => $us2,
+                                'referencia_licencia'  => $ref_licencia,
                                 
                             );
                           
@@ -1479,13 +1507,23 @@ class Subir_Archivo extends CI_Controller
                 'peso_neto'               =>  $row->peso_neto,
                 'u_suplementarias'        =>  $row->cuantia,
                 'precio_item'             =>  $row->total,
-                'precio_item'             =>  $row->total,
+                'origen'                  =>  $row->pais_origen,
                 'seguro'                  =>  $row->seguro,
                 'otros'                   =>  $row->otros_gastos,
                 'codigo_producto'         =>  $row->codigo_producto,
-                'doc_transp'              =>  $row->documento_transporte
+                'doc_transp'              =>  $row->documento_transporte,
+                'tipo_bulto'              =>  $row->embalaje,
+                'codigo_preferencia'      =>  $row->ref_tlc,
+                'marcas_uno'              =>  $row->marcas_uno,
+                'marcas_dos'              =>  $row->marcas_dos,
+                'u_suplementarias_uno'    =>  $row->u_suplementarias_uno,
+                'u_suplementarias_dos'    =>  $row->u_suplementarias_dos,
+                'referencia_licencia'     =>  $row->referencia_licencia,
+                'cuota'                   =>  $row->cuota
+                
                
             );
+
             $dua_id=$this->Subir_archivos_model->guardar_items_dpr($data);
             $correla=$correla+1;
         }
