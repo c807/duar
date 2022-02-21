@@ -140,6 +140,7 @@ class Crearpoliza_model extends CI_Model
     public function lista_items($id)
     {
         $query = $this->db->where('duaduana', $id)
+           ->order_by('duarx.detalle.item')
            ->get('duarx.detalle')
            ->result();
         return $query;
@@ -156,10 +157,29 @@ class Crearpoliza_model extends CI_Model
 
     public function listado_adjuntos($id)
     {
-        $query = $this->db->where('duaduana', $id)
-           ->get('duarx.documento')
+        
+        $query = $this->db
+           ->select("do.item, do.documento, do.tipodocumento, do.referencia, do.fecha_documento, do.fecha_expiracion, do.id_pais, do.id_entidad, do.otra_entidad, do.monto_autorizado, do.documento_escaneado, do.numero, do.fecha, do.duaduana, do.eliminar, do.nombre_documento, do.atd_file_size")
+           ->where('do.duaduana', $id)
+           ->get('duarx.documento do')
            ->result();
         return $query;
+    }
+
+    
+    public function listado_adjuntos_item($id,$item)
+    {
+        
+        $query = $this->db
+        ->select("do.*,da.descripcion")
+        ->join('duarx.documentos_adjuntos da', 'da.id_adjunto =  do.tipodocumento', 'inner')
+        ->where('do.duaduana',$id)
+        ->where('do.item',$item)
+        ->order_by('do.documento',$id)
+        ->get('duarx.documento do')
+        ->result();
+        return $query;
+     
     }
 
     public function consulta_adjunto($item)
@@ -265,9 +285,17 @@ class Crearpoliza_model extends CI_Model
 
     public function generar_xml($duaduana)
     {
-        $query = $this->db->where('duaduana', $duaduana)
-        ->get('duarx.encabezado')
+
+        $query = $this->db
+        ->select("en.*, ad.nombre aduana_registro_name, ba.descripcion nombre_banco,pr.descripcion nombre_presentacion")
+        ->join('duarx.aduana ad', 'ad.codigo =  en.aduana_registro', 'inner')
+        ->join('duarx.presentacion pr', 'pr.codigo =  en.presentacion', 'inner')
+        ->join('duarx.banco  ba', 'ba.codigo =  en.banco', 'inner')
+        ->where('en.duaduana',$duaduana)
+        ->get('duarx.encabezado en')
         ->row();
         return $query;
+       
     }
+
 }

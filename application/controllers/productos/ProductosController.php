@@ -2,7 +2,7 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-    
+
 class ProductosController extends CI_Controller
 {
     public function __construct()
@@ -20,88 +20,88 @@ class ProductosController extends CI_Controller
 
     public function crear_productos()
     {
-        $tlc=0;
-        if (isset($_POST["tlc"])>0) {
-            $tlc=1;
+        $tlc = 0;
+        if (isset($_POST["tlc"]) > 0) {
+            $tlc = 1;
         }
 
-        $permiso=0;
-        $codigo=0;
-        if (isset($_POST["permiso"])>0) {
-            $permiso=1;
-        }
-        
-        $fito=0;
-        if (isset($_POST["fito"])>0) {
-            $fito=1;
+        $permiso = 0;
+        $codigo = 0;
+        if (isset($_POST["permiso"]) > 0) {
+            $permiso = 1;
         }
 
-        $id=$_POST["producimport"];
+        $fito = 0;
+        if (isset($_POST["fito"]) > 0) {
+            $fito = 1;
+        }
+
+        $id = $_POST["producimport"];
         if ($id) {
         } else {
-            $codigo=$this->ProductosModel->buscar_producto($_POST["codproducto"], $_POST["paises"], $_SESSION['pais_id'], $_POST["importador"]);
+            $codigo = $this->ProductosModel->buscar_producto($_POST["codproducto"], $_POST["paises"], $_SESSION['pais_id'], $_POST["importador"]);
         }
-        
-       
-        if ($codigo==1) {
+
+
+        if ($codigo == 1) {
             // echo 1;
             echo "existe";
         } else {
             $data = array(
 
-            'importador'           => trim($_POST["importador"]),
+                'importador'           => trim($_POST["importador"]),
 
-            'codproducto'          => $_POST["codproducto"],
+                'codproducto'          => $_POST["codproducto"],
 
-            'descripcion'          => $_POST["descripcion"],
+                'descripcion'          => $_POST["descripcion"],
 
-            'descripcion_generica' => $_POST["descripcion_generica"],
+                'descripcion_generica' => $_POST["descripcion_generica"],
 
-            'funcion'              => $_POST["funcion"],
+                'funcion'              => $_POST["funcion"],
 
-            'partida'              => $_POST["partida"],
+                'partida'              => $_POST["partida"],
 
-            'observaciones'        => $_POST["observaciones"],
+                'observaciones'        => $_POST["observaciones"],
 
-            'nombre_proveedor'     => $_POST["proveedor"],
+                'nombre_proveedor'     => $_POST["proveedor"],
 
-            'permiso'              => $permiso,
+                'permiso'              => $permiso,
 
-            'tlc'                  => $tlc,
+                'tlc'                  => $tlc,
 
-            'fito'                 => $fito,
+                'fito'                 => $fito,
 
-            'paisorigen'           => $_POST["paises"],
+                'paisorigen'           => $_POST["paises"],
 
-            'marca'                => $_POST["marca"],
+                'marca'                => $_POST["marca"],
 
-            'pais_id'              =>  $_SESSION['pais_id'],
+                'pais_id'              =>  $_SESSION['pais_id'],
 
-            'idunidad'             => $_POST["u_comercial"],
-            
-            'idestado'             => $_POST["estados"],
+                'idunidad'             => $_POST["u_comercial"],
 
-            'pais_procedencia'      => $_POST["pais_procedencia"],
-            
-            'pais_adquisicion'      => $_POST["pais_adquisicion"]
-     
-        );
+                'idestado'             => $_POST["estados"],
+
+                'pais_procedencia'      => $_POST["pais_procedencia"],
+
+                'pais_adquisicion'      => $_POST["pais_adquisicion"]
+
+            );
 
 
 
-            $result= $this->ProductosModel->guardar_producto($id, $data);
-            if ($result>0) {
+            $result = $this->ProductosModel->guardar_producto($id, $data);
+            if ($result > 0) {
                 echo "true";
             } else {
                 echo "false";
             }
         }
     }
-  
-   
+
+
     public function cargar_desde_archivo()
     {
-        $nombre=basename($_FILES["file"]["name"]);
+        $nombre = basename($_FILES["file"]["name"]);
         $ubicacion = sys_base("duar/public/fls");
 
         if (!file_exists($ubicacion)) {
@@ -109,19 +109,19 @@ class ProductosController extends CI_Controller
                 die('Fallo al crear las carpeta de archivos...');
             }
         }
-       
-        $ubicacion .= "/".$nombre;
+
+        $ubicacion .= "/" . $nombre;
         move_uploaded_file($_FILES['file']['tmp_name'], $ubicacion);
-     
+
         try {
             $objPHPExcel = PHPExcel_IOFactory::load($ubicacion);
-            $bandera="N";
-                            
+            $bandera = "N";
+
             $objPHPExcel = PHPExcel_IOFactory::load($ubicacion);
             foreach ($objPHPExcel->getWorksheetIterator() as $worksheet) {
                 $highestRow = $worksheet->getHighestRow();
                 $highestColumn = $worksheet->getHighestColumn();
-                for ($row=2; $row<=$highestRow; $row++) {
+                for ($row = 2; $row <= $highestRow; $row++) {
                     $importador = $worksheet->getCellByColumnAndRow(0, $row)->getValue();
                     $codproducto = $worksheet->getCellByColumnAndRow(1, $row)->getValue();
                     $descripcion = $worksheet->getCellByColumnAndRow(2, $row)->getValue();
@@ -134,49 +134,49 @@ class ProductosController extends CI_Controller
                     $proveedor = $worksheet->getCellByColumnAndRow(9, $row)->getValue();
                     $origen = $worksheet->getCellByColumnAndRow(10, $row)->getValue();
                     $marca = $worksheet->getCellByColumnAndRow(11, $row)->getValue();
-                    $fito =$worksheet->getCellByColumnAndRow(12, $row)->getValue();
-                    $idunidad =$worksheet->getCellByColumnAndRow(13, $row)->getValue();
-                    $idestado= $worksheet->getCellByColumnAndRow(14, $row)->getValue();
-                    $procedencia= $worksheet->getCellByColumnAndRow(15, $row)->getValue();
-                    $adquisicion= $worksheet->getCellByColumnAndRow(16, $row)->getValue();
-                  
+                    $fito = $worksheet->getCellByColumnAndRow(12, $row)->getValue();
+                    $idunidad = $worksheet->getCellByColumnAndRow(13, $row)->getValue();
+                    $idestado = $worksheet->getCellByColumnAndRow(14, $row)->getValue();
+                    $procedencia = $worksheet->getCellByColumnAndRow(15, $row)->getValue();
+                    $adquisicion = $worksheet->getCellByColumnAndRow(16, $row)->getValue();
 
-                    $codigo=$this->ProductosModel->buscar_producto($codproducto, $origen, $_SESSION['pais_id'], $importador);
-                          
-                    if ($codigo==1) {
+
+                    $codigo = $this->ProductosModel->buscar_producto($codproducto, $origen, $_SESSION['pais_id'], $importador);
+
+                    if ($codigo == 1) {
                         $data[] = array(
 
-                          'codproducto' 	=> $codproducto ,
-                          
-                          'descripcion'     => $descripcion ,
-          
-                          'paisorigen'      => $origen
-                          
-                      );
-                        $bandera="S";
+                            'codproducto'     => $codproducto,
+
+                            'descripcion'     => $descripcion,
+
+                            'paisorigen'      => $origen
+
+                        );
+                        $bandera = "S";
                     } else {
                     }
                 }
             }
-          
-            if ($bandera=='S') {
+
+            if ($bandera == 'S') {
                 echo 0;
-               
-                $_SESSION['duplicados']=$data;
+
+                $_SESSION['duplicados'] = $data;
             }
         } catch (Exception $e) {
-            die('Error loading file "'.pathinfo($ubicacion, PATHINFO_BASENAME).'": '.$e->getMessage());
+            die('Error loading file "' . pathinfo($ubicacion, PATHINFO_BASENAME) . '": ' . $e->getMessage());
         }
-        
-       
-        if ($bandera=="N") {
+
+
+        if ($bandera == "N") {
             $this->guardar();
         }
     }
 
     public function guardar()
     {
-        $nombre=basename($_FILES["file"]["name"]);
+        $nombre = basename($_FILES["file"]["name"]);
         $ubicacion = sys_base("duar/public/fls");
 
         if (!file_exists($ubicacion)) {
@@ -184,8 +184,8 @@ class ProductosController extends CI_Controller
                 die('Fallo al crear las carpeta de archivos...');
             }
         }
-        
-        $ubicacion .= "/".$nombre;
+
+        $ubicacion .= "/" . $nombre;
         move_uploaded_file($_FILES['file']['tmp_name'], $ubicacion);
 
         try {
@@ -193,7 +193,7 @@ class ProductosController extends CI_Controller
             foreach ($objPHPExcel->getWorksheetIterator() as $worksheet) {
                 $highestRow = $worksheet->getHighestRow();
                 $highestColumn = $worksheet->getHighestColumn();
-                for ($row=2; $row<=$highestRow; $row++) {
+                for ($row = 2; $row <= $highestRow; $row++) {
                     $importador = $worksheet->getCellByColumnAndRow(0, $row)->getValue();
                     $codproducto = $worksheet->getCellByColumnAndRow(1, $row)->getValue();
                     $descripcion = $worksheet->getCellByColumnAndRow(2, $row)->getValue();
@@ -206,34 +206,34 @@ class ProductosController extends CI_Controller
                     $proveedor = $worksheet->getCellByColumnAndRow(9, $row)->getValue();
                     $origen = $worksheet->getCellByColumnAndRow(10, $row)->getValue();
                     $marca = $worksheet->getCellByColumnAndRow(11, $row)->getValue();
-                    $fito =$worksheet->getCellByColumnAndRow(12, $row)->getValue();
-                    $idunidad =$worksheet->getCellByColumnAndRow(13, $row)->getValue();
-                    $idestado= $worksheet->getCellByColumnAndRow(14, $row)->getValue();
-                    $procedencia= $worksheet->getCellByColumnAndRow(15, $row)->getValue();
-                    $adquisicion= $worksheet->getCellByColumnAndRow(16, $row)->getValue();
-                   // $codproducto=trim($codproducto);
+                    $fito = $worksheet->getCellByColumnAndRow(12, $row)->getValue();
+                    $idunidad = $worksheet->getCellByColumnAndRow(13, $row)->getValue();
+                    $idestado = $worksheet->getCellByColumnAndRow(14, $row)->getValue();
+                    $procedencia = $worksheet->getCellByColumnAndRow(15, $row)->getValue();
+                    $adquisicion = $worksheet->getCellByColumnAndRow(16, $row)->getValue();
+                    // $codproducto=trim($codproducto);
 
-                   
-                        $data[] = array(
 
-                        'importador'		   => $importador,
+                    $data[] = array(
 
-                        'codproducto'		   => $codproducto,
-                        
+                        'importador'           => $importador,
+
+                        'codproducto'           => $codproducto,
+
                         'descripcion'          => $descripcion,
-        
+
                         'descripcion_generica' => $descripcion_generica,
-        
+
                         'funcion'              => $funcion,
-        
+
                         'partida'              => $partida,
-        
+
                         'observaciones'        => $observaciones,
-        
+
                         'permiso'              => $permiso,
-        
+
                         'tlc'                  => $tlc,
-        
+
                         'nombre_proveedor'     => $proveedor,
 
                         'paisorigen'           => $origen,
@@ -251,33 +251,31 @@ class ProductosController extends CI_Controller
                         'pais_procedencia'     => $procedencia,
 
                         'pais_adquisicion'     => $adquisicion
-                        
+
                     );
-                    
                 }
             }
             $this->ProductosModel->insertar($data);
             unlink($ubicacion);
         } catch (Exception $e) {
-            die('Error loading file "'.pathinfo($ubicacion, PATHINFO_BASENAME).'": '.$e->getMessage());
+            die('Error loading file "' . pathinfo($ubicacion, PATHINFO_BASENAME) . '": ' . $e->getMessage());
         }
     }
 
-        
     public function borrar_producto()
     {
-        $codigo=$_POST['txtcodigo'];
-        $nombre=$_POST['txtnombre'];
-        $id=$_POST['txtidproducto'];
-    
+        $codigo = $_POST['txtcodigo'];
+        $nombre = $_POST['txtnombre'];
+        $id = $_POST['txtidproducto'];
+
         $this->ProductosModel->borrar_producto($id);
     }
 
     public function consulta($id, $importador)
     {
-     
+
         $this->datos['productos'] =  $this->ProductosModel->consulta($id, $_SESSION['pais_id'], $importador);
-                
+
         $this->load->view('importador/lista', $this->datos);
     }
 
@@ -286,6 +284,34 @@ class ProductosController extends CI_Controller
         $this->datos['productos'] = $_SESSION['duplicados'];
         unset($_SESSION["duplicados"]);
         $this->load->view('importador/duplicados', $this->datos);
+    }
+    public function listado_permisos($id)
+    {
+        $datos['lista_p']    = $this->ProductosModel->listado_permisos($id);
+        $this->load->view('importador/cuerpo_permisos', $datos);
+    }
+    public function agregar_permiso($permiso, $id)
+    {
+        $data = array(
+
+            'idpermiso'           => $permiso,
+
+            'partida'              => $id
+
+        );
+
+        $result = $this->ProductosModel->verificar_permiso($permiso, $id);
+        if ($result) {
+         }else
+        {
+            $result = $this->ProductosModel->agregar_permiso($data);
+            echo $result;
+        }
+    }
+
+    public function eliminar_permiso($id)
+    {
+        $this->ProductosModel->eliminar_permiso($id);
     }
 }
     

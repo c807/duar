@@ -527,6 +527,15 @@ class Subir_archivos_model extends CI_Model
     }
 
     
+    public function verificar_dpr($id)
+    {
+        $pro = $this->db->where('duaduana', $id)
+                            ->get('duarx.detalle')
+                            ->row();
+        return $pro;
+    }
+
+    
     public function guardar_items_dpr($data)
     {
         $this->db->insert('detalle', $data);

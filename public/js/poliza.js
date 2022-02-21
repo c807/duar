@@ -665,7 +665,7 @@ function crear_pdf_sw() {
 }
 
 
-function generar_xml() {
+function generar_xml_original() {
     dua = $("#id_dua").val();
     var url = base_url("index.php/poliza/crear/generar_xml/" + dua);
     $.get(url, function(data) {
@@ -678,4 +678,16 @@ function cargar_adjunto_masivo() {
     $("#add_adjuntos").modal("show");
     $("#id_opc").val(2);
     $("#item_adjunto").val("");
+}
+
+
+function generar_xml() {
+    dua = $("#id_dua").val();
+    var url = base_url("index.php/poliza/crear/generar_xml/" + dua);
+    $.getJSON(url, {
+        producto: file.value
+    }, function(data) {
+
+
+    });
 }

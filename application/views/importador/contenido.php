@@ -7,13 +7,13 @@
 <div class="container">
     <div class="panel panel-default" id="formedita" style="display: none;">
         <div class="panel-heading" id="titulo"><i class="glyphicon glyphicon-edit"></i> Editar Producto Agregado
-            <button class="btn btn-danger btn-xs pull-right" onclick="cerrar('formedita');"><i
-                    class="glyphicon glyphicon-remove"></i></button>
+            <button class="btn btn-danger btn-xs pull-right" onclick="cerrar('formedita');"><i class="glyphicon glyphicon-remove"></i></button>
         </div>
         <div class="panel-body" id="contenidoedita">
             Aca va el producto
         </div>
     </div>
+
 
 
     <div class="panel panel-default">
@@ -23,7 +23,41 @@
 
         </div>
         <div class="row-fluid  message" id="messagedel"></div>
-        <div class="table-responsive">
+
+        <div class="container" style="margin-top:6px; display: none" id="c-permisos">
+            <div class="row">
+                <div class="col-md-7 bg-red">
+                    <?php $this->load->view("catalogos/permisos", $this->datos); ?>
+                    <br>
+                    <br>
+                    <input type="text" id="p_import" name="p_import" class="form-control col-sm-4  " readonly>
+                </div>
+
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-success" id="btn-add-permiso" name="btn-add-permiso" onclick="addpermiso()"> <i class="glyphicon glyphicon-plus"></i></button>
+                </div>
+                <div class="col-sm-4"></div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-10">
+                    <?php $this->load->view("importador/lista_permisos"); ?>
+                    <div class="col-sm-2">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row text-center">
+                <div class="col-sm-10">
+                    <button type="button" class="btn btn-primary" id="btn-add-permiso" name="btn-add-permiso" onclick="permisos_off()">Cerrar</button>
+                </div>
+            </div>
+          
+        </div>
+
+
+       
+        <div class="table-responsive" id="tbl-productos">
             <table class="table table-hovered" id="tbl">
                 <thead>
                     <tr>
@@ -39,7 +73,7 @@
                         <th>Fito</th>
                         <th>Partida</th>
                         <th>Origen</th>
-                        <th colspan="4">Acciones</th>
+                        <th colspan="5">Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="listaprod">
@@ -73,8 +107,7 @@
 
             </div>
             <div class="row-fluid" id="messagefile"></div>
-            <form enctype="multipart/form-data" method="post" class="up_productos" id="up_productos"
-                action="javascript:subir_productos()">
+            <form enctype="multipart/form-data" method="post" class="up_productos" id="up_productos" action="javascript:subir_productos()">
                 <div class="modal-body">
 
                     <div class="container-fluid">
@@ -109,10 +142,8 @@
                 </div>
                 <div class="row-fluid  message" id="message"></div>
                 <div class="modal-body">
-                    <form enctype="multipart/form-data" class="add_producto" id="add_producto"
-                        action="javascript:gestion_productos('c')">
-                        <input type="hidden" name="pais_id" id="pais_id" value="<?php echo $_SESSION['pais_id']?>"
-                            readonly>
+                    <form enctype="multipart/form-data" class="add_producto" id="add_producto" action="javascript:gestion_productos('c')">
+                        <input type="hidden" name="pais_id" id="pais_id" value="<?php echo $_SESSION['pais_id'] ?>" readonly>
                         <div class="container-fluid">
                             <input type="hidden" class="form-control " name="producimport" id="producimport" />
                             <div class="row">
@@ -134,33 +165,28 @@
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label">Código</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control" name="codproducto" id="codproducto"
-                                                placeholder="Introduzca código de producto" required />
+                                            <input type="text" class="form-control" name="codproducto" id="codproducto" placeholder="Introduzca código de producto" required />
                                         </div>
                                     </div>
 
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label">Descripción F.</label>
                                         <div class="col-sm-8">
-                                            <textarea class="form-control" rows="3" id="descripcion" name="descripcion"
-                                                placeholder="Introduzca descripción según factura" required></textarea>
+                                            <textarea class="form-control" rows="3" id="descripcion" name="descripcion" placeholder="Introduzca descripción según factura" required></textarea>
                                         </div>
                                     </div>
 
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label">Función</label>
                                         <div class="col-sm-8">
-                                            <textarea class="form-control" rows="3" id="funcion" name="funcion"
-                                                placeholder="Introduzca función" required></textarea>
+                                            <textarea class="form-control" rows="3" id="funcion" name="funcion" placeholder="Introduzca función" required></textarea>
                                         </div>
                                     </div>
 
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label">Observaciones</label>
                                         <div class="col-sm-8">
-                                            <textarea class="form-control" rows="3" id="observaciones"
-                                                name="observaciones" placeholder="Introduzca Observación"
-                                                required></textarea>
+                                            <textarea class="form-control" rows="3" id="observaciones" name="observaciones" placeholder="Introduzca Observación" required></textarea>
                                         </div>
                                     </div>
 
@@ -170,8 +196,7 @@
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label">Proveedor</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control" name="proveedor" id="proveedor"
-                                                placeholder="Nombre Proveedor" required />
+                                            <input type="text" class="form-control" name="proveedor" id="proveedor" placeholder="Nombre Proveedor" required />
                                         </div>
                                     </div>
 
@@ -179,8 +204,7 @@
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label  ">Partida</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control" name="partida" id="partida"
-                                                placeholder="Introduzca partida Arancelelaria" required />
+                                            <input type="text" class="form-control" name="partida" id="partida" placeholder="Introduzca partida Arancelelaria" required />
                                         </div>
                                     </div>
 
@@ -194,8 +218,7 @@
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label  ">Marca</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control" name="marca" id="marca"
-                                                placeholder="Introduzca Marca" required />
+                                            <input type="text" class="form-control" name="marca" id="marca" placeholder="Introduzca Marca" required />
                                         </div>
                                     </div>
 
@@ -231,9 +254,7 @@
                                     <div class="form-group row">
                                         <label class="col-sm-4 control-label">Descripción G.</label>
                                         <div class="col-sm-8">
-                                            <textarea class="form-control" rows="3" id="descripcion_generica"
-                                                name="descripcion_generica"
-                                                placeholder="Introduzca descripción genérica" required></textarea>
+                                            <textarea class="form-control" rows="3" id="descripcion_generica" name="descripcion_generica" placeholder="Introduzca descripción genérica" required></textarea>
                                         </div>
                                     </div>
 
@@ -244,21 +265,18 @@
                                     <div class="col-sm-2"></div>
                                     <div class="col-sm-2">
                                         <div class=" checkbox ">
-                                            <label><input type="checkbox" value="" name="permiso"
-                                                    id="permiso">PERMISO</label>
+                                            <label><input type="checkbox" value="" name="permiso" id="permiso">PERMISO</label>
                                         </div>
                                     </div>
                                     <div class="col-sm-2">
                                         <div class=" checkbox">
-                                            <label><input type="checkbox" value="" name="tlc" id="tlc"
-                                                    class="pull-right">TLC</label>
+                                            <label><input type="checkbox" value="" name="tlc" id="tlc" class="pull-right">TLC</label>
                                         </div>
                                     </div>
 
                                     <div class="col-sm-2 hn">
                                         <div class=" checkbox">
-                                            <label><input type="checkbox" value="" name="fito" id="fito"
-                                                    class="pull-right">Fito</label>
+                                            <label><input type="checkbox" value="" name="fito" id="fito" class="pull-right">Fito</label>
                                         </div>
                                     </div>
 
@@ -269,13 +287,11 @@
                             <div class="row">
                                 <div class="col-md-8"></div>
                                 <div class="col-md-2">
-                                    <button type="button" class="btn btn-default pull-right "
-                                        data-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-default pull-right " data-dismiss="modal">Cancelar</button>
                                 </div>
 
                                 <div class="col">
-                                    <input type="submit" value="Guardar" id="enviar"
-                                        class="btn btn-success pull-left btnsuccess" />
+                                    <input type="submit" value="Guardar" id="enviar" class="btn btn-success pull-left btnsuccess" />
                                 </div>
                             </div>
                     </form>
@@ -305,8 +321,7 @@
             <!-- Modal body -->
             <div class="modal-body">
                 <form enctype="multipart/form-data" class="del_producto">
-                    <input type="text" class="form-control w-50 text-left" id="txtidproducto" name="txtidproducto"
-                        readonly>
+                    <input type="text" class="form-control w-50 text-left" id="txtidproducto" name="txtidproducto" readonly>
                     <div class="form-group  has-success">
                         <label for="txtcodigo" class="control-label">Código</label>
                         <input type="text" class="form-control w-50 text-left" id="txtcodigo" name="txtcodigo" readonly>
@@ -314,8 +329,7 @@
 
                     <div class="form-group  has-success">
                         <label for="txtnombre" class="control-label">Nombre</label>
-                        <input type="text" class="form-control w-100 text-left" id="txtnombre" name="txtnombre"
-                            readonly>
+                        <input type="text" class="form-control w-100 text-left" id="txtnombre" name="txtnombre" readonly>
                     </div>
 
                     <div class="form-group text-center">
@@ -335,8 +349,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
 
-                <input type="button" value="Borrar" id="borrar" class="btn btn-success" data-dismiss="modal"
-                    onclick="borrar_productos()" />
+                <input type="button" value="Borrar" id="borrar" class="btn btn-success" data-dismiss="modal" onclick="borrar_productos()" />
 
 
             </div>
@@ -380,8 +393,7 @@
                             </div>
 
                             <div class="col-sm-8">
-                                <textarea class="sinborde" rows="1" id="descripcion" name="descripcion"
-                                    style="width:100%"></textarea>
+                                <textarea class="sinborde" rows="1" id="descripcion" name="descripcion" style="width:100%"></textarea>
                             </div>
                         </div>
 
@@ -482,8 +494,7 @@
                             </div>
 
                             <div class="col-sm-8">
-                                <label><input type="checkbox" value="" name="permiso" id="permiso"
-                                        class="pull-right"></label>
+                                <label><input type="checkbox" value="" name="permiso" id="permiso" class="pull-right"></label>
                             </div>
                         </div>
 
@@ -510,8 +521,7 @@
 
 <!--- modal busqueda personalizada -->
 <div class="modal" id="buscar" role="dialog" data-backdrop="static">
-    <form role="search" method="get" action="<?php echo $action; ?>" id="formproducto"
-        onsubmit="enviarformproducto(this); return false;">
+    <form role="search" method="get" action="<?php echo $action; ?>" id="formproducto" onsubmit="enviarformproducto(this); return false;">
         <div class="modal-dialog modal-dialog-centered" role="document">
 
             <div class="modal-content">
@@ -548,8 +558,7 @@
 
                         </select>
 
-                        <br><input type="search" class="form-control" placeholder="Importador" id="Buscador"
-                            name="importador" />
+                        <br><input type="search" class="form-control" placeholder="Importador" id="Buscador" name="importador" />
 
                     </div><br>
 
@@ -568,7 +577,164 @@
 </div>
 
 <!---fin  modal busqueda personalizada -->
+<div class="modal" id="permissions" role="dialog" data-backdrop="static">
+
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header hdmodal buttonclose">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 id="opcion" class="modal-title border-bottom pb-3 mb-4"><strong>FICHA uno</strong></h4>
+
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <h1>hola</h1>
+                <form enctype="multipart/form-data" class="del_producto">
+                    <div class="container-fluid">
+
+                        <div class="row">
+                            <div class="col-sm-5 text-left">
+                                <h4><strong><input type="text" class="sinborde" name="nombre_importador" /></strong>
+                                </h4>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-tag"></i> Producto:</b>
+                            </div>
+
+                            <div class="col-sm-8">
+                                <textarea class="sinborde" rows="1" id="descripcion" name="descripcion" style="width:100%"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-barcode"></i> Código:</b>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="text" class="sinborde" name="codproducto" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-star"></i> Marca:</b> <br>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="text" class="sinborde" name="marca" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-registration-mark"></i> Partida:</b> <br>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="text" class="sinborde" name="partida" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-indent-right"></i> Peso Neto: </b> <br>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="text" class="sinborde" name="pesoneto" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-th"></i> Numeros: </b> <br>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="text" class="sinborde" name="numeros" readonly />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-certificate"></i> Tipo Bulto:</b> <br>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="text" class="sinborde" name="descripcion_bulto" readonly />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-th"></i> Número de Bultos:</b> <br>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="text" class="sinborde" name="nbultos" />
+                            </div>
+
+
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-road"></i> País de Origen</b> <br>
+                            </div>
+                            <div class="col-sm-8">
+                                <input type="text" class="sinborde" name="paisorigen" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-calendar"></i> Fecha: </b> <br>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-wrench"></i> Aplica TLC: </b> <br>
+                            </div>
+
+                            <div class="col-sm-8">
+                                <label><input type="checkbox" value="" name="tlc" id="tlc" class="pull-right"></label>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b><i class="glyphicon glyphicon-ok"></i> Permiso: </b> <br>
+                            </div>
+
+                            <div class="col-sm-8">
+                                <label><input type="checkbox" value="" name="permiso" id="permiso" class="pull-right"></label>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+
+
+
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
 
 <script type="text/javascript">
-ocultar_elementos_dpr();
+    ocultar_elementos_dpr();
 </script>

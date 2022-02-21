@@ -80,5 +80,32 @@
                             ->get('producto_importador a')
                             ->result();
         }
+        public function listado_permisos($id){
+         
+            return $this->db->select('p.descripcion, d.id, d.idpermiso,d.partida')
+                            ->join('detalle_permiso d', 'd.idpermiso = p.idpermiso')
+                            ->where('d.partida', $id)
+                            ->get('permiso p')
+                            ->result();
+        }
+
+        public function agregar_permiso($data){
+            $this->db->insert('detalle_permiso', $data);
+            return ($this->db->affected_rows() > 0);
+        }
+
+        public function eliminar_permiso($id)
+        {
+            $this->db->where('id', $id);
+            $this->db->delete('detalle_permiso');
+        }
+
+        function verificar_permiso($permiso,$id){
+            return $this->db
+            ->where('idpermiso', $permiso)
+            ->where('partida', $id)
+            ->get('detalle_permiso')
+            ->row();
+        }
     }
     /* End of file ModelName.php */

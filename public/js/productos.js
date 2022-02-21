@@ -69,8 +69,6 @@ function gestion_productos(opcion) {
 						document.getElementById("listaprod").innerHTML = data;
 					});
 				}
-
-				
 			},
 		});
 	}
@@ -133,11 +131,13 @@ function borrar_productos() {
 		},
 	});
 }
+
 function mostrarModal(titulo) {
 	$("#modalTitle").html(titulo);
 
 	$("#crear_producto").modal("show");
 }
+
 function mostrar(valor) {
 	modal_producto_importador(valor);
 	$("#crear_producto").on("show.bs.modal", function (e) {
@@ -224,6 +224,7 @@ function mostrar(valor) {
 	});
 	ocultar_elementos_dpr();
 }
+
 function mostrarficha() {
 	$("#verficha").on("show.bs.modal", function (e) {
 		var bookId = $(e.relatedTarget).data("book-id");
@@ -319,16 +320,19 @@ function alert_hide() {
 		$(this).parent().fadeTo(500, 0).slideUp(500);
 	});
 }
+
 function CerrarModal() {
 	$("#crear_producto").modal("hide");
 	$("body").removeClass("modal-open");
 	$(".modal-backdrop").remove();
 }
+
 function cerrar_modal_delete() {
 	$("#borrar_producto").modal("hide");
 	$("body").removeClass("modal-open");
 	$(".modal-backdrop").remove();
 }
+
 function modal_producto_importador(valor) {
 	var url = base_url("index.php/poliza/crear/verifica_permiso/" + valor);
 	$.getJSON(url, { usuario: valor.value }, function (data) {
@@ -371,5 +375,57 @@ function ocultar_elementos_dpr() {
 	pais = $("#pais_id").val();
 	if (pais == 2) {
 		$(".hn").hide();
+	}
+}
+
+function permisos_lista(id) {
+	var url = base_url(
+		"index.php/productos/ProductosController/listado_permisos/" + id
+	);
+
+	$.get(url, function (data) {
+		document.getElementById("contenidoLista").innerHTML = data;
+	});
+}
+
+function mostrar_permisos(id) {
+	$("#tbl-productos").hide();
+	$("#c-permisos").show();
+	$("#p_import").val(id);
+	permisos_lista(id);
+}
+
+function addpermiso() {
+	if ($("#p_import").val()) {
+		permiso = $("#catalogopermisos").val();
+		id = $("#p_import").val();
+		var url = base_url(
+			"index.php/productos/ProductosController/agregar_permiso/" +
+				permiso +
+				"/" +
+				id
+		);
+		$.post(url, function (data) {
+			permisos_lista(id);
+		});
+	}
+}
+
+function permisos_off() {
+	$("#tbl-productos").show();
+	$("#c-permisos").hide();
+}
+
+function eliminar_permiso(id) {
+	var strconfirm = confirm("Esta seguro(a) de eliminar este permiso?");
+	if (strconfirm == true) {
+		permiso = $("#p_import").val();
+		var url = base_url(
+			"index.php/productos/ProductosController/eliminar_permiso/" + id
+		);
+		$.post(url, function (data) {
+			$.notify("Permiso ha sido borrado", "success");
+			permisos_lista(permiso);
+		});
 	}
 }

@@ -25,7 +25,9 @@ class Importador extends CI_Controller
         $this->datos['u_comercial'] = $this->Conf_model->u_comercial();
         $this->datos['importador'] = $this->Conf_model->empresas();
         $this->datos['tipobulto'] = $this->Conf_model->tipoBulto();
-        $this->load->view("principal", $this->datos);
+        $this->datos['catalogopermisos'] = $this->Conf_model->catalogo_permisos();
+       // var_dump(  $this->datos['catalogopermisos']);
+       $this->load->view("principal", $this->datos);
     }
 
     public function buscar()
@@ -85,7 +87,5 @@ class Importador extends CI_Controller
         enviarJson($res);
     }
 
-    public function empresas()
-    {
-    }
+  
 }

@@ -9,6 +9,8 @@ class Subir_Archivo extends CI_Controller
         $this->load->model(array('subir_archivos/Subir_archivos_model'));
         $this->load->model('subir_archivos/Subir_archivos_model');
         $this->load->model('Conf_model');
+        $this->load->model('productos/ProductosModel');
+      
         
         
         $this->datos = array();
@@ -152,11 +154,7 @@ class Subir_Archivo extends CI_Controller
                             } else {
                                 $numero_partida="";
                                 $datos = $this->Subir_archivos_model->verificar_partida($codigo, $nit_importador, $_SESSION['pais_id']);
-                          
-                                
-                              
                                 $numero_partida=$datos[0]->partida;
-                               
                                 $permiso=$datos[0]->permiso;
                                 $estado=$datos[0]->idestado;
                                 $unidad=$datos[0]->idunidad;
@@ -171,10 +169,7 @@ class Subir_Archivo extends CI_Controller
                                 if($_SESSION['pais_id']==3){ //Honduras
                                     $descripcion_generica=$datos[0]->descripcion;
                                 }
-                                
-
-                                
-
+   
                                 if ($tlc == null) {
                                     $tlc = '0';
                                 }
@@ -1473,7 +1468,40 @@ class Subir_Archivo extends CI_Controller
            
             $this->pdf->Ln(5);
         }
+        $this->pdf->Ln(5);
+       // var_dump($datos['retaceo']);
+    /** bloque para obtener lista de ermisos vinculados a un arancel */
+       $this->pdf->SetFont('Arial', 'B', 12);
+       $this->pdf->Cell(180, 7, 'Cuadro de permisos', 0, 0, 'C', '0');
+       $this->pdf->SetFont('Arial', '', 7);
+      
+       //$this->pdf->SetTextColor(0, 64, 0);
+       $this->pdf->SetFillColor(20, 90, 50);
+       $this->pdf->SetDrawColor(0, 64, 0);
+       $this->pdf->SetTextColor(242, 244, 244);
+       
+       $this->pdf->Ln(7);
+       $this->pdf->Cell(10, 7, '', '', 0, 'C', '0');
+       $this->pdf->Cell(30, 7, 'Partida', 'TBL', 0, 'C', '1');
+       $this->pdf->Cell(20, 7, 'Permiso', 'TBLR', 0, 'C', '1');
+       $this->pdf->Cell(120, 7, utf8_decode('Descripción'), 'TBL', 0, 'C', '1');
+       $this->pdf->Ln(10);
+       $this->pdf->SetTextColor(0,0,0);
+        foreach ($datos['retaceo'] as $item) {
+            $id=$item->partida;
+            $this->pdf->Cell(10, 5,"", 0, 0, 'L', 0);
+            $this->pdf->Cell(25, 5, $item->partida, 0, 0, 'L', 0);
+            $this->pdf->Ln(5);
+            $datos['lista_p']    = $this->ProductosModel->listado_permisos($id);
+            foreach ($datos['lista_p'] as $lpermiso) {
+                $this->pdf->Cell(40, 5,"", 0, 0, 'L', 0);
+                $this->pdf->Cell(20, 5, $lpermiso->idpermiso, 0, 0, 'C', 0);
+                $this->pdf->Cell(120, 5,  utf8_decode($lpermiso->descripcion), 0, 0, 'L', 0);
+                $this->pdf->Ln(5);
 
+            }
+        }
+        /**Fin permisos */
         $this->pdf->Ln(5);
       
       
@@ -1493,40 +1521,46 @@ class Subir_Archivo extends CI_Controller
 
     public function get_detalle_dpr($id)
     {
-        $datos['detalle_dpr']    = $this->Subir_archivos_model->lista_retaceo($id);
-        $correla=1;
-       
-        foreach ($datos['detalle_dpr'] as $row) {
-            $data = array(
-                'item'                    =>  $correla,
-                'duaduana'                =>  $_SESSION['dua'],
-                'no_bultos'               =>  $row->bultos,
-                'partida'                 =>  $row->partida,
-                'descripcion'             =>  $row->descripcion,
-                'peso_bruto'              =>  $row->peso_bruto,
-                'peso_neto'               =>  $row->peso_neto,
-                'u_suplementarias'        =>  $row->cuantia,
-                'precio_item'             =>  $row->total,
-                'origen'                  =>  $row->pais_origen,
-                'seguro'                  =>  $row->seguro,
-                'otros'                   =>  $row->otros_gastos,
-                'codigo_producto'         =>  $row->codigo_producto,
-                'doc_transp'              =>  $row->documento_transporte,
-                'tipo_bulto'              =>  $row->embalaje,
-                'codigo_preferencia'      =>  $row->ref_tlc,
-                'marcas_uno'              =>  $row->marcas_uno,
-                'marcas_dos'              =>  $row->marcas_dos,
-                'u_suplementarias_uno'    =>  $row->u_suplementarias_uno,
-                'u_suplementarias_dos'    =>  $row->u_suplementarias_dos,
-                'referencia_licencia'     =>  $row->referencia_licencia,
-                'cuota'                   =>  $row->cuota
-                
-               
-            );
-
-            $dua_id=$this->Subir_archivos_model->guardar_items_dpr($data);
-            $correla=$correla+1;
+        $rsl=$this->Subir_archivos_model->verificar_dpr($_SESSION['dua']);
+        if ($rsl){
+            echo 1;
+        }else{
+            $datos['detalle_dpr']    = $this->Subir_archivos_model->lista_retaceo($id);
+            $correla=1;
+           
+            foreach ($datos['detalle_dpr'] as $row) {
+                $data = array(
+                    'item'                    =>  $correla,
+                    'duaduana'                =>  $_SESSION['dua'],
+                    'no_bultos'               =>  $row->bultos,
+                    'partida'                 =>  $row->partida,
+                    'descripcion'             =>  $row->descripcion,
+                    'peso_bruto'              =>  $row->peso_bruto,
+                    'peso_neto'               =>  $row->peso_neto,
+                    'u_suplementarias'        =>  $row->cuantia,
+                    'precio_item'             =>  $row->total,
+                    'origen'                  =>  $row->pais_origen,
+                    'seguro'                  =>  $row->seguro,
+                    'otros'                   =>  $row->otros_gastos,
+                    'codigo_producto'         =>  $row->codigo_producto,
+                    'doc_transp'              =>  $row->documento_transporte,
+                    'tipo_bulto'              =>  $row->embalaje,
+                    'codigo_preferencia'      =>  $row->ref_tlc,
+                    'marcas_uno'              =>  $row->marcas_uno,
+                    'marcas_dos'              =>  $row->marcas_dos,
+                    'u_suplementarias_uno'    =>  $row->u_suplementarias_uno,
+                    'u_suplementarias_dos'    =>  $row->u_suplementarias_dos,
+                    'referencia_licencia'     =>  $row->referencia_licencia,
+                    'cuota'                   =>  $row->cuota
+                    
+                   
+                );
+    
+                $dua_id=$this->Subir_archivos_model->guardar_items_dpr($data);
+                $correla=$correla+1;
+            }
         }
+       
     }
 
     

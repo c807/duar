@@ -261,6 +261,7 @@ class Crear extends CI_Controller
 
     public function guardar_adjunto($id, $dua)
     {
+        header('Content-Type: application/json; charset=utf-8');
         $nombre = $_FILES["file"]["name"];
         $ubicacion = sys_base("duar/public/dmup");
 
@@ -280,16 +281,22 @@ class Crear extends CI_Controller
             $item = $id;
         }
 
-        $cadena=$nombre;
-        $t=strlen($cadena);
+        $cadena = $nombre;
+        $t = strlen($cadena);
         $num = 0 - $t;
         $rest = substr($cadena, $num, -4); // devuelve "de"
-       $nombre=$rest;
+        $nombre = $rest;
         //echo $ubicacion;
         // var_dump($_FILES);
         move_uploaded_file($_FILES['file']['tmp_name'], $ubicacion);
+        // $encode = chunk_split(file_get_contents($ubicacion));
         $encode = chunk_split(base64_encode(file_get_contents($ubicacion)));
 
+        //$str = $this->base64url_encode($encode);
+
+
+
+        // $encode = $str;
         // echo $encode;
         $data = array(
             'item'                          =>  $item,
@@ -311,6 +318,7 @@ class Crear extends CI_Controller
         $id = $_POST['id_doc'];
         $dua_id = $this->Crearpoliza_model->guardar_adjunto($id, $data);
     }
+
 
     public function get_dua($id)
     {
@@ -480,17 +488,293 @@ class Crear extends CI_Controller
 
 
 
+    function download_xml()
+    {
+        $filename = "dm.xml";
+        // load download helder
+        $this->load->helper('download');
+        // read file contents
+        $data = file_get_contents(base_url('/' . $filename));
+        //  $data = file_get_contents(base_url('/uploads/'.$filename));
+        force_download($filename, $data);
+    }
+
+    function obtenerErrorDeJSON()
+    {
+        switch (json_last_error()) {
+            case JSON_ERROR_NONE:
+                return "No ha ocurrido ningún error";
+            case JSON_ERROR_DEPTH:
+                return "Se ha excedido la profundidad máxima de la pila.";
+            case JSON_ERROR_STATE_MISMATCH:
+                return "Error por desbordamiento de buffer o los modos no coinciden";
+            case JSON_ERROR_CTRL_CHAR:
+                return "Error del carácter de control, posiblemente se ha codificado de forma incorrecta.";
+            case JSON_ERROR_SYNTAX:
+                return "Error de sintaxis.";
+            case JSON_ERROR_UTF8:
+                return "Caracteres UTF-8 mal formados, posiblemente codificados incorrectamente.";
+            case JSON_ERROR_RECURSION:
+                return "El objeto o array pasado a json_encode() incluye referencias recursivas y no se puede codificar.";
+            case JSON_ERROR_INF_OR_NAN:
+                return "El valor pasado a json_encode() incluye NAN (Not A Number) o INF (infinito)";
+            case JSON_ERROR_UNSUPPORTED_TYPE:
+                return "Se proporcionó un valor de un tipo no admitido para json_encode(), tal como un resource.";
+            default:
+                return "Error desconocido";
+        }
+    }
+
     public function generar_xml($id)
     {
-        $datos   = $this->Crearpoliza_model->generar_xml($id);
+        header('Content-Type: application/json'); //cabecera json
+        $data = array("ATTACHED_DOCUMENTS_LIST" => array());
+        $general   = $this->Crearpoliza_model->generar_xml($id);
         $datos_items['items']    = $this->Crearpoliza_model->lista_items($id);
         $datos_docs['doc']    = $this->Crearpoliza_model->listado_adjuntos($id);
         $datos_eq['eq']    = $this->Crearpoliza_model->lista_equipamiento($id);
+        $doc_scaneado = "";
+        $hijos = "";
+        $document_name = "APPLICATION/PDF";
+        $padre = '{' . '"ATTACHED_DOCUMENTS_LIST"' . ":" . "[";
+        foreach ($datos_docs['doc']  as  $adjunto) {
+            $tipo_documento = $adjunto->tipodocumento;
+            $referencia = $adjunto->referencia;
+            $doc_scaneado = $adjunto->documento_escaneado;
+            $str = str_replace(["\r\n", "\r", "\n"], '', $doc_scaneado);
+            $ref = str_replace(["\r\n", "\r", "\n"], '', $referencia);
+            array_push($data['ATTACHED_DOCUMENTS_LIST'], array(
+                'ITM_NBR'     => $adjunto->item,
+                'ATD_COD'     => $tipo_documento,
+                'ATD_REF'     => trim($ref),
+                'ATD_FIL_BYT' => trim($str),
+                'ATD_FIL_NAM' => trim($adjunto->nombre_documento . '.PDF'),
+                'ATD_FIL_CTY' => 'APPLICATION/PDF',
+                'ATD_FIL_SIZ' => $adjunto->atd_file_size,
+            ));
+        }
+        $str = preg_replace('//s*/', '', $data);
+        $str = str_replace(["\r\n", "\r", "\n"], '', $str);
+        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+        $api_key = "WSAA.08071107520015:4iqdMuStIt0Ww9h";
+        $password = "4iqdMuStIt0Ww9h";
+        $key = base64_encode($api_key);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "https://swtest.aduana.gob.sv/WSWebInterface/REST/encodeAttachedDocuments");
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERPWD, $api_key);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_setopt(
+            $ch,
+            CURLOPT_HTTPHEADER,
+            array(
+                'Accept: application/json',
+                'Content-Type: application/json',
+
+            )
+            // 'Authorization: '.  $key
+        );
+        if (curl_exec($ch) === false) {
+            echo 'Curl error: ' . curl_error($ch);
+        }
+        $errors = curl_error($ch);  //retorna errores                                                                                                          
+        $result = curl_exec($ch);
+        $returnCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE); //retorna el codigo de respuesta
+        curl_close($ch);
+
+        $rsl = json_decode($result, true);
+        $doc_scaneado = $rsl['ENCODED_ATTACHED_DOCUMENTS'];
+
+        if ($rsl['errorCode'] == 0) {
+            echo "DOCUMENTOS ADJUNTOS PROCESADOS CORRECTAMENTE";
+        } else {
+            echo "ERROR, NO HA SIFO POSIBLE PROCESAR DOCUMENTOS ADJUNTOS";
+        }
+
+        $date_of_exit                   = null;
+        $time_of_exit                   = null;
+        $actual_office_of_exit_code     = null;
+        $actual_office_of_exit_name     = null;
+        $exit_reference                 = null;
+        $comments                       = null;
+        $item_tax_total                 = null;
+        $global_tax_item                = null;
+        $total_number_of_items          = null;
+        $total_number_of_packages       = null;
+        $place_of_declaration           = null;
+        $date_of_declaration            = null;
+        $selected_page                  = null;
+        $financial_code                 = null;
+        $amount_foreign_currency        = null;
+        $datos_modelo                   = null;
+        $number_of_the_form             = null;
+        $total_number_of_forms          = null;
+        $customs_clearance_office_code  = null;
+        $manifest_reference_number      = null;
+        $exporter_code                  = null;
+        $declaration_gen_procedure_code = null;
+        $type_of_declaration            = null;
+        $number                         = null;
+        $date                           = null;
+        $exporter_name                  = null;
+        $consignee_code                 = null;
+        $consignee_name                 = null;
+        $financial_code                 = null;
+        $financial_name                 = null;
+        $declarant_code                 = null;
+        $declarant_name                 = null;
+        $declarant_representative       = null;
+        $reference                      = null;
+        $country_first_destination      = null;
+        $trading_country                = null;
+        $export_country_code            = null;
+        $export_country_region          = null;
+        $destination_country_code       = null;
+        $destination_country_region     = null;
+        $country_of_origin_name         = null;
+        $cap                            = null;
+        $additional_information         = null;
+        $comments_free_text             = null;
+        $transport                      = null;
+        $means_of_transport             = null;
+        $identity                       = null;
+        $nationality                    = null;
+        $mode                           = null;
+        $inland_mode_of_transport       = null;
+        $container_flag                 = null;
+        $serial_number                  = null;
+        $value_details                  = null;
+        $number_of_loading_lists        = null;
+        $type_of_transit_document       = null;
+        $code                           = null;
+        $place                          = null;
+        $situation                      = null;
+        $name                           = null;
+        $currency_code                  = null;
+        $country                        = null;
+        $location_of_goods              = null;
+        $code1                          = null;
+        $code2                          = null;
 
 
+        $number_of_packages             = null;
+        $kind_of_packages_code          = null;
+        //number_of_packages
+        $reference                      = null;
+        $description                    = null;
+        $calculation_working_mode       = null;
+        $currency_code                  = null;
+        $extended_customs_procedure     = null;
+        $national_customs_procedure     = null;
+        $amount_deducted_from_licence   = null;
+        $location_of_goods              = null;
+        $preciPreference_codesion_1     = null;
+        $attached_document_date         = null;
+        $temp_attached_document_item    = null;
+        $attached_document_reference    = null;
+        $equipment_type                 = null;
+        $equipment_size                 = null;
+        $id_equipment                   = null;
+        $empty_full_indicator           = null;
+        $packages_number                = null;
+        $packages_weight                = null;
+        $commodity_code                 = null;
+        $precision_1                    = null;
+        $item_price                     = null;
+        $country_of_origin_code         = null;
+        $commercial_Description         = null;
+        $summary_declaration            = null;
+        $gross_weight_itm               = null;
+        $transport                      = null;
+        $means_of_transport             = null;
+        $temp_item_number               = null;
+        $marks1_of_packages             = null;
+        $marks2_of_packages             = null;
+        $preference_code                = null;
+        $attached_document_code         = null;
+        $attached_document_name         = null;
+        $departure_arrival_information  = null;
+        $consignee_name_doc             = null;
+        $number_reference               = null;
+        $identity_arrival_information   = null;
+        $inco_term                      = null;
+        $aduana_registro_code           = null;
+        $aduana_registro_name           = null;
+        $lugar_carga                    = null;
+        $codigo_banco                   = null;
+        $nombre_banco                   = null;
+        $financial_transaction_code1    = null;
+        $financial_transaction_code2    = null;
+        $branch                         = null;
+        $regimen_adicional              = null;
+        $terms_code                     = null;
+        $terms_description              = null;
+        $flete_interno                  = null;
+        $flete_externo                  = null;
+        $seguro                         = null;
+        $otros_costos                   = null;
+        $deducciones                    = null;
 
 
-        exit;
+        //$amount_foreign_currency        = null;
+        //attached_document_reference
+
+        $i = 1;
+        foreach ($datos_items['items'] as $item_group) {
+            $total_number_of_items = $i;
+            $total_number_of_packages = $total_number_of_packages + $item_group->no_bultos;
+
+            $i = $i + 1;
+        }
+        $customs_clearance_office_code = $general->aduana_entrada_salida;
+        $type_of_declaration = substr($general->modelo, 0, 2);
+        $declaration_gen_procedure_code = substr($general->modelo, 3, 1);
+
+        $mode = $general->mod_transp;
+        $code_delivery_terms = $general->fob;
+        // $xml->writeElement("Exporter_code", $datos->nit_exportador);
+        $exporter_name = $general->nombre_exportador;
+        $consignee_code = $general->nit_consignatario;
+        $consignee_name = "SABRITAS Y CIA, SOCIEDAD EN COMANDI (trs)";
+        // $general->consignatario;
+        $declarant_code = $general->declarante;
+        $number_reference = $general->referencia;
+        $country_first_destination = $general->pais_proc;
+        $export_country_code = $general->pais_export;
+        $destination_country_code = $general->pais_destino;
+        $identity_arrival_information = "CHIQUITA LOGISTIC SERVICES (trs)";
+        $nationality_arrival_information = $general->pais_transporte;
+        $container_flag = "false";
+        $inco_term = $general->incoterm;
+        $exporter_code = "N/A";
+        $aduana_registro_code = $general->aduana_registro;
+        $aduana_registro_name = $general->aduana_registro_name;
+        $lugar_carga = $general->lugar_carga;
+        $location_of_goods = $general->localizacion_mercancia;
+        $codigo_banco = $general->banco;
+        $nombre_banco = $general->nombre_banco;
+        $branch = $general->agencia;
+        $regimen_adicional = $general->reg_adicional;
+        $terms_code = $general->presentacion;
+        $terms_description = $general->nombre_presentacion;
+        $calculation_working_mode = "0"; //verificar esto
+        $amount_foreign_currency = $general->total_facturar;
+        $currency_code = "USD";
+        $flete_interno = $general->flete_interno;
+        $flete_externo = $general->flete_externo;
+        $seguro = $general->seguro;
+        $otros_costos  = $general->otros;
+        $deducciones = $general->deducciones;
+
+
+        //  $general->nit_exportador
         $xml = new XMLWriter();
         $xml->openMemory();
         $xml->setIndent(true);
@@ -498,179 +782,861 @@ class Crear extends CI_Controller
         $xml->startDocument('version="1.0" encoding="UTF-8" standalone="no"');
 
         $xml->startElement("ASYCUDA"); //elemento colegio
-        $xml->startElement("Export_release"); //elemento curso
 
-        $xml->writeElement("Date_of_exit", "4");
-        $xml->writeElement("Time_of_exit", "70");
-        $xml->writeElement("Actual_office_of_exit_code", 1);
-        $xml->writeElement("Actual_office_of_exit_name", "nombre");
-        $xml->writeElement("Exit_reference", "referencia");
-        $xml->writeElement("Comments", "Comments");
+        $xml->startElement("Export_release"); //elemento curso        
+        //$xml->writeElement("Date_of_exit", $date_of_exit);
+        if ($date_of_exit == null) {
+            $xml->startElement("Date_of_exit");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Date_of_exit", $date_of_exit);
+        }
+        //$xml->writeElement("Time_of_exit", $time_of_exit);
+        if ($time_of_exit == null) {
+            $xml->startElement("Time_of_exit");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Time_of_exit", $time_of_exit);
+        }
+        // $xml->writeElement("Actual_office_of_exit_code", $actual_office_of_exit_code);
+        if ($actual_office_of_exit_code == null) {
+            $xml->startElement("Actual_office_of_exit_code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Actual_office_of_exit_code", $actual_office_of_exit_code);
+        }
+        //$xml->writeElement("Actual_office_of_exit_name", $actual_office_of_exit_name);
+        if ($actual_office_of_exit_code == null) {
+            $xml->startElement("Actual_office_of_exit_name");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Actual_office_of_exit_name", $actual_office_of_exit_code);
+        }
+
+        if ($exit_reference == null) {
+            $xml->startElement("Exit_reference");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Exit_reference", $exit_reference);
+        }
+
+        if ($comments == null) {
+            $xml->startElement("Comments");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Comments", $comments);
+        }
+
 
         $xml->endElement(); //fin export_release
 
-        $xml->startElement("Assessment_notice");
-        $xml->writeElement("Item_tax_total", 1);
+        $xml->startElement("Assessment_notice"); //  14  hijos de item 
+        //$xml->writeElement("Item_tax_total",$item_tax_total);
+        if ($item_tax_total == null) {
+            $xml->startElement("Item_tax_total");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Item_tax_total");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Item_tax_total");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Item_tax_total");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Item_tax_total");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Item_tax_total");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Item_tax_total");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Item_tax_total");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Item_tax_total");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Item_tax_total");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Item_tax_total");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Item_tax_total");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Item_tax_total");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Item_tax_total");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            //$item_tax_total =  $datos->$item_tax_total;
+            $xml->writeElement("Item_tax_total", $item_tax_total);
+            $xml->writeElement("Item_tax_total", $item_tax_total);
+            $xml->writeElement("Item_tax_total", $item_tax_total);
+            $xml->writeElement("Item_tax_total", $item_tax_total);
+            $xml->writeElement("Item_tax_total", $item_tax_total);
+            $xml->writeElement("Item_tax_total", $item_tax_total);
+            $xml->writeElement("Item_tax_total", $item_tax_total);
+            $xml->writeElement("Item_tax_total", $item_tax_total);
+            $xml->writeElement("Item_tax_total", $item_tax_total);
+            $xml->writeElement("Item_tax_total", $item_tax_total);
+            $xml->writeElement("Item_tax_total", $item_tax_total);
+            $xml->writeElement("Item_tax_total", $item_tax_total);
+            $xml->writeElement("Item_tax_total", $item_tax_total);
+        }
+
+
+
         $xml->endElement(); //fin Assessment_notice
 
         $xml->startElement("Global_taxes");
-        $xml->writeElement("Global_tax_item", 1);
+        if ($global_tax_item == null) {
+            $xml->startElement("Global_tax_item");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Global_tax_item");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Global_tax_item");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Global_tax_item");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Global_tax_item");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Global_tax_item");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Global_tax_item");
+            $xml->writeElement("null");
+            $xml->endElement();
+
+            $xml->startElement("Global_tax_item");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Global_tax_item", $global_tax_item);
+            $xml->writeElement("Global_tax_item", $global_tax_item);
+            $xml->writeElement("Global_tax_item", $global_tax_item);
+            $xml->writeElement("Global_tax_item", $global_tax_item);
+            $xml->writeElement("Global_tax_item", $global_tax_item);
+            $xml->writeElement("Global_tax_item", $global_tax_item);
+            $xml->writeElement("Global_tax_item", $global_tax_item);
+            $xml->writeElement("Global_tax_item", $global_tax_item);
+        } //estoy aqui
+
         $xml->endElement(); //fin Global_taxes
 
         $xml->startElement("Property");
         $xml->startElement("Forms");
-        $xml->writeElement("Number_of_the_form", "valor");
-        $xml->writeElement("Total_number_of_forms", "valor");
+
+        if ($number_of_the_form == null) {
+            $xml->startElement("Number_of_the_form");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Number_of_the_form", $number_of_the_form);
+        }
+
+
+        if ($total_number_of_forms == null) {
+            $xml->startElement("Total_number_of_forms");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Total_number_of_forms", $total_number_of_forms);
+        }
         $xml->endElement(); //fin Forms
 
         $xml->startElement("Nbers");
-        $xml->writeElement("Number_of_loading_lists", "valor");
-        $xml->writeElement("Total_number_of_items", 1);
-        $xml->writeElement("Total_number_of_packages", 1);
+
+        if ($number_of_loading_lists == null) {
+            $xml->startElement("Number_of_loading_lists");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Number_of_loading_lists", $number_of_loading_lists);
+        }
+
+
+        if ($total_number_of_items == null) {
+            $xml->startElement("Total_number_of_items");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Total_number_of_items", $total_number_of_items);
+        }
+
+
+        if ($total_number_of_packages == null) {
+            $xml->startElement("Total_number_of_packages");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Total_number_of_packages", $total_number_of_packages);
+        }
+
+
         $xml->endElement(); //fin Nbers
 
-        $xml->writeElement("Place_of_declaration", 1);
-        $xml->writeElement("Date_of_declaration", 1);
-        $xml->writeElement("Selected_page", 1);
+
+        if ($place_of_declaration == null) {
+            $xml->startElement("Place_of_declaration");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Place_of_declaration", $place_of_declaration);
+        }
+
+        if ($date_of_declaration == null) {
+            $xml->startElement("Date_of_declaration");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Date_of_declaration", $date_of_declaration);
+        }
+
+        if ($selected_page == null) {
+            $xml->startElement("Selected_page");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Selected_page", $selected_page);
+        }
         $xml->endElement(); // fin Property
 
         $xml->startElement("Identification");
-        $xml->startElement("Office_segment");
-        $xml->writeElement("Place_of_declaration", "valor");
-        $xml->writeElement("Customs_clearance_office_code", "valor");
+        $xml->startElement("Office_segment"); //  consultar sobre su  cierre
+
+        if ($customs_clearance_office_code == null) {
+            $xml->startElement("Customs_clearance_office_code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Customs_clearance_office_code", $customs_clearance_office_code);
+        }
         $xml->endElement(); // fin Identification
 
         $xml->startElement("Type");
-        $xml->writeElement("Type_of_declaration", substr($datos->modelo, 0, 2));
-        $xml->writeElement("Declaration_gen_procedure_code", substr($datos->modelo, 3, 1));
-        $xml->writeElement("Type_of_transit_document", "valor");
+
+
+        if ($type_of_declaration == null) {
+            $xml->startElement("Type_of_declaration");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Type_of_declaration", $type_of_declaration);
+        }
+
+
+        if ($declaration_gen_procedure_code == null) {
+            $xml->startElement("Declaration_gen_procedure_code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Declaration_gen_procedure_code", $declaration_gen_procedure_code);
+        }
+
+        if ($type_of_transit_document == null) {
+            $xml->startElement("Type_of_transit_document");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Type_of_transit_document", $type_of_transit_document);
+        }
         $xml->endElement();  // fin Type
-        $xml->writeElement("Manifest_reference_number", "valor");
+
+        if ($manifest_reference_number == null) {
+            $xml->startElement("Manifest_reference_number");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Manifest_reference_number", $manifest_reference_number);
+        }
 
         $xml->startElement("Registration");
-        $xml->writeElement("Serial_number", "valor");
-        $xml->writeElement("Number", "valor");
-        $xml->writeElement("Date", "valor");
+
+        if ($serial_number == null) {
+            $xml->startElement("Serial_number");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Serial_number", $serial_number);
+        }
+
+        if ($number == null) {
+            $xml->startElement("Number");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Number", $number);
+        }
+
+        if ($date == null) {
+            $xml->startElement("Date");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Date", $date);
+        }
         $xml->endElement(); // fin Registration
 
         $xml->startElement("Assessment");
-        $xml->writeElement("Serial_number", "valor");
-        $xml->writeElement("Number", "valor");
-        $xml->writeElement("Date", "valor");
+
+        if ($serial_number == null) {
+            $xml->startElement("Serial_number");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Serial_number", $serial_number);
+        }
+
+        if ($number == null) {
+            $xml->startElement("Number");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Number", $number);
+        }
+
+        if ($date == null) {
+            $xml->startElement("Date");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Date", $date);
+        }
         $xml->endElement(); // fin Assessment
 
         $xml->startElement("receipt");
-        $xml->writeElement("Serial_number", "valor");
-        $xml->writeElement("Number", "valor");
-        $xml->writeElement("Date", "valor");
+
+        if ($serial_number == null) {
+            $xml->startElement("Serial_number");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Serial_number", $serial_number);
+        }
+
+        if ($number == null) {
+            $xml->startElement("Number");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Number", $number);
+        }
+
+        if ($date == null) {
+            $xml->startElement("Date");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Date", $date);
+        }
         $xml->endElement(); // fin receipt
-
-
+        $xml->endElement(); // fin Identification
 
         $xml->startElement("Traders");
         $xml->startElement("Exporter");
-        $xml->writeElement("Exporter_code", $datos->nit_exportador);
-        $xml->writeElement("Exporter_name", $datos->nombre_exportador);
+
+        if ($exporter_code == null) {
+            $xml->startElement("Exporter_code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+
+            $xml->writeElement("Exporter_code", $exporter_code);
+        }
+
+
+        if ($exporter_name == null) {
+            $xml->startElement("Exporter_name");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+
+            $xml->writeElement("Exporter_name", $exporter_name);
+        }
         $xml->endElement(); // fin Exporter
 
         $xml->startElement("Consignee");
-        $xml->writeElement("Consignee_code", $datos->nit_consignatario);
-        $xml->writeElement("Consignee_name", $datos->consignatario);
+
+        if ($consignee_code == null) {
+            $xml->startElement("Consignee_code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Consignee_code", $consignee_code);
+        }
+
+        if ($consignee_name == null) {
+            $xml->startElement("Consignee_name");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Consignee_name", $consignee_name);
+        }
+
+
+        if ($consignee_name_doc == null) {
+            $xml->startElement("Consignee_name_doc");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Consignee_name_doc", $consignee_name_doc);
+        }
+
         $xml->endElement(); //fin Consignee
 
         $xml->startElement("Financial");
-        $xml->writeElement("Financial_code", 1);
-        $xml->writeElement("Financial_name", "valor");
+
+        if ($financial_code == null) {
+            $xml->startElement("Financial_code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Financial_code", $financial_code);
+        }
+
+        if ($financial_name == null) {
+            $xml->startElement("Financial_name");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Financial_name", $financial_name);
+        }
         $xml->endElement(); //fin Financial
 
         $xml->endElement(); //fin Traders
 
         $xml->startElement("Declarant");
-        $xml->writeElement("Declarant_code", $datos->declarante);
-        $xml->writeElement("Declarant_name", "valor");
-        $xml->writeElement("Declarant_representative", "valor");
-        $xml->writeElement("Reference", $datos->referencia);
+
+        if ($declarant_code == null) {
+            $xml->startElement("Declarant_code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Declarant_code", $declarant_code);
+        }
+
+        if ($declarant_name == null) {
+            $xml->startElement("Declarant_name");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Declarant_name",  $declarant_name);
+        }
+
+        if ($declarant_representative == null) {
+            $xml->startElement("Declarant_representative");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Declarant_representative",  $declarant_representative);
+        }
+
+        $xml->startElement("Reference");
+        if ($number_reference == null) {
+            $xml->startElement("Number");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Number",  $number_reference);  // completar esto en formulario de creacion de poliza
+        }
+
+        $xml->endElement();
+
+
         $xml->endElement(); // fin Declarant
 
         $xml->startElement("General_information");
+
         $xml->startElement("Country");
-        $xml->writeElement("Country_first_destination", $datos->pais_export);
-        $xml->writeElement("Trading_country", "valor");
+
+        if ($country_first_destination == null) {
+            $xml->startElement("Country_first_destination");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Country_first_destination", $country_first_destination);
+        }
+
+        if ($trading_country == null) {
+            $xml->startElement("Trading_country");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Trading_country",  $trading_country);
+        }
 
         $xml->startElement("Export");
-        $xml->writeElement("Export_country_code", $datos->pais_export);
-        $xml->writeElement("Export_country_region", "valor");
+
+        if ($export_country_code == null) {
+            $xml->startElement("Export_country_code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Export_country_code", $export_country_code);
+        }
+
+        if ($export_country_region == null) {
+            $xml->startElement("Export_country_region");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Export_country_region", $export_country_region);
+        }
         $xml->endElement(); //Export
 
         $xml->startElement("Destination");
-        $xml->writeElement("Destination_country_code", $datos->pais_destino);
-        $xml->writeElement("Destination_country_region", "valor");
+
+        if ($destination_country_code == null) {
+            $xml->startElement("Destination_country_code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Destination_country_code", $destination_country_code);
+        }
+
+
+        if ($destination_country_region == null) {
+            $xml->startElement("Destination_country_region");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Destination_country_region",  $destination_country_region);
+        }
         $xml->endElement(); //Destination
-        $xml->writeElement("Country_of_origin_name", "valor");
+
+        if ($country_of_origin_name == null) {
+            $xml->startElement("Country_of_origin_name");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Country_of_origin_name", $country_of_origin_name);
+        }
 
         $xml->endElement(); //Country
-        $xml->writeElement("Value_details", "valor");
-        $xml->writeElement("CAP", "valor");
-        $xml->writeElement("Additional_information", "valor");
-        $xml->writeElement("Comments_free_text", "valor");
+
+
+
+        if ($value_details == null) {
+            $xml->startElement("Value_details");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Value_details", $value_details);
+        }
+
+
+        if ($cap == null) {
+            $xml->startElement("CAP");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("CAP", $cap);
+        }
+
+        if ($additional_information == null) {
+            $xml->startElement("Additional_information");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Additional_information", $additional_information);
+        }
+
+        if ($comments_free_text == null) {
+            $xml->startElement("Comments_free_text");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Comments_free_text", $comments_free_text);
+        }
 
         $xml->endElement(); // fin General_information
+
 
         $xml->startElement("Transport");
         $xml->startElement("Means_of_transport");
 
         $xml->startElement("Departure_arrival_information");
-        $xml->writeElement("Identity", "valor");
-        $xml->writeElement("Nationality", "valor");
+
+
+        if ($identity_arrival_information == null) {
+            $xml->startElement("Identity");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Identity", $identity_arrival_information);
+        }
+
+
+        if ($nationality_arrival_information == null) {
+            $xml->startElement("Nationality");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Nationality", $nationality_arrival_information);
+        }
+
+
         $xml->endElement(); // Departure_arrival_information
 
         $xml->startElement("Border_information");
-        $xml->writeElement("Identity", "valor");
-        $xml->writeElement("Nationality", "valor");
-        $xml->writeElement("Mode", $datos->mod_transp);
-        $xml->endElement(); // Border_information
 
-        $xml->writeElement("Inland_mode_of_transport", "valor");
+        if ($identity == null) {
+            $xml->startElement("Identity");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Identity", $identity);
+        }
+
+
+        if ($nationality == null) {
+            $xml->startElement("Nationality");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Nationality", $nationality);
+        }
+
+
+
+        if ($mode == null) {
+            $xml->startElement("Mode");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Mode", $mode);
+        }
+        $xml->endElement(); // Border_information
+        //$xml->endElement(); // Border_information
+
+
+        if ($inland_mode_of_transport == null) {
+            $xml->startElement("Inland_mode_of_transport");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Inland_mode_of_transport", $inland_mode_of_transport);
+        }
 
         $xml->endElement(); // Means_of_transport
-        $xml->writeElement("Container_flag", "false");
+
+        if ($container_flag == null) {
+            $xml->startElement("Container_flag");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Container_flag", $container_flag);
+        }
+
 
         $xml->startElement("Delivery_terms");
-        $xml->writeElement("Code", $datos->fob);
-        $xml->writeElement("Place", "valor");
-        $xml->writeElement("Situation", "VALOR");
+
+        if ($inco_term == null) {
+            $xml->startElement("Code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Code", $inco_term);
+        }
+
+        if ($place == null) {
+            $xml->startElement("Place");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Place", $place);
+        }
+
+        if ($situation == null) {
+            $xml->startElement("Situation");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Situation", $situation);
+        }
         $xml->endElement(); // Delivery_terms
 
         $xml->startElement("Border_office");
-        $xml->writeElement("Code", $datos->pais_origen);
-        $xml->writeElement("Name", "name");
+
+
+        if ($aduana_registro_code == null) {
+            $xml->startElement("Code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Code", $aduana_registro_code);
+        }
+
+
+
+        if ($aduana_registro_name == null) {
+            $xml->startElement("Name");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Name", $aduana_registro_name);
+        }
+
+
+
         $xml->endElement(); // Border_office
 
+
         $xml->startElement("Place_of_loading");
-        $xml->writeElement("Code", $datos->lugar_carga);
-        $xml->writeElement("Name", "name");
-        $xml->writeElement("Country", "name");
+
+
+        if ($lugar_carga == null) {
+            $xml->startElement("Code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Code", $lugar_carga);
+        }
+        //$xml->writeElement("Name", "name");
+        if ($name == null) {
+            $xml->startElement("Name");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Name", $name);
+        }
+
+        //$xml->writeElement("Country", "name");
+        if ($country == null) {
+            $xml->startElement("Country");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Country", $country);
+        }
         $xml->endElement(); // Place_of_loading
-        $xml->writeElement("Location_of_goods", $datos->localizacion_mercancia);
+
+        // $xml->writeElement("Location_of_goods", $general->localizacion_mercancia);
+        if ($location_of_goods == null) {
+            $xml->startElement("Location_of_goods");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Location_of_goods", $location_of_goods);
+        }
+
 
         $xml->endElement(); // Transport
 
         $xml->startElement("Financial");
 
+
         $xml->startElement("Financial_transaction");
-        $xml->writeElement("code1", "valor");
-        $xml->writeElement("code2", "valor");
+
+        if ($financial_transaction_code1 == null) {
+            $xml->startElement("code1");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("code1", $financial_transaction_code1);
+        }
+
+        if ($financial_transaction_code2 == null) {
+            $xml->startElement("code2");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("code2", $financial_transaction_code2);
+        }
+
         $xml->endElement(); // Financial
 
         $xml->startElement("Bank");
-        $xml->writeElement("Code", $datos->banco);
-        $xml->writeElement("Name", "valor");
-        $xml->writeElement("Reference", "valor");
+        if ($codigo_banco == null) {
+            $xml->startElement("Code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Code", $codigo_banco);
+        }
+
+
+        if ($nombre_banco == null) {
+            $xml->startElement("Name");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Name",  $nombre_banco);
+        }
+
+        if ($branch == null) {
+            $xml->startElement("Branch");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Branch",  $branch);
+        }
+
+        if ($regimen_adicional == null) {
+            $xml->startElement("Reference");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Reference",  $regimen_adicional);
+        }
         $xml->endElement(); // Bank
 
+
         $xml->startElement("Terms");
-        $xml->writeElement("Reference", $datos->presenacion);
-        $xml->writeElement("Description", "valor");
+
+        if ($terms_code == null) {
+            $xml->startElement("Code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Code", $terms_code);
+        }
+
+        if ($terms_description == null) {
+            $xml->startElement("Description");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Description", $terms_description);
+        }
         $xml->endElement(); // Terms
 
         $xml->startElement("Total_invoice");
@@ -834,14 +1800,30 @@ class Crear extends CI_Controller
         $xml->endElement(); // fin  Transit
 
         $xml->startElement("Valuation");
-        $xml->writeElement("Calculation_working_mode", "valor");
 
+        if ($calculation_working_mode == null) {
+            $xml->startElement("Calculation_working_mode");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Calculation_working_mode", $calculation_working_mode);
+        }
         $xml->startElement("Weight");
+        $gross_weight = null;
+        if ($gross_weight == null) {
+            $xml->startElement("Gross_weight");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Gross_weight", $gross_weight);
+        }
+        $xml->endElement(); // Weight*/
 
-        $xml->startElement("Gross_weight");
+        /* $xml->startElement("Gross_weight");
         $xml->startElement("null");
         $xml->endElement();
-        $xml->endElement(); // fin Gross_weight
+        $xml->endElement(); // Gross_weight
+        $xml->endElement(); // Weight*/
 
         $xml->startElement("Total_cost");
         $xml->startElement("null");
@@ -853,8 +1835,6 @@ class Crear extends CI_Controller
         $xml->endElement();
         $xml->endElement(); // fin Total_CIF
 
-        $xml->endElement(); // fin Weight
-
         $xml->startElement("Gs_Invoice");
 
         $xml->startElement("Amount_national_currency");
@@ -862,42 +1842,144 @@ class Crear extends CI_Controller
         $xml->endElement();
         $xml->endElement(); // fin Amount_national_currency
 
-        $xml->writeElement("Amount_foreign_currency", "valor");
-        $xml->writeElement("Currency_code", "valor");
 
-        $xml->startElement("Currency_name");
-        $xml->startElement("null");
-        $xml->endElement();
-        $xml->endElement(); // fin Currency_name
+        if ($amount_foreign_currency == null) {
+            $xml->startElement("Amount_foreign_currency");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Amount_foreign_currency", $amount_foreign_currency);
+        }
 
-        $xml->startElement("Currency_rate");
-        $xml->startElement("null");
-        $xml->endElement();
-        $xml->endElement(); // fin Currency_rate
+
+
+        if ($currency_code == null) {
+            $xml->startElement("Currency_code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Currency_code", $currency_code);
+        }
+
+        $gs_invoice_Currency_name = null;
+        if ($gs_invoice_Currency_name == null) {
+            $xml->startElement("Currency_name");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Currency_name", $gs_invoice_Currency_name);
+        }
+
+        $gs_invoice_Currency_rate = null;
+
+        if ($gs_invoice_Currency_rate == null) {
+            $xml->startElement("Currency_rate");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Currency_rate", $gs_invoice_Currency_rate);
+        }
+
+
 
         $xml->endElement(); // fin Gs_Invoice
 
         $xml->startElement("Gs_external_freight");
+
 
         $xml->startElement("Amount_national_currency");
         $xml->startElement("null");
         $xml->endElement();
         $xml->endElement(); // fin Amount_national_currency
 
-        $xml->writeElement("Amount_foreign_currency", "valor");
-        $xml->writeElement("Currency_code", "valor");
+        if ($flete_interno == null) {
+            $xml->startElement("Amount_foreign_currency");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Amount_foreign_currency", $flete_interno);
+        }
 
-        $xml->startElement("Currency_name");
+
+        if ($currency_code == null) {
+            $xml->startElement("Currency_code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Currency_code", $currency_code);
+        }
+
+        $gs_external_currency_name = null;
+        if ($gs_external_currency_name == null) {
+            $xml->startElement("Currency_name");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Currency_name", $gs_external_currency_name);
+        }
+
+
+        $gs_external_currency_rate = null;
+        if ($gs_external_currency_rate == null) {
+            $xml->startElement("Currency_rate");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Currency_rate", $gs_external_currency_rate);
+        }
+        $xml->endElement();
+        /* gsinternal  */
+
+
+        $xml->startElement("Gs_internal_freight");
+
+
+        $xml->startElement("Amount_national_currency");
         $xml->startElement("null");
         $xml->endElement();
-        $xml->endElement(); // fin Currency_name
+        $xml->endElement(); // fin Amount_national_currency
 
-        $xml->startElement("Currency_rate");
-        $xml->startElement("null");
-        $xml->endElement();
-        $xml->endElement(); // fin Currency_rate
+        if ($flete_externo == null) {
+            $xml->startElement("Amount_foreign_currency");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Amount_foreign_currency", $flete_externo);
+        }
 
-        $xml->endElement(); // fin Gs_external_freight
+
+        if ($currency_code == null) {
+            $xml->startElement("Currency_code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Currency_code", $currency_code);
+        }
+
+        $gs_external_currency_name = null;
+        if ($gs_external_currency_name == null) {
+            $xml->startElement("Currency_name");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Currency_name", $gs_external_currency_name);
+        }
+
+
+        $gs_external_currency_rate = null;
+        if ($gs_external_currency_rate == null) {
+            $xml->startElement("Currency_rate");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Currency_rate", $gs_external_currency_rate);
+        }
+
+        $xml->endElement(); // fin Gs_internal_freight
+        /* fin */
+
+
+
 
         $xml->startElement("Gs_insurance");
 
@@ -906,8 +1988,23 @@ class Crear extends CI_Controller
         $xml->endElement();
         $xml->endElement(); // fin Amount_national_currency
 
-        $xml->writeElement("Amount_foreign_currency", "valor");
-        $xml->writeElement("Currency_code", "valor");
+
+        if ($seguro == null) {
+            $xml->startElement("Amount_foreign_currency");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Amount_foreign_currency", $seguro);
+        }
+
+        if ($currency_code == null) {
+            $xml->startElement("Currency_code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Currency_code", $currency_code);
+        }
+
 
         $xml->startElement("Currency_name");
         $xml->startElement("null");
@@ -928,8 +2025,28 @@ class Crear extends CI_Controller
         $xml->endElement();
         $xml->endElement(); // fin Amount_national_currency
 
-        $xml->writeElement("Amount_foreign_currency", "valor");
-        $xml->writeElement("Currency_code", "valor");
+
+        if ($otros_costos == null) {
+            $xml->startElement("Amount_foreign_currency");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $n = $otros_costos;
+            $aux = (string) $n;
+            $decimal = substr($aux, strpos($aux, "."));
+            if ($decimal == "0.00") {
+                $otros_costos = "0.0";
+            }
+            $xml->writeElement("Amount_foreign_currency", $otros_costos);
+        }
+
+        if ($currency_code == null) {
+            $xml->startElement("Currency_code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Currency_code", $currency_code);
+        }
 
         $xml->startElement("Currency_name");
         $xml->startElement("null");
@@ -950,8 +2067,28 @@ class Crear extends CI_Controller
         $xml->endElement();
         $xml->endElement(); // fin Amount_national_currency
 
-        $xml->writeElement("Amount_foreign_currency", "valor");
-        $xml->writeElement("Currency_code", "valor");
+
+        if ($deducciones == null) {
+            $xml->startElement("Amount_foreign_currency");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $n = $deducciones;
+            $aux = (string) $n;
+            $decimal = substr($aux, strpos($aux, "."));
+            if ($decimal == "0.00") {
+                $deducciones = "0.0";
+            }
+            $xml->writeElement("Amount_foreign_currency", $deducciones);
+        }
+
+        if ($currency_code == null) {
+            $xml->startElement("Currency_code");
+            $xml->writeElement("null");
+            $xml->endElement();
+        } else {
+            $xml->writeElement("Currency_code", $currency_code);
+        }
 
         $xml->startElement("Currency_name");
         $xml->startElement("null");
@@ -981,7 +2118,9 @@ class Crear extends CI_Controller
 
         $xml->endElement(); // fin Valuation
 
+
         $xml->startElement("FAUCA");
+
 
         $xml->startElement("FAUCA_Fecha_vencimiento");
         $xml->startElement("null");
@@ -1045,16 +2184,77 @@ class Crear extends CI_Controller
         $xml->endElement(); // fin FAUCA_ProductorEx_Empresa
 
         $xml->endElement(); // fin FAUCA
+        //var_dump($datos_items['items']);
 
-        $xml->startElement("Item");
         foreach ($datos_items['items']  as $item) {
-            $xml->writeElement("Amount_foreign_currency", 1);
+            $datos_docs['doc']    = $this->Crearpoliza_model->listado_adjuntos_item($id, $item->item);
+            $temp_item_number = $item->item;
+            $number_of_packages = $item->no_bultos;
+            $marks1_of_packages = "-";
+            $marks2_of_packages = "-";
+            $kind_of_packages_code = $item->origen;
+            $commodity_code = $item->partida;
+            $commodity_code = substr($commodity_code, 0, 8);
+            $precision_1 = substr($item->partida, 8, 3);
+            $suppplementary_unit_quantity = $item->no_bultos;
+            $item_price = $item->precio_item;
+            $country_of_origin_code = $item->origen;
+            $dato_partida = $this->Crearpoliza_model->consulta_producto($item->partida);
+            $commercial_description = $dato_partida->descripcion;
+            $summary_declaration = "GWFCUSA052982 " . "trs";
+            $amount_deducted_from_licence = "0.0";
+            $gross_weight_itm = $item->peso_bruto;
+            $net_weight_itm = $item->peso_neto;
+            $amount_foreign_currency = $item->precio_item;
+            $consignee_cod_itm = "N/A";
+            $consignee_nam_itm = "N/A";
+            $consignee_typ_itm = "ARE";
+
+            $xml->startElement("Item");
+            if ($temp_item_number == null) {
+                $xml->startElement("Temp_item_number");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Temp_item_number", $temp_item_number);
+            }
 
             $xml->startElement("Packages");
-            $xml->writeElement("Number_of_packages", $item->no_bultos);
-            $xml->writeElement("Amount_foreign_currency", $item->marcas_uno);
-            $xml->writeElement("Amount_foreign_currency", $item->marcas_dos);
-            $xml->writeElement("Kind_of_packages_code", $item->origen);
+            if ($number_of_packages == null) {
+                $xml->startElement("Number_of_packages");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Number_of_packages", $number_of_packages);
+            }
+            //  agregado 
+            if ($marks1_of_packages == null) {
+                $xml->startElement("Marks1_of_packages");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Marks1_of_packages", $marks1_of_packages);
+            }
+
+            if ($marks2_of_packages == null) {
+                $xml->startElement("Marks2_of_packages");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Marks2_of_packages", $marks2_of_packages);
+            }
+
+
+
+            //  $xml->writeElement("Kind_of_packages_code", $item->origen);
+            if ($kind_of_packages_code == null) {
+                $xml->startElement("Kind_of_packages_code");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Kind_of_packages_code", $kind_of_packages_code . "verificar esto");
+            }
+
             $xml->endElement(); // fin Packages
 
             $xml->startElement("Tarification");
@@ -1065,8 +2265,24 @@ class Crear extends CI_Controller
             $xml->endElement(); // fin Tarification_data
 
             $xml->startElement("HScode");
-            $xml->writeElement("Commodity_code", "valor");
-            $xml->writeElement("Precision_1", "valor");
+            // $xml->writeElement("Commodity_code", $commodity_code);
+            if ($commodity_code == null) {
+                $xml->startElement("Commodity_code");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Commodity_code", $commodity_code);
+            }
+
+            //$xml->writeElement("Precision_1",$precision_1 );
+            if ($precision_1 == null) {
+                $xml->startElement("Precision_1");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Precision_1", $precision_1);
+            }
+
 
             $xml->startElement("Precision_2");
             $xml->startElement("null");
@@ -1086,9 +2302,34 @@ class Crear extends CI_Controller
 
             $xml->endElement(); // fin HScode
 
-            $xml->writeElement("PreciPreference_codesion_1", $item->codigo_preferencia);
-            $xml->writeElement("Extended_customs_procedure", "valor");
-            $xml->writeElement("National_customs_procedure", "valor");
+            $preference_code = "TLC-US" . "trs";
+            if ($preference_code == null) {
+                $xml->startElement("Preference_code");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Preference_code", $preference_code);
+                // $xml->writeElement("Preference_code", $item->codigo_preferencia);
+            }
+
+            $extended_customs_procedure = "4000 " . "trs";
+            if ($extended_customs_procedure == null) {
+                $xml->startElement("Extended_customs_procedure");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Extended_customs_procedure", $extended_customs_procedure);
+            }
+
+            $national_customs_procedure = "000 " . "trs";
+            if ($national_customs_procedure == null) {
+                $xml->startElement("National_customs_procedure");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("National_customs_procedure", $national_customs_procedure);
+            }
+
 
             $xml->startElement("Quota_code");
             $xml->startElement("null");
@@ -1097,7 +2338,7 @@ class Crear extends CI_Controller
 
             $xml->startElement("Quota");
 
-            $xml->startElement("Quota_code");
+            $xml->startElement("QuotaCode");
             $xml->startElement("null");
             $xml->endElement();
             $xml->endElement(); // fin Quota_code
@@ -1128,10 +2369,17 @@ class Crear extends CI_Controller
             $xml->endElement();
             $xml->endElement(); // fin Suppplementary_unit_name
 
-            $xml->startElement("Suppplementary_unit_quantity");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Suppplementary_unit_quantity
+
+
+            if ($suppplementary_unit_quantity == null) {
+                $xml->startElement("Suppplementary_unit_quantity");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Suppplementary_unit_quantity", $suppplementary_unit_quantity);
+            }
+
+
 
             $xml->endElement(); // fin Supplementary_unit
 
@@ -1147,12 +2395,9 @@ class Crear extends CI_Controller
             $xml->endElement();
             $xml->endElement(); // fin Suppplementary_unit_name
 
-            $xml->startElement("Suppplementary_unit_quantity");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Suppplementary_unit_quantity
+            $xml->writeElement("Suppplementary_unit_quantity", "0.0");
 
-            $xml->endElement(); // fin Supplementary_unit
+            $xml->endElement(); // fin Suppplementary_unit_quantity
 
             $xml->startElement("Supplementary_unit");
 
@@ -1166,14 +2411,16 @@ class Crear extends CI_Controller
             $xml->endElement();
             $xml->endElement(); // fin Suppplementary_unit_name
 
-            $xml->startElement("Suppplementary_unit_quantity");
-            $xml->startElement("null");
-            $xml->endElement();
+            $xml->writeElement("Suppplementary_unit_quantity", "0.0");
             $xml->endElement(); // fin Suppplementary_unit_quantity
 
-            $xml->endElement(); // fin Supplementary_unit
-
-            $xml->writeElement("Item_price", $item->precio_item); //me que en line 600
+            if ($item_price == null) {
+                $xml->startElement("Item_price");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Item_price", $item_price);
+            }
 
             $xml->startElement("Valuation_method_code");
             $xml->startElement("null");
@@ -1198,7 +2445,14 @@ class Crear extends CI_Controller
             $xml->endElement(); // fin Tarification
 
             $xml->startElement("Goods_description");
-            $xml->writeElement("Country_of_origin_code", $item->origen);
+
+            if ($country_of_origin_code == null) {
+                $xml->startElement("Country_of_origin_code");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Country_of_origin_code", $country_of_origin_code);
+            }
 
             $xml->startElement("Country_of_origin_region");
             $xml->startElement("null");
@@ -1210,13 +2464,26 @@ class Crear extends CI_Controller
             $xml->endElement();
             $xml->endElement(); // fin Description_of_goods
 
-            $xml->writeElement("Commercial_Description", $item->desc_sac);
-
+            //$xml->writeElement("Commercial_Description", $item->desc_sac);
+            if ($commercial_description == null) {
+                $xml->startElement("Commercial_Description");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Commercial_Description", $commercial_description);
+            }
 
             $xml->endElement(); // fin Goods_description
 
             $xml->startElement("Previous_doc");
-            $xml->writeElement("Summary_declaration", $item->desc_sac);
+
+            if ($summary_declaration == null) {
+                $xml->startElement("Summary_declaration");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Summary_declaration", $summary_declaration);
+            }
 
             $xml->startElement("Summary_declaration_sl");
             $xml->startElement("null");
@@ -1243,7 +2510,15 @@ class Crear extends CI_Controller
             $xml->endElement(); // fin Licence_number
 
             $xml->startElement("Amount");
-            $xml->writeElement("Amount_deducted_from_licence", "valor");
+
+            if ($amount_deducted_from_licence == null) {
+                $xml->startElement("Amount_deducted_from_licence");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Amount_deducted_from_licence", $amount_deducted_from_licence);
+            }
+
             $xml->startElement("Quantity_deducted_from_licence");
             $xml->startElement("null");
             $xml->endElement();
@@ -1297,10 +2572,6 @@ class Crear extends CI_Controller
             $xml->endElement();
             $xml->endElement(); // fin Duty_tax_code
 
-            $xml->startElement("Duty_tax_code");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_code
 
             $xml->startElement("Duty_tax_Base");
             $xml->startElement("null");
@@ -1336,128 +2607,7 @@ class Crear extends CI_Controller
             $xml->endElement();
             $xml->endElement(); // fin Duty_tax_code
 
-            $xml->startElement("Duty_tax_code");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_code
 
-            $xml->startElement("Duty_tax_Base");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_Base
-
-            $xml->startElement("Duty_tax_rate");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_rate
-
-            $xml->startElement("Duty_tax_amount");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_amount
-
-            $xml->startElement("Duty_tax_MP");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_MP
-
-            $xml->startElement("Duty_tax_Type_of_calculation");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_Type_of_calculation
-
-            $xml->endElement(); // fin Taxation_line
-
-
-            $xml->startElement("Taxation_line");
-
-            $xml->startElement("Duty_tax_code");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_code
-
-            $xml->startElement("Duty_tax_code");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_code
-
-            $xml->startElement("Duty_tax_Base");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_Base
-
-            $xml->startElement("Duty_tax_rate");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_rate
-
-            $xml->startElement("Duty_tax_amount");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_amount
-
-            $xml->startElement("Duty_tax_MP");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_MP
-
-            $xml->startElement("Duty_tax_Type_of_calculation");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_Type_of_calculation
-
-            $xml->endElement(); // fin Taxation_line
-
-            $xml->startElement("Taxation_line");
-
-            $xml->startElement("Duty_tax_code");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_code
-
-            $xml->startElement("Duty_tax_code");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_code
-
-            $xml->startElement("Duty_tax_Base");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_Base
-
-            $xml->startElement("Duty_tax_rate");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_rate
-
-            $xml->startElement("Duty_tax_amount");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_amount
-
-            $xml->startElement("Duty_tax_MP");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_MP
-
-            $xml->startElement("Duty_tax_Type_of_calculation");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_Type_of_calculation
-
-            $xml->endElement(); // fin Taxation_line
-
-            $xml->startElement("Taxation_line");
-
-            $xml->startElement("Duty_tax_code");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_code
-
-            $xml->startElement("Duty_tax_code");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_code
 
             $xml->startElement("Duty_tax_Base");
             $xml->startElement("null");
@@ -1494,10 +2644,7 @@ class Crear extends CI_Controller
             $xml->endElement();
             $xml->endElement(); // fin Duty_tax_code
 
-            $xml->startElement("Duty_tax_code");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Duty_tax_code
+
 
             $xml->startElement("Duty_tax_Base");
             $xml->startElement("null");
@@ -1533,10 +2680,42 @@ class Crear extends CI_Controller
             $xml->endElement();
             $xml->endElement(); // fin Duty_tax_code
 
+
+            $xml->startElement("Duty_tax_Base");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_Base
+
+            $xml->startElement("Duty_tax_rate");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_rate
+
+            $xml->startElement("Duty_tax_amount");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_amount
+
+            $xml->startElement("Duty_tax_MP");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_MP
+
+            $xml->startElement("Duty_tax_Type_of_calculation");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_Type_of_calculation
+
+            $xml->endElement(); // fin Taxation_line
+
+            $xml->startElement("Taxation_line");
+
             $xml->startElement("Duty_tax_code");
             $xml->startElement("null");
             $xml->endElement();
             $xml->endElement(); // fin Duty_tax_code
+
+
 
             $xml->startElement("Duty_tax_Base");
             $xml->startElement("null");
@@ -1572,6 +2751,76 @@ class Crear extends CI_Controller
             $xml->startElement("null");
             $xml->endElement();
             $xml->endElement(); // fin Duty_tax_code
+
+
+
+            $xml->startElement("Duty_tax_Base");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_Base
+
+            $xml->startElement("Duty_tax_rate");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_rate
+
+            $xml->startElement("Duty_tax_amount");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_amount
+
+            $xml->startElement("Duty_tax_MP");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_MP
+
+            $xml->startElement("Duty_tax_Type_of_calculation");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_Type_of_calculation
+
+            $xml->endElement(); // fin Taxation_line
+
+            $xml->startElement("Taxation_line");
+
+            $xml->startElement("Duty_tax_code");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_code
+
+
+
+            $xml->startElement("Duty_tax_Base");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_Base
+
+            $xml->startElement("Duty_tax_rate");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_rate
+
+            $xml->startElement("Duty_tax_amount");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_amount
+
+            $xml->startElement("Duty_tax_MP");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_MP
+
+            $xml->startElement("Duty_tax_Type_of_calculation");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Duty_tax_Type_of_calculation
+
+            $xml->endElement(); // fin Taxation_line
+
+
+            $xml->startElement("Taxation_line");
+
+
 
             $xml->startElement("Duty_tax_code");
             $xml->startElement("null");
@@ -1608,8 +2857,25 @@ class Crear extends CI_Controller
             $xml->endElement(); // fin Taxation
 
             $xml->startElement("Valuation_item");
-            $xml->writeElement("Gross_weight_itm", $item->peso_bruto);
-            $xml->writeElement("Gross_weight_itm", $item->peso_neto);
+            $xml->startElement("Weight_itm");
+
+
+            if ($gross_weight_itm == null) {
+                $xml->startElement("Gross_weight_itm");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Gross_weight_itm", $gross_weight_itm);
+            }
+            //$xml->writeElement("Gross_weight_itm", $item->peso_neto);
+            if ($net_weight_itm == null) {
+                $xml->startElement("Net_weight_itm");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Net_weight_itm", $net_weight_itm);
+            }
+            $xml->endElement(); // fin Taxation
 
             $xml->startElement("Total_cost_itm");
             $xml->startElement("null");
@@ -1643,7 +2909,14 @@ class Crear extends CI_Controller
             $xml->endElement();
             $xml->endElement(); // fin Amount_national_currency
 
-            $xml->writeElement("Amount_foreign_currency", $item->peso_neto);
+
+            if ($amount_foreign_currency == null) {
+                $xml->startElement("Amount_foreign_currency");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Amount_foreign_currency", $amount_foreign_currency);
+            }
 
             $xml->startElement("Currency_code");
             $xml->startElement("null");
@@ -1690,6 +2963,41 @@ class Crear extends CI_Controller
             $xml->endElement(); // fin Currency_name
 
             $xml->endElement(); // fin item_external_freight
+
+
+            //here
+            $xml->startElement("item_internal_freight");
+
+            $xml->startElement("Amount_national_currency");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Amount_national_currency
+
+            $xml->startElement("Amount_foreign_currency");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Amount_foreign_currency
+
+            $xml->startElement("Currency_code");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Currency_code
+
+            $xml->startElement("Currency_name");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Currency_name
+
+            $xml->startElement("Currency_rate");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin Currency_name
+
+            $xml->endElement(); // fin item_internal_freight
+
+            //here
+
+
 
             $xml->startElement("item_insurance");
 
@@ -1822,109 +3130,323 @@ class Crear extends CI_Controller
             $xml->endElement();
             $xml->endElement(); // fin FAUCA_reglas_accesorias
 
+
+            $xml->startElement("FAUCA_unit");
+            $xml->startElement("null");
+            $xml->endElement();
+            $xml->endElement(); // fin FAUCA_reglas_accesorias
+
+
             $xml->endElement(); // fin FAUCA_item
 
-            foreach ($datos_docs['doc'] as $doc) {
-                $xml->startElement("Attached_documents");
 
-                $xml->startElement("Attached_documents");
-                $xml->writeElement("Amount_foreign_currency", $doc->tipodocumento);
-                $xml->writeElement("Amount_foreign_currency", "FACTURA O DUCUMENTO EQUIVALENTE");
+            if ($consignee_cod_itm == null) {
+                $xml->startElement("consignee_cod_itm");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("consignee_cod_itm", $consignee_cod_itm);
+            }
+
+
+            if ($consignee_nam_itm == null) {
+                $xml->startElement("consignee_nam_itm");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("consignee_nam_itm", $consignee_nam_itm);
+            }
+
+            if ($consignee_typ_itm == null) {
+                $xml->startElement("consignee_typ_itm");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("consignee_typ_itm", $consignee_typ_itm);
+            }
+
+
+            //FIN ITEMS
+            $xml->startElement("Attached_documents");
+            // var_dump($datos_docs['doc']);
+            foreach ($datos_docs['doc'] as $doc) {
+
+                $attached_document_code = $doc->tipodocumento;
+                $attached_document_name = $doc->descripcion;
+
+                $attached_document_date = date("d/m/Y", strtotime($doc->fecha_documento));
+                if ($doc->fecha_expiracion) {
+                    $attached_document_date_expiration = date("d/m/Y", strtotime($doc->fecha_expiracion));
+                } else {
+                    $attached_document_date_expiration = null;
+                }
+
+
+                $temp_attached_document_item = $doc->item;
+                $attached_document_reference = $doc->referencia . " trs";
+                // $attached_document_date_expiration =  $attached_document_date;
+                $attached_document_amount = $doc->monto_autorizado;
+                //$attached_document_date= date("d/m/Y", strtotime($doc->fecha_expiracion));
+
+
+
+
+                $xml->startElement("Attached_document");
+                //$xml->writeElement("Attached_document_code", $doc->tipodocumento);
+                if ($attached_document_code == null) {
+                    $xml->startElement("Attached_document_code");
+                    $xml->writeElement("null");
+                    $xml->endElement();
+                } else {
+                    $xml->writeElement("Attached_document_code", $attached_document_code);
+                }
+                //$xml->writeElement("Attached_document_name", "CERTIFICADO DE ORIGEN");///////////////////////////////////////////////////////////////////////////
+                if ($attached_document_name == null) {
+                    $xml->startElement("Attached_document_name");
+                    $xml->writeElement("null");
+                    $xml->endElement();
+                } else {
+                    $xml->writeElement("Attached_document_name", $attached_document_name);
+                }
 
                 $xml->startElement("Attached_document_from_rule");
                 $xml->startElement("null");
                 $xml->endElement();
                 $xml->endElement(); // fin Attached_document_from_rule
 
-                $xml->writeElement("Attached_document_date", $doc->fecha_documento);
-                $xml->writeElement("Temp_attached_document_item", $doc->item);
-                $xml->writeElement("Attached_document_reference", $doc->referencia);
+                // $xml->writeElement("Attached_document_date", $doc->fecha_documento);
+                if ($attached_document_date == null) {
+                    $xml->startElement("Attached_document_date");
+                    $xml->writeElement("null");
+                    $xml->endElement();
+                } else {
+                    $xml->writeElement("Attached_document_date", $attached_document_date);
+                }
 
-                $xml->startElement("Attached_document_date_expiration");
-                $xml->startElement("null");
-                $xml->endElement();
-                $xml->endElement(); // fin Attached_document_date_expiration
+                //$xml->writeElement("Temp_attached_document_item", $doc->item);
+                if ($temp_attached_document_item == null) {
+                    $xml->startElement("Temp_attached_document_item");
+                    $xml->writeElement("null");
+                    $xml->endElement();
+                } else {
+                    $xml->writeElement("Temp_attached_document_item", $temp_attached_document_item);
+                }
 
-                $xml->startElement("Attached_document_country_code");
-                $xml->startElement("null");
-                $xml->endElement();
-                $xml->endElement(); // fin Attached_document_country_code
+                if ($attached_document_reference == null) {
+                    $xml->startElement("Attached_document_reference");
+                    $xml->writeElement("null");
+                    $xml->endElement();
+                } else {
+                    $xml->writeElement("Attached_document_reference", $attached_document_reference);
+                }
 
-                $xml->startElement("Attached_document_entity_code");
-                $xml->startElement("null");
-                $xml->endElement();
-                $xml->endElement(); // fin Attached_document_entity_code
+                if ($attached_document_date_expiration == null) {
+                    $xml->startElement("Attached_document_date_expiration");
+                    $xml->writeElement("null");
+                    $xml->endElement();
+                } else {
+                    $xml->writeElement("Attached_document_date_expiration", $attached_document_date_expiration);
+                }
 
-                $xml->startElement("Attached_document_entity_name");
-                $xml->startElement("null");
-                $xml->endElement();
-                $xml->endElement(); // fin Attached_document_entity_name
 
-                $xml->startElement("Attached_document_entity_other");
-                $xml->startElement("null");
-                $xml->endElement();
-                $xml->endElement(); // fin Attached_document_entity_name
 
-                $xml->writeElement("Attached_document_amount", "0.0");
+                $attached_document_country_code = null;
+                if ($attached_document_country_code == null) {
+                    $xml->startElement("Attached_document_country_code");
+                    $xml->writeElement("null");
+                    $xml->endElement();
+                } else {
+                    $xml->writeElement("Attached_document_country_code", $attached_document_country_code);
+                }
 
-                $xml->endElement(); // fin Attached_documents
 
-                $xml->endElement(); // fin Attached_documents
+                $attached_document_entity_code = null;
+                if ($$attached_document_entity_code == null) {
+                    $xml->startElement("Attached_document_entity_code");
+                    $xml->writeElement("null");
+                    $xml->endElement();
+                } else {
+                    $xml->writeElement("Attached_document_entity_code", $$attached_document_entity_code);
+                }
+
+                $attached_document_entity_name = null;
+                if ($attached_document_entity_name == null) {
+                    $xml->startElement("Attached_document_entity_name");
+                    $xml->writeElement("null");
+                    $xml->endElement();
+                } else {
+                    $xml->writeElement("Attached_document_entity_name", $attached_document_entity_name);
+                }
+
+
+                $attached_document_entity_other = null;
+                if ($attached_document_entity_other == null) {
+                    $xml->startElement("Attached_document_entity_other");
+                    $xml->writeElement("null");
+                    $xml->endElement();
+                } else {
+                    $xml->writeElement("Attached_document_entity_other", $attached_document_entity_other);
+                }
+
+
+                if ($attached_document_amount == null) {
+                    $xml->startElement("Attached_document_amount");
+                    $xml->writeElement("null");
+                    $xml->endElement();
+                } else {
+                    $xml->writeElement("Attached_document_amount", $attached_document_amount);
+                }
+
+
+
+                $xml->endElement(); // fin Attached_documentss
             } //fin  foreach doc
+            $xml->endElement(); // fin Attached_document
+
+            $xml->endElement(); // fin Attached_documents
         } // fin foreach items
-        $xml->endElement(); //fin Item
+
 
         $xml->startElement("Temp");
         $xml->startElement("Scanned_Documents_CDATA");
-        //incrustar adjuntos aqui
+
+        $xml->writeCData($doc_scaneado);
+        //  $xml->writeElement("Scanned_Documents_CDATA", "<![CDATA[". $doc_scaneado."]]>");
         $xml->endElement(); //fin Scanned_Documents_CDATA
         $xml->endElement(); // fin Temp
 
-        $xml->startElement("Container");
+
         foreach ($datos_eq['eq'] as $eq) {
+            $item_Number = $eq->item;
+            $equipment_type = $eq->id_equipamiento;
+            $equipment_size = $eq->tamano_equipo;
+            $id_equipment = $eq->idequipamiento;
+            $container_identity = $eq->contenedor;
+            $container_type = $eq->id_contenedor;
+            $empty_full_indicator = $eq->id_carga;
+            $packages_number = $eq->numero_paquetes;
+            $packages_weight = $eq->peso_mercancias;
+            $xml->startElement("Container");
             $xml->startElement("Item");
-            $xml->writeElement("Attached_document_reference", $eq->item);
+            //$xml->writeElement("Attached_document_reference", $eq->item);
+            if ($attached_document_reference == null) {
+                $xml->startElement("Item_Number");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Item_Number", $item_Number);
+            }
             $xml->endElement(); //fin Item
 
-            $xml->writeElement("Equipment_type", $eq->id_equipamiento);
-            $xml->writeElement("Equipment_size", $eq->tamano_equipo);
-            $xml->writeElement("ID_equipment", $eq->idequipamiento);
 
-            $xml->startElement("Container_identity");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Container_identity
+            if ($equipment_type == null) {
+                $xml->startElement("Equipment_type");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Equipment_type", $equipment_type);
+            }
 
-            $xml->startElement("Container_type");
-            $xml->startElement("null");
-            $xml->endElement();
-            $xml->endElement(); // fin Container_type
+            if ($equipment_size == null) {
+                $xml->startElement("Equipment_size");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Equipment_size", $equipment_size);
+            }
 
-            $xml->writeElement("Empty_full_indicator", $eq->idcarga);
+
+            if ($id_equipment == null) {
+                $xml->startElement("ID_equipment");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("ID_equipment", $id_equipment);
+            }
+
+
+            if ($container_identity == null) {
+                $xml->startElement("Container_identity");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Container_identity", $container_identity);
+            }
+
+            if ($container_type == null) {
+                $xml->startElement("Container_type");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Container_type", $container_type);
+            }
+
+
+            if ($empty_full_indicator == null) {
+                $xml->startElement("Empty_full_indicator");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Empty_full_indicator", $empty_full_indicator);
+            }
+
             $xml->writeElement("Gross_weight", "0.0");
 
             $xml->startElement("Package");
-            $xml->writeElement("Packages_number", $eq->numero_paquetes);
-            $xml->writeElement("Packages_weight", $eq->peso_mercancias);
+
+            if ($packages_number == null) {
+                $xml->startElement("Packages_number");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Packages_number", $packages_number);
+            }
+
+            // $xml->writeElement("Packages_weight", $eq->peso_mercancias);
+            if ($packages_weight == null) {
+                $xml->startElement("Packages_weight");
+                $xml->writeElement("null");
+                $xml->endElement();
+            } else {
+                $xml->writeElement("Packages_weight", $packages_weight);
+            }
             $xml->endElement(); // fin Package
+
+            $xml->endElement(); // fin Package
+
+
         }
+
 
         $xml->endElement(); // fin Container
 
+        $xml->endElement(); // fin Temp
 
         $xml->endElement(); //fin asycuda
 
         $content = $xml->outputMemory();
-        ob_end_clean();
+
+        $filename = "dm.xml";
+
+        file_put_contents($filename, $content);
+
+        /* ob_end_clean();
         ob_start();
         header('Content-Type: application/xml; charset=UTF-8');
         header('Content-Encoding: UTF-8');
-        header("Content-Disposition: attachment;filename=ejemplo.xml");
+        header("Content-Disposition: attachment;filename=dm.xml");
         header('Expires: 0');
         header('Pragma: cache');
         header('Cache-Control: private');
-        echo $content;
+       
+        header('Content-Type: text/xml');*/
 
+
+        //  echo $content;
+
+
+        //  $xml->flush();
+        //   readfile('localhost/grupo_c807/duar/elmer.xml');
         /*  $xml = '<root>';
           foreach ($datos as $row) {
               $xml .= '<item>
@@ -1933,9 +3455,9 @@ class Crear extends CI_Controller
                <image>'.$row->declarante.'</image>
              </item>';
           }
-          $xml .= '</root>';
-          $this->output->set_content_type('text/xml');
-         $this->output->set_output($xml);*/
+          $xml .= '</root>';*/
+        // $this->output->set_content_type('text/xml');
+        //$this->output->set_output($content);
     }
 
     /*======================================================================*/
@@ -1989,12 +3511,7 @@ class Crear extends CI_Controller
         }
 
         $ubicacion .= "/" . $nombre;
-        //echo $ubicacion;
-        // var_dump($_FILES);
         move_uploaded_file($_FILES['file_up']['tmp_name'], $ubicacion);
         $encode = chunk_split(base64_encode(file_get_contents($ubicacion)));
-
-        //  $id= $_POST['id_doc'];
-        $dua_id = $this->Crearpoliza_model->guardar_adjunto($id, $data);
     }
 }

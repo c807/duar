@@ -1080,11 +1080,18 @@
                         <article id="tab5">
                             <div class="row">
                                 <div class="col-md-2 col-md-offset-5">
-                                    <button type="button" class="boton" onclick="generar_xml()">Generar XML</button>
+                                    <button type="button"  name="btn_gen_xml"  id="btn_gen_xml" class="boton" onclick="generar_xml()">Generar XML</button>
+
                                 </div>
 
                             </div>
 
+                            <div class="row">
+                                <div class="col-md-2 col-md-offset-5">
+                                    <?php $fname = 'dm.xml'; ?>
+                                    <a href="<?php echo base_url(); ?>/index.php/poliza/crear/download_xml/<?php echo $fname; ?>" class="boton"  name="btn_down_xml"  id="btn_down_xml">Download XML</a>
+                                </div>
+                            </div>
 
                         </article>
                     </div>
@@ -1108,15 +1115,15 @@
                     <div class="modal-body">
 
                         <form enctype="multipart/form-data" method="post" class="form_adjunto" id="form_adjunto" action="javascript:guardar_adjunto()">
-                           
+
                             <div class="container">
-                            <div class="col-sm-2">
-                            <input type="text" class="form-control" id="id_opc" name="id_opc" >
-                            </div>
+                                <div class="col-sm-2">
+                                    <input type="text" class="form-control" id="id_opc" name="id_opc">
+                                </div>
                                 <div class="row">
-                               
+
                                     <div class="col">
-                                   
+
                                         <div class="form-group form-group-sm">
                                             <div class="col-md-2 text-left">
                                                 <label for="item_adjunto" class="control-label">Item</label>
@@ -1457,7 +1464,16 @@
                 }
             })
         });
+
+       
     </script>
+    <script>
+         $("#btn_gen_xml").click(function() {
+            
+          //  document.getElementById("btn_down_xml").click(); 
+         });
+    </script>
+
 </body>
 
 </html>
