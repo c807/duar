@@ -1,98 +1,112 @@
-body{
-	background:#E8EBDA; /*#E8EBDA;*/
-	font-family: 'Roboto', sans-serif;
-	padding-top:70px;
-}
-.sombra{
-	box-shadow: 0 0 2px rgba(0,0,0,0.5);
+body {
+    background: #E8EBDA;
+    /*#E8EBDA;*/
+    font-family: 'Roboto', sans-serif;
+    padding-top: 70px;
 }
 
-.navbar-prin{
-	background: #FFF;
-	border: 1px solid #EEEEEE;
-	box-shadow: 0 0 4px rgba(0,0,0,0.2);
-	margin: 10px auto 5px auto;
+.sombra {
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 }
 
-.navbar-poli{
-	background: #FFF;
-	border: 1px solid #EEEEEE;
-	box-shadow: 0 0 4px rgba(0,0,0,0.2);
-	width: 98%;
-	margin: 10px auto 5px auto;
+.navbar-prin {
+    background: #FFF;
+    border: 1px solid #EEEEEE;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+    margin: 10px auto 5px auto;
 }
 
-.panel > .panel-heading{
-	background: #4E714A;
-	border: 1px solid #4E714A;
-	color : #FFF;
+.navbar-poli {
+    background: #FFF;
+    border: 1px solid #EEEEEE;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+    width: 98%;
+    margin: 10px auto 5px auto;
 }
 
-.panel-poli{
-	width: 98%;
-	margin: 10px auto 20px auto;
+.panel>.panel-heading {
+    background: #4E714A;
+    border: 1px solid #4E714A;
+    color: #FFF;
 }
 
-label{
-	font-weight: 300;
+.panel-poli {
+    width: 98%;
+    margin: 10px auto 20px auto;
 }
+
+label {
+    font-weight: 300;
+}
+
+
 /*    ---  SOLICITUDES  ---   */
-table{
-	font-size: 12px;
-}
-table tr:hover{
-	background: #EDEDED;
+
+table {
+    font-size: 12px;
 }
 
-.tbl-th{
-	font-weight: 400;
-	background:#E5EBEE;
+table tr:hover {
+    background: #EDEDED;
 }
 
-.bita-lista{
-	background: #FAFAFA;
+.tbl-th {
+    font-weight: 400;
+    background: #E5EBEE;
 }
-.bita-deta{
-	color: #555;
-	font-size: 13px;
+
+.bita-lista {
+    background: #FAFAFA;
 }
+
+.bita-deta {
+    color: #555;
+    font-size: 13px;
+}
+
 .titbar th {
-	background: #E5EBEE;
+    background: #E5EBEE;
 }
-.pretitulo{
-	display: block;
+
+.pretitulo {
+    display: block;
 }
-.restitulo{
-	color:#4288C3;
+
+.restitulo {
+    color: #4288C3;
 }
-.m1{
-	width: 45px;
-	display: inline-block;
+
+.m1 {
+    width: 45px;
+    display: inline-block;
 }
-.m2{
-	width: 35px;
-	display: inline-block;
+
+.m2 {
+    width: 35px;
+    display: inline-block;
 }
+
 
 /* para mostrar alerta verde*/
-.alertgreen{
-	background: #28a745;
-	color : #FFF;
+
+.alertgreen {
+    background: #28a745;
+    color: #FFF;
 }
 
-.alertred{
-	background: #dc3545;
-	color : #FFF;
+.alertred {
+    background: #dc3545;
+    color: #FFF;
 }
 
 .btnsuccess {
-	background: #28a745;
+    background: #28a745;
 }
 
 .hdmodal {
-	  background-color: #385B34;
-	  color:#FFF;
-  }
+    background-color: #385B34;
+    color: #FFF;
+}
 
 .close {
     color: #ccc;
@@ -106,27 +120,24 @@ table tr:hover{
 }
 
 .sinborde {
-	border: 0;
-  }
+    border: 0;
+}
 
-.cajafija{
-		position: fixed;
-		min-height: 300px;
-		width: 400px;
-		text-align: center;
-		word-wrap: break-word;
-		background-color: aquamarine;
-		
-		top:2px;
-		right:2px;
-	
+.cajafija {
+    position: fixed;
+    min-height: 300px;
+    width: 400px;
+    text-align: center;
+    word-wrap: break-word;
+    background-color: aquamarine;
+    top: 2px;
+    right: 2px;
 }
 
 .boton {
     background-color: white;
     border-style: solid;
     border-color: #3D6654;
-
     padding: 6px 6px;
     text-align: center;
     text-decoration: none;
@@ -136,16 +147,13 @@ table tr:hover{
     -webkit-transition-duration: 0.4s;
     transition-duration: 0.4s;
     cursor: pointer;
-
     position: relative;
     left: 13%;
     clear: left;
-    font-size: 12px;
+    font-size: 14px;
     width: 125px;
     border-radius: 8px;
     padding: 10px;
-
-
 }
 
 .boton:hover {
@@ -153,10 +161,60 @@ table tr:hover{
     color: white;
 }
 
-.center-check{
-	text-align:center;
+.center-check {
+    text-align: center;
 }
 
-.s-td{
-	width:15px;
+.s-td {
+    width: 15px;
+}
+
+
+/* ALL LOADERS */
+
+.loader {
+    width: 100px;
+    height: 100px;
+    border-radius: 100%;
+    position: relative;
+    margin: 0 auto;
+}
+
+#loader-1:before,
+#loader-1:after {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    width: 75%;
+    height: 75%;
+    border-radius: 75%;
+    border: 10px solid transparent;
+    border-top-color: #A5CF61;
+    border-top-color: #C4D600;
+}
+
+#loader-1:before {
+    z-index: 100;
+    animation: spin 1s infinite;
+}
+
+#loader-1:after {
+    border: 10px solid #23504D;
+    border: 10px solid #056753;
+}
+
+@keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
 }

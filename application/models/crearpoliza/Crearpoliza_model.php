@@ -287,10 +287,11 @@ class Crearpoliza_model extends CI_Model
     {
 
         $query = $this->db
-        ->select("en.*, ad.nombre aduana_registro_name, ba.descripcion nombre_banco,pr.descripcion nombre_presentacion")
+        ->select("en.*, ad.nombre aduana_registro_name, ba.descripcion nombre_banco,pr.descripcion nombre_presentacion,zd.descripcion zona_descarga")
         ->join('duarx.aduana ad', 'ad.codigo =  en.aduana_registro', 'inner')
         ->join('duarx.presentacion pr', 'pr.codigo =  en.presentacion', 'inner')
         ->join('duarx.banco  ba', 'ba.codigo =  en.banco', 'inner')
+        ->join('duarx.zona_descargue  zd', 'zd.codigo =  en.lugar_carga', 'inner')
         ->where('en.duaduana',$duaduana)
         ->get('duarx.encabezado en')
         ->row();

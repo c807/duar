@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Declaracion de Mercancias</title>
+    
     <style>
         .size {
             width: 20%;
@@ -18,7 +19,8 @@
 </head>
 
 <body>
-
+<!--loader -->
+<div class="loader" id="loader-1" style=" position: absolute; top: 50%; left: 50%;margin: -25px 0 0 -25px; display:none"></div>
     <div class="container">
         <div class="panel panel-default">
             <div class="panel-heading" id="titulo">Declarión de Mercancias<span id="defile"></span>
@@ -1088,10 +1090,11 @@
 
                             <div class="row">
                                 <div class="col-md-2 col-md-offset-5">
-                                    <?php $fname = 'dm.xml'; ?>
-                                    <a href="<?php echo base_url(); ?>/index.php/poliza/crear/download_xml/<?php echo $fname; ?>" class="boton"  name="btn_down_xml"  id="btn_down_xml">Download XML</a>
+                                  <!--  <a href="<?php echo base_url(); ?>index.php/poliza/crear/download_xml/<?php echo $fname; ?>" class="boton"  name="btn_down_xml"  id="btn_down_xml">Download XML</a> -->
+                                  <div class="boton "  name="btn_down_xml"  id="btn_down_xml" onclick="download_xml()">Descargar XML</div>
                                 </div>
                             </div>
+                           
 
                         </article>
                     </div>

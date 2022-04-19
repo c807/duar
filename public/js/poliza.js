@@ -674,6 +674,37 @@ function generar_xml_original() {
     });
 }
 
+
+function download_xml() {
+    var dataObj = {
+        somekey: "someValue"
+    }
+    $("#loader-1").show();
+    referencia = $("#referencia").val();
+    var url = base_url("index.php/poliza/crear/download_xml/" + "R" + referencia + ".xml");
+    $.ajax({
+        method: "POST",
+        url: url,
+        data: dataObj,
+        success: function(response) {
+            const blob = new Blob([response], {
+                type: 'text/xml'
+            });
+            const downloadUrl = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = downloadUrl;
+            a.download = "R" + referencia + ".xml";
+            document.body.appendChild(a);
+            a.click();
+
+            $("#loader-1").css("display", "none");
+        }
+
+    });
+
+    // window.location.origin + "/grupo_c807/duar/" + "dm.xml";
+}
+
 function cargar_adjunto_masivo() {
     $("#add_adjuntos").modal("show");
     $("#id_opc").val(2);
@@ -682,12 +713,27 @@ function cargar_adjunto_masivo() {
 
 
 function generar_xml() {
+    var dataObj = {
+        somekey: "someValue"
+    }
+    $("#loader-1").css("display", "block");
     dua = $("#id_dua").val();
-    var url = base_url("index.php/poliza/crear/generar_xml/" + dua);
-    $.getJSON(url, {
-        producto: file.value
-    }, function(data) {
+    referencia = $("#referencia").val();
+    var url = base_url("index.php/poliza/crear/generar_xml/" + dua + "/" + referencia);
+    $.ajax({
+        method: "POST",
+        url: url,
+        data: dataObj,
+        success: function(response) {
+            $("#loader-1").css("display", "none");
 
+        },
+        error: function(request, status, errorThrown) {
+            $("#loader-1").css("display", "none");
+
+        }
 
     });
+
+
 }

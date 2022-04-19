@@ -488,44 +488,9 @@ class Crear extends CI_Controller
 
 
 
-    function download_xml()
-    {
-        $filename = "dm.xml";
-        // load download helder
-        $this->load->helper('download');
-        // read file contents
-        $data = file_get_contents(base_url('/' . $filename));
-        //  $data = file_get_contents(base_url('/uploads/'.$filename));
-        force_download($filename, $data);
-    }
 
-    function obtenerErrorDeJSON()
-    {
-        switch (json_last_error()) {
-            case JSON_ERROR_NONE:
-                return "No ha ocurrido ningún error";
-            case JSON_ERROR_DEPTH:
-                return "Se ha excedido la profundidad máxima de la pila.";
-            case JSON_ERROR_STATE_MISMATCH:
-                return "Error por desbordamiento de buffer o los modos no coinciden";
-            case JSON_ERROR_CTRL_CHAR:
-                return "Error del carácter de control, posiblemente se ha codificado de forma incorrecta.";
-            case JSON_ERROR_SYNTAX:
-                return "Error de sintaxis.";
-            case JSON_ERROR_UTF8:
-                return "Caracteres UTF-8 mal formados, posiblemente codificados incorrectamente.";
-            case JSON_ERROR_RECURSION:
-                return "El objeto o array pasado a json_encode() incluye referencias recursivas y no se puede codificar.";
-            case JSON_ERROR_INF_OR_NAN:
-                return "El valor pasado a json_encode() incluye NAN (Not A Number) o INF (infinito)";
-            case JSON_ERROR_UNSUPPORTED_TYPE:
-                return "Se proporcionó un valor de un tipo no admitido para json_encode(), tal como un resource.";
-            default:
-                return "Error desconocido";
-        }
-    }
 
-    public function generar_xml($id)
+    public function generar_xml($id, $ref_duca)
     {
         header('Content-Type: application/json'); //cabecera json
         $data = array("ATTACHED_DOCUMENTS_LIST" => array());
@@ -541,8 +506,12 @@ class Crear extends CI_Controller
             $tipo_documento = $adjunto->tipodocumento;
             $referencia = $adjunto->referencia;
             $doc_scaneado = $adjunto->documento_escaneado;
-            $str = str_replace(["\r\n", "\r", "\n"], '', $doc_scaneado);
-            $ref = str_replace(["\r\n", "\r", "\n"], '', $referencia);
+
+            $str = str_replace(array("\r\n", "\r", "\n"), '', $doc_scaneado);
+            $ref = str_replace(array("\r\n", "\r", "\n"), '', $referencia);
+            // $str = str_replace(["\r\n", "\r", "\n"], '', $doc_scaneado); //falla en servidor produccion
+            // $ref = str_replace(["\r\n", "\r", "\n"], '', $referencia);//falla en servidor produccion
+
             array_push($data['ATTACHED_DOCUMENTS_LIST'], array(
                 'ITM_NBR'     => $adjunto->item,
                 'ATD_COD'     => $tipo_documento,
@@ -553,17 +522,28 @@ class Crear extends CI_Controller
                 'ATD_FIL_SIZ' => $adjunto->atd_file_size,
             ));
         }
-        $str = preg_replace('//s*/', '', $data);
-        $str = str_replace(["\r\n", "\r", "\n"], '', $str);
-        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
-        $api_key = "WSAA.08071107520015:4iqdMuStIt0Ww9h";
-        $password = "4iqdMuStIt0Ww9h";
+        // $str = preg_replace('//s*/', '', $data); //falla en servidor produccion
+        // $str = str_replace(["\r\n", "\r", "\n"], '', $str);//falla en servidor produccion
+
+        $str = preg_replace(array('//s*/'), '', $data);
+        $str = str_replace(array("\r\n", "\r", "\n"), '', $str);
+
+
+        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        // echo $json;
+        // exit;
+        //  $api_key = "WSAA.08071107520015:4iqdMuStIt0Ww9h"; //pruebas
+        //  $password = "4iqdMuStIt0Ww9h"; //pruebas
+
+        $api_key = "WSAA.08071107520015:RFi1esgCqjHFkQG"; //produccion
+        // $password = "4iqdMuStIt0Ww9h";
         $key = base64_encode($api_key);
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://swtest.aduana.gob.sv/WSWebInterface/REST/encodeAttachedDocuments");
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
+        // curl_setopt($ch, CURLOPT_URL, "https://swtest.aduana.gob.sv/WSWebInterface/REST/encodeAttachedDocuments"); //servidor  pruebas
+        curl_setopt($ch, CURLOPT_URL, "https://siduneaworld.aduana.gob.sv/WSWebInterface/REST/encodeAttachedDocuments"); // servidor producccion
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 120);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
@@ -582,7 +562,7 @@ class Crear extends CI_Controller
             // 'Authorization: '.  $key
         );
         if (curl_exec($ch) === false) {
-            echo 'Curl error: ' . curl_error($ch);
+          //  echo 'Curl error: ' . curl_error($ch);
         }
         $errors = curl_error($ch);  //retorna errores                                                                                                          
         $result = curl_exec($ch);
@@ -591,13 +571,15 @@ class Crear extends CI_Controller
 
         $rsl = json_decode($result, true);
         $doc_scaneado = $rsl['ENCODED_ATTACHED_DOCUMENTS'];
-
+        //  echo $result;
+        $respuesta="";
         if ($rsl['errorCode'] == 0) {
-            echo "DOCUMENTOS ADJUNTOS PROCESADOS CORRECTAMENTE";
+            $respuesta= "DOCUMENTOS ADJUNTOS PROCESADOS CORRECTAMENTE";
         } else {
-            echo "ERROR, NO HA SIFO POSIBLE PROCESAR DOCUMENTOS ADJUNTOS";
+            $respuesta= "ERROR, NO HA SIFO POSIBLE PROCESAR DOCUMENTOS ADJUNTOS";
         }
-
+        // echo $json;
+        // exit;
         $date_of_exit                   = null;
         $time_of_exit                   = null;
         $actual_office_of_exit_code     = null;
@@ -656,7 +638,7 @@ class Crear extends CI_Controller
         $code                           = null;
         $place                          = null;
         $situation                      = null;
-        $name                           = null;
+        $name_carga                     = null;
         $currency_code                  = null;
         $country                        = null;
         $location_of_goods              = null;
@@ -723,6 +705,7 @@ class Crear extends CI_Controller
         $deducciones                    = null;
 
 
+
         //$amount_foreign_currency        = null;
         //attached_document_reference
 
@@ -741,15 +724,16 @@ class Crear extends CI_Controller
         $code_delivery_terms = $general->fob;
         // $xml->writeElement("Exporter_code", $datos->nit_exportador);
         $exporter_name = $general->nombre_exportador;
-        $consignee_code = $general->nit_consignatario;
-        $consignee_name = "SABRITAS Y CIA, SOCIEDAD EN COMANDI (trs)";
-        // $general->consignatario;
+        $nit_consignatario = trim(str_replace(array('-'), '', $general->nit_consignatario));
+        $consignee_code = $nit_consignatario;
+        $consignee_name = $general->consignatario;
         $declarant_code = $general->declarante;
         $number_reference = $general->referencia;
         $country_first_destination = $general->pais_proc;
         $export_country_code = $general->pais_export;
         $destination_country_code = $general->pais_destino;
-        $identity_arrival_information = "CHIQUITA LOGISTIC SERVICES (trs)";
+        //$identity_arrival_information = "CHIQUITA LOGISTIC SERVICES"; //TODO:revisar esto debe ser dinamico
+        $identity_arrival_information = $general->registro_nac_medio;
         $nationality_arrival_information = $general->pais_transporte;
         $container_flag = "false";
         $inco_term = $general->incoterm;
@@ -757,6 +741,7 @@ class Crear extends CI_Controller
         $aduana_registro_code = $general->aduana_registro;
         $aduana_registro_name = $general->aduana_registro_name;
         $lugar_carga = $general->lugar_carga;
+        $name_carga = $general->zona_descarga;
         $location_of_goods = $general->localizacion_mercancia;
         $codigo_banco = $general->banco;
         $nombre_banco = $general->nombre_banco;
@@ -764,7 +749,7 @@ class Crear extends CI_Controller
         $regimen_adicional = $general->reg_adicional;
         $terms_code = $general->presentacion;
         $terms_description = $general->nombre_presentacion;
-        $calculation_working_mode = "0"; //verificar esto
+        $calculation_working_mode = "0";
         $amount_foreign_currency = $general->total_facturar;
         $currency_code = "USD";
         $flete_interno = $general->flete_interno;
@@ -779,7 +764,8 @@ class Crear extends CI_Controller
         $xml->openMemory();
         $xml->setIndent(true);
         $xml->setIndentString('	');
-        $xml->startDocument('version="1.0" encoding="UTF-8" standalone="no"');
+        // $xml->startDocument('version="1.0" encoding="UTF-8" standalone="no"');
+        $xml->startDocument('1.0', 'UTF-8', 'no');
 
         $xml->startElement("ASYCUDA"); //elemento colegio
 
@@ -1531,12 +1517,12 @@ class Crear extends CI_Controller
             $xml->writeElement("Code", $lugar_carga);
         }
         //$xml->writeElement("Name", "name");
-        if ($name == null) {
+        if ($name_carga == null) {
             $xml->startElement("Name");
             $xml->writeElement("null");
             $xml->endElement();
         } else {
-            $xml->writeElement("Name", $name);
+            $xml->writeElement("Name", $name_carga);
         }
 
         //$xml->writeElement("Country", "name");
@@ -2190,9 +2176,11 @@ class Crear extends CI_Controller
             $datos_docs['doc']    = $this->Crearpoliza_model->listado_adjuntos_item($id, $item->item);
             $temp_item_number = $item->item;
             $number_of_packages = $item->no_bultos;
-            $marks1_of_packages = "-";
-            $marks2_of_packages = "-";
-            $kind_of_packages_code = $item->origen;
+
+            $marks1_of_packages = $item->marcas_uno;
+            $marks2_of_packages = $item->marcas_dos;
+
+            $kind_of_packages_code = $item->tipo_bulto;
             $commodity_code = $item->partida;
             $commodity_code = substr($commodity_code, 0, 8);
             $precision_1 = substr($item->partida, 8, 3);
@@ -2200,8 +2188,11 @@ class Crear extends CI_Controller
             $item_price = $item->precio_item;
             $country_of_origin_code = $item->origen;
             $dato_partida = $this->Crearpoliza_model->consulta_producto($item->partida);
+
             $commercial_description = $dato_partida->descripcion;
-            $summary_declaration = "GWFCUSA052982 " . "trs";
+            $commercial_description = substr($commercial_description, 0, 44);
+
+            $summary_declaration = $item->doc_transp;
             $amount_deducted_from_licence = "0.0";
             $gross_weight_itm = $item->peso_bruto;
             $net_weight_itm = $item->peso_neto;
@@ -2252,7 +2243,7 @@ class Crear extends CI_Controller
                 $xml->writeElement("null");
                 $xml->endElement();
             } else {
-                $xml->writeElement("Kind_of_packages_code", $kind_of_packages_code . "verificar esto");
+                $xml->writeElement("Kind_of_packages_code", $kind_of_packages_code);
             }
 
             $xml->endElement(); // fin Packages
@@ -2302,7 +2293,9 @@ class Crear extends CI_Controller
 
             $xml->endElement(); // fin HScode
 
-            $preference_code = "TLC-US" . "trs";
+            $preference_code = $item->codigo_preferencia;
+
+
             if ($preference_code == null) {
                 $xml->startElement("Preference_code");
                 $xml->writeElement("null");
@@ -2312,7 +2305,7 @@ class Crear extends CI_Controller
                 // $xml->writeElement("Preference_code", $item->codigo_preferencia);
             }
 
-            $extended_customs_procedure = "4000 " . "trs";
+            $extended_customs_procedure = $general->reg_extendido;
             if ($extended_customs_procedure == null) {
                 $xml->startElement("Extended_customs_procedure");
                 $xml->writeElement("null");
@@ -2321,7 +2314,7 @@ class Crear extends CI_Controller
                 $xml->writeElement("Extended_customs_procedure", $extended_customs_procedure);
             }
 
-            $national_customs_procedure = "000 " . "trs";
+            $national_customs_procedure = $general->reg_adicional;
             if ($national_customs_procedure == null) {
                 $xml->startElement("National_customs_procedure");
                 $xml->writeElement("null");
@@ -3174,16 +3167,16 @@ class Crear extends CI_Controller
                 $attached_document_code = $doc->tipodocumento;
                 $attached_document_name = $doc->descripcion;
 
-                $attached_document_date = date("d/m/Y", strtotime($doc->fecha_documento));
+                $attached_document_date = date("m/d/Y", strtotime($doc->fecha_documento));
                 if ($doc->fecha_expiracion) {
-                    $attached_document_date_expiration = date("d/m/Y", strtotime($doc->fecha_expiracion));
+                    $attached_document_date_expiration = date("m/d/Y", strtotime($doc->fecha_expiracion));
                 } else {
                     $attached_document_date_expiration = null;
                 }
 
 
                 $temp_attached_document_item = $doc->item;
-                $attached_document_reference = $doc->referencia . " trs";
+                $attached_document_reference = $doc->referencia;
                 // $attached_document_date_expiration =  $attached_document_date;
                 $attached_document_amount = $doc->monto_autorizado;
                 //$attached_document_date= date("d/m/Y", strtotime($doc->fecha_expiracion));
@@ -3426,38 +3419,13 @@ class Crear extends CI_Controller
 
         $content = $xml->outputMemory();
 
-        $filename = "dm.xml";
+        // $filename = "R".$ref_duca.".xml";
 
+        $ubicacion = sys_base("duar/public/xml");
+        $filename = $ubicacion . "/" . "R" . $ref_duca . ".xml";
+        //  $ubicacion .= "/" . $nombre;
         file_put_contents($filename, $content);
-
-        /* ob_end_clean();
-        ob_start();
-        header('Content-Type: application/xml; charset=UTF-8');
-        header('Content-Encoding: UTF-8');
-        header("Content-Disposition: attachment;filename=dm.xml");
-        header('Expires: 0');
-        header('Pragma: cache');
-        header('Cache-Control: private');
-       
-        header('Content-Type: text/xml');*/
-
-
-        //  echo $content;
-
-
-        //  $xml->flush();
-        //   readfile('localhost/grupo_c807/duar/elmer.xml');
-        /*  $xml = '<root>';
-          foreach ($datos as $row) {
-              $xml .= '<item>
-               <name>'.$row->anio.'</name>
-               <price>'.$row->aduana_registro.'</price>
-               <image>'.$row->declarante.'</image>
-             </item>';
-          }
-          $xml .= '</root>';*/
-        // $this->output->set_content_type('text/xml');
-        //$this->output->set_output($content);
+        echo $respuesta;
     }
 
     /*======================================================================*/
@@ -3497,6 +3465,12 @@ class Crear extends CI_Controller
         );
 
         echo json_encode($data);
+    }
+    public function download_xml($filename)
+    {
+        $this->load->helper('download');
+        $data = file_get_contents(base_url('/public/xml/' . $filename));
+        force_download($filename, $data);
     }
 
     public function cargar_adjunto_masivo()
