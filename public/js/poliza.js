@@ -307,9 +307,10 @@ function add_adjunto(id, dua) {
 
         },
         error: function() {
-            $.notify("Ha ocurrido un error, operacion ha sido cancelada", "error");
+
         }
     });
+    //  $.notify("Ha ocurrido un error, operacion ha sido cancelada", "error");
 }
 
 function reload(item, dua) {
@@ -344,7 +345,7 @@ function guardar_adjunto() {
             opc = opc + 1;
         }
 
-
+        $.notify("Documento adjunto ha sido guardado con éxito ", "success ");
 
 
     }
@@ -418,7 +419,7 @@ function consulta_adjunto(doc) {
 }
 /* consulta un items y los muestra info en formulario */
 function consulta_item(doc) {
-    //	alert(doc);
+
     var url = base_url("index.php/poliza/crear/consulta_item/" + doc);
     $.getJSON(url, {
         producto: doc.value
@@ -447,6 +448,7 @@ function consulta_item(doc) {
         $("#otros_costos_item").val(data.otros);
         $("#deducciones_item").val(data.deducciones);
         $("#id_detalle").val(doc);
+        $("#item_id").val(data.item);
         $("select").trigger("chosen:updated");
     });
 }

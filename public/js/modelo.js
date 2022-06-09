@@ -1,6 +1,7 @@
 $(document).on("change", "#selectmod", function(e) {
     $('#selectregadi').html('');
     $("select").trigger("chosen:updated");
+
 })
 
 function dependencia(opc, val, id, selec) {
@@ -19,6 +20,8 @@ function dependencia(opc, val, id, selec) {
             opcion.value = arg.codigo;
             opcion.innerHTML = arg.codigo + ' - ' + arg.codigo_adicional + ' ' + arg.descripcion_adicional;
             document.getElementById(id).appendChild(opcion);
+
+
         })
 
         $("select").trigger("chosen:updated");
@@ -30,6 +33,7 @@ function setvalida() {
     var ext = $("#selectregext").val();
     var adi = $("#selectregadi").val();
 
+
     if (mod == null || ext == null || adi == null) {
         $("#btvalida").notify(
             "Faltan datos por completar",
@@ -37,6 +41,7 @@ function setvalida() {
 
     } else {
         $("#mod").submit();
+
     }
 }
 

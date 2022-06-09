@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Declaracion de Mercancias</title>
-    
+
     <style>
         .size {
             width: 20%;
@@ -19,8 +19,8 @@
 </head>
 
 <body>
-<!--loader -->
-<div class="loader" id="loader-1" style=" position: absolute; top: 50%; left: 50%;margin: -25px 0 0 -25px; display:none"></div>
+    <!--loader -->
+    <div class="loader" id="loader-1" style=" position: absolute; top: 50%; left: 50%;margin: -25px 0 0 -25px; display:none"></div>
     <div class="container">
         <div class="panel panel-default">
             <div class="panel-heading" id="titulo">Declarión de Mercancias<span id="defile"></span>
@@ -119,6 +119,7 @@
                                     </div>
 
                                     <div class="row">
+                                    <input type="hidden" class="form-control input-sm" id="regimen_id" name="regimen_id" placeholder="Exportador">
                                         <div class="col">
                                             <div class="form-group form-group-sm">
                                                 <div class="col-md-3 text-left size">
@@ -139,6 +140,7 @@
                                     </div>
 
                                     <div class="row">
+
                                         <div class="col">
                                             <div class="form-group form-group-sm">
                                                 <div class="col-md-3 text-left size">
@@ -811,6 +813,9 @@
                                     <div class="row">
                                         <input type="hidden" class="form-control input-sm" id="id_detalle" name="id_detalle">
                                     </div>
+                                    <div class="row">
+                                        <input type="hidden" class="form-control input-sm" id="item_id" name="item_id">
+                                    </div>
 
                                     <div class="row">
                                         <div class="col-md-4"> </div>
@@ -832,9 +837,7 @@
                                 <button type="button" class="btn btn-primary" onclick="cargar_adjunto_masivo()">Cargar
                                     adjunto</button>
 
-                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#add_adjuntos">
-                                    Launch demo modal
-                                </button>
+                             
                                 <br>
                                 <br>
 
@@ -1082,7 +1085,7 @@
                         <article id="tab5">
                             <div class="row">
                                 <div class="col-md-2 col-md-offset-5">
-                                    <button type="button"  name="btn_gen_xml"  id="btn_gen_xml" class="boton" onclick="generar_xml()">Generar XML</button>
+                                    <button type="button" name="btn_gen_xml" id="btn_gen_xml" class="boton" onclick="generar_xml()">Generar XML</button>
 
                                 </div>
 
@@ -1090,11 +1093,11 @@
 
                             <div class="row">
                                 <div class="col-md-2 col-md-offset-5">
-                                  <!--  <a href="<?php echo base_url(); ?>index.php/poliza/crear/download_xml/<?php echo $fname; ?>" class="boton"  name="btn_down_xml"  id="btn_down_xml">Download XML</a> -->
-                                  <div class="boton "  name="btn_down_xml"  id="btn_down_xml" onclick="download_xml()">Descargar XML</div>
+                                    <!--  <a href="<?php echo base_url(); ?>index.php/poliza/crear/download_xml/<?php echo $fname; ?>" class="boton"  name="btn_down_xml"  id="btn_down_xml">Download XML</a> -->
+                                    <div class="boton " name="btn_down_xml" id="btn_down_xml" onclick="download_xml()">Descargar XML</div>
                                 </div>
                             </div>
-                           
+
 
                         </article>
                     </div>
@@ -1121,7 +1124,7 @@
 
                             <div class="container">
                                 <div class="col-sm-2">
-                                    <input type="text" class="form-control" id="id_opc" name="id_opc">
+                                    <input type="hidden" class="form-control" id="id_opc" name="id_opc">
                                 </div>
                                 <div class="row">
 
@@ -1129,7 +1132,7 @@
 
                                         <div class="form-group form-group-sm">
                                             <div class="col-md-2 text-left">
-                                                <label for="item_adjunto" class="control-label">Item</label>
+                                                <label for="item_adjunto" class="control-label" >Item</label>
                                             </div>
                                             <div class="col-md-2">
                                                 <input type="number" class="form-control input-sm" id="item_adjunto" name="item_adjunto" placeholder="Item" min="0" step="0.01" readonly>
@@ -1438,6 +1441,15 @@
                 });
             });
         });
+
+        $('#selectregext').on('change', function(e) {
+
+            var id = $('select[name="reg_extendido"] option:selected').text();
+            const onlyNumbers = id.replace(/[^0-9]+/g, ""); 
+            id = onlyNumbers.substr(-3);
+            $("#regimen_id").val(id);
+          //  alert(id);
+        });
     </script>
 
     <script>
@@ -1466,15 +1478,15 @@
                     //$('#exportador').prop("disabled",true)
                 }
             })
-        });
 
-       
+
+        });
     </script>
     <script>
-         $("#btn_gen_xml").click(function() {
-            
-          //  document.getElementById("btn_down_xml").click(); 
-         });
+        $("#btn_gen_xml").click(function() {
+
+            //  document.getElementById("btn_down_xml").click(); 
+        });
     </script>
 
 </body>
