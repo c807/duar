@@ -1,7 +1,23 @@
 <div class="form-group col-md-8">
 	<div class="panel panel-default">
 		<div class="panel-heading" id="titulo">Lista</div>
-		<div class="panel-body" id="contenidosolicitud">
+		<div class="panel-body">
+			<p>Se muestran las solicitudes de 
+				<select
+					id="selectAforador"
+					class="form-control"
+					onChange="cargalistaSol()"
+					style="width:250px;display: inline-block;"
+				>
+					<option value="">Todos</option>	
+					<?php foreach ($ejecutivos as $key => $value): ?>
+						<option value="<?php echo $value['usuario']; ?>"><?php echo $value['nombre']; ?></option>
+					<?php endforeach ?>
+				</select>
+			 pendientes de iniciar</p>
+			<div class="table-responsive"  id="contenidosolicitud">
+				
+			</div>
 		</div>
 	</div>
 </div>

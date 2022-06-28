@@ -6,17 +6,27 @@ class Solicitud_model extends CI_Model {
 	# 3	Terminado
 	# 4	Comentario
 
-	function verSolicitudes($ars){
+	public function verSolicitudes($ars=array())
+	{
+		$usuario = $_SESSION['UserID'];
+
+		if (!verDato($ars, 'margi')) {
+			$esAforador = $this->Conf_model->getUsuarioRol(array(
+				'usuario' => $usuario,
+				'rol' => 5
+			));
+
+			if (!$esAforador) {
+				$ars['margi'] = $usuario;
+			}
+		}
+
 		if (verDato($ars, 'id')) {
 			$this->db->where('a.solicitud', $ars['id']);
 		}
 
-		$permite = array(1725, 1211, 9, 1196, 1676);
-		if (! in_array($_SESSION['UserID'],$permite)) {
-
-			if (verDato($ars, 'margi')) {
-				$this->db->where("a.marginador", $ars['margi']);
-			}
+		if (verDato($ars, 'margi')) {
+			$this->db->where("a.marginador", $ars['margi']);
 		}
 
 
@@ -27,10 +37,11 @@ class Solicitud_model extends CI_Model {
 		$soli = $this->db->select("
 							a.*,
 							b.nombre as nomejecutivo,
-							c.nombre as nomstatus
-							")
+							c.nombre as nomstatus,
+							d.nombre as nommarginador")
 						->from("solicitud a")
 						->join("csd.usuario b","a.ejecutivo = b.usuario","left")
+						->join("csd.usuario d", "d.usuario = a.marginador", "left")
 						->join("status c","a.status = c.status")
 						->where("a.status <>",5)
 						->get();

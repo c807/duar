@@ -1,51 +1,58 @@
 <?php
 class Solicitud extends CI_Controller {
 
-	function __construct() {
+	public function __construct()
+	{
 		parent:: __construct();
+
 		if (login()) {
-			$modelos = array(
-							'Solicitud_model',
-							'Bitacora_model'
-							);
 			$this->user = $_SESSION['UserID'];
-			$this->load->model($modelos);
+			$this->load->model(array(
+				'Solicitud_model',
+				'Bitacora_model'
+			));
 		} else {
         	redirect(login_url());
         }
 	}
 
-	function index()
+	public function index()
 	{
-		$slc = new Solicitud_model();
-
 		$datos['navtext'] = "Solicitudes Recibidas";
 		$datos['vista']   = 'solicitud/cuerpo';
 
+		$solicitudes = $this->Solicitud_model->verSolicitudes();
+
 		$pendientes = 0;
-		if ($slc->verSolicitudes(array('margi' => $this->user))) {
-			$pendientes = count($slc->verSolicitudes(array('margi' => $this->user)));
+		if ($solicitudes) {
+			$pendientes = count($solicitudes);
 		}
+
 		$datos['contar'] = $pendientes;
 
 		$conf = new Conf_model();
 		$datos['xnombre'] = $conf->dtusuario($_SESSION['UserID'])->nombre;
 
+		$ejecutivos = array(); 
+		if ($solicitudes) {
+			foreach ($solicitudes as $key => $value) {
+				$ejecutivos[$value->marginador] = array(
+					'usuario' => $value->marginador,
+					'nombre' => $value->nommarginador
+				);
+			}
+		}
+
+		$datos['ejecutivos'] = $ejecutivos;
+
 		$this->load->view('principal',$datos);
 	}
 
-	function act_lista(){
-		$cf = new Conf_model();
-
-		$res = $cf->dtusuario($this->user);
-		$aforador = '';
-		if ($res) {
-			$aforador = $res->nombre;
-		}
-		$this->datos['nomuser'] = $aforador;
-
-		$sol = new Solicitud_model();
-		$this->datos['lista'] = $sol->verSolicitudes(array('margi' => $this->user));
+	public function act_lista()
+	{
+		$detalle = $this->Solicitud_model->verSolicitudes($_REQUEST);
+		$this->datos['lista'] = $detalle;
+		$this->datos['total'] = count($detalle);
 		$this->load->view('solicitud/lista', $this->datos);
 	}
 

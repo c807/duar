@@ -336,5 +336,17 @@ class Conf_model extends CI_Model
                         ->result();
     }
 
+    public function getUsuarioRol($args=[])
+    {
+        if (verDato($args, 'empresa')) {
+            $this->db->where('empresa', $args['empresa']);
+        }
+
+        return $this->db
+        ->where('usuario', $args['usuario'])
+        ->where('rol', $args['rol'])
+        ->get('gacela.usuariorol')
+        ->row();
+    }
 	
 }

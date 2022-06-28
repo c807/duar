@@ -1,7 +1,8 @@
-<p>Se muestran las solicitudes de <b><?php echo $nomuser; ?></b> pendientes de iniciar</p>
-
-<table class="table table-hover table-responsive" style="border:1px solid #ddd;">
+<table class="table table-hover" style="border:1px solid #ddd;">
 	<thead>
+		<tr class="active">
+			<th class="text-left" colspan="100%"><?php echo "{$total} registros en {elapsed_time} segundos." ?></th>
+		</tr>
 		<tr class="bg-success">
 			<th>#</th>
 			<th>Importador</th>

@@ -21,10 +21,17 @@ function cargando(id){
 }
 
 function cargalistaSol(){
+	var afo = document.getElementById('selectAforador')
+
+	let datos = {}
+	if (afo && afo.value) {
+		datos['margi'] = afo.value
+	}
+
 	var url = base_url('index.php/solicitud/solicitud/act_lista');
 	cargando('contenidosolicitud');
 
-	$.post(url,function(data){
+	$.post(url,datos, function(data){
 		document.getElementById("contenidosolicitud").innerHTML = data;
 	})
 }
