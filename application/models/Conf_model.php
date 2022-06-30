@@ -336,7 +336,7 @@ class Conf_model extends CI_Model
                         ->result();
     }
 
-    public function getUsuarioRol($args=[])
+    public function getUsuarioRol($args=array())
     {
         if (verDato($args, 'empresa')) {
             $this->db->where('empresa', $args['empresa']);
