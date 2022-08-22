@@ -239,15 +239,11 @@
   <Transport>
     <Means_of_transport>
       <Departure_arrival_information>
-        <Identity>
-          <null/>
-        </Identity>
+        <Identity>C335BMJ GT-624</Identity>
         <Nationality>SV</Nationality>
       </Departure_arrival_information>
       <Border_information>
-        <Identity>
-          <null/>
-        </Identity>
+        <Identity>C335BMJ GT-624</Identity>
         <Nationality>
           <null/>
         </Nationality>
@@ -586,7 +582,7 @@
         <Suppplementary_unit_name>
           <null/>
         </Suppplementary_unit_name>
-        <Suppplementary_unit_quantity>675.00</Suppplementary_unit_quantity>
+        <Suppplementary_unit_quantity>18900.00</Suppplementary_unit_quantity>
       </Supplementary_unit>
       <Supplementary_unit>
         <Suppplementary_unit_code>
@@ -628,7 +624,7 @@
       <Description_of_goods>
         <null/>
       </Description_of_goods>
-      <Commercial_Description>COD. EPA: 2217079 - PISO VINILICO DECO &amp; ART</Commercial_Description>
+      <Commercial_Description>PISOS VINILICOS</Commercial_Description>
     </Goods_description>
     <Previous_doc>
       <Summary_declaration>8</Summary_declaration>
@@ -988,135 +984,16 @@
     <consignee_cod_itm>N/A</consignee_cod_itm>
     <consignee_nam_itm>N/A</consignee_nam_itm>
     <consignee_typ_itm>N/A</consignee_typ_itm>
-    <Attached_documents>
-      <Attached_document>
-        <Attached_document_code>001</Attached_document_code>
-        <Attached_document_name>FACTURA O DUCUMENTO EQUIVALENTE</Attached_document_name>
-        <Attached_document_from_rule>
-          <null/>
-        </Attached_document_from_rule>
-        <Attached_document_date>05/10/2022</Attached_document_date>
-        <Temp_attached_document_item>1</Temp_attached_document_item>
-        <Attached_document_reference>PRUEBA-FACTURA</Attached_document_reference>
-        <Attached_document_date_expiration>05/10/2022</Attached_document_date_expiration>
-        <Attached_document_country_code>
-          <null/>
-        </Attached_document_country_code>
-        <Attached_document_entity_code>
-          <null/>
-        </Attached_document_entity_code>
-        <Attached_document_entity_name>
-          <null/>
-        </Attached_document_entity_name>
-        <Attached_document_entity_other>
-          <null/>
-        </Attached_document_entity_other>
-        <Attached_document_amount>26271.00</Attached_document_amount>
-      </Attached_document>
-      <Attached_document>
-        <Attached_document_code>017</Attached_document_code>
-        <Attached_document_name>CARTA DE PORTE</Attached_document_name>
-        <Attached_document_from_rule>
-          <null/>
-        </Attached_document_from_rule>
-        <Attached_document_date>05/23/2022</Attached_document_date>
-        <Temp_attached_document_item>1</Temp_attached_document_item>
-        <Attached_document_reference>PUEBA-CARTADEPORTE</Attached_document_reference>
-        <Attached_document_date_expiration>05/10/2022</Attached_document_date_expiration>
-        <Attached_document_country_code>
-          <null/>
-        </Attached_document_country_code>
-        <Attached_document_entity_code>
-          <null/>
-        </Attached_document_entity_code>
-        <Attached_document_entity_name>
-          <null/>
-        </Attached_document_entity_name>
-        <Attached_document_entity_other>
-          <null/>
-        </Attached_document_entity_other>
-        <Attached_document_amount>0.00</Attached_document_amount>
-      </Attached_document>
-      <Attached_document>
-        <Attached_document_code>026</Attached_document_code>
-        <Attached_document_name>MANIFIESTO DE CARGA</Attached_document_name>
-        <Attached_document_from_rule>
-          <null/>
-        </Attached_document_from_rule>
-        <Attached_document_date>05/23/2022</Attached_document_date>
-        <Temp_attached_document_item>1</Temp_attached_document_item>
-        <Attached_document_reference>PRUEBAMANIFIESTO</Attached_document_reference>
-        <Attached_document_date_expiration>05/10/2022</Attached_document_date_expiration>
-        <Attached_document_country_code>
-          <null/>
-        </Attached_document_country_code>
-        <Attached_document_entity_code>
-          <null/>
-        </Attached_document_entity_code>
-        <Attached_document_entity_name>
-          <null/>
-        </Attached_document_entity_name>
-        <Attached_document_entity_other>
-          <null/>
-        </Attached_document_entity_other>
-        <Attached_document_amount>0.00</Attached_document_amount>
-      </Attached_document>
-      <Attached_document>
-        <Attached_document_code>023</Attached_document_code>
-        <Attached_document_name>DECLARACIÓN ÚNICA C. A. (DUCA_T)</Attached_document_name>
-        <Attached_document_from_rule>
-          <null/>
-        </Attached_document_from_rule>
-        <Attached_document_date>05/25/2022</Attached_document_date>
-        <Temp_attached_document_item>1</Temp_attached_document_item>
-        <Attached_document_reference>PUEBA-DUCAT</Attached_document_reference>
-        <Attached_document_date_expiration>05/10/2022</Attached_document_date_expiration>
-        <Attached_document_country_code>
-          <null/>
-        </Attached_document_country_code>
-        <Attached_document_entity_code>
-          <null/>
-        </Attached_document_entity_code>
-        <Attached_document_entity_name>
-          <null/>
-        </Attached_document_entity_name>
-        <Attached_document_entity_other>
-          <null/>
-        </Attached_document_entity_other>
-        <Attached_document_amount>0.00</Attached_document_amount>
-      </Attached_document>
-      <Attached_document>
-        <Attached_document_code>069</Attached_document_code>
-        <Attached_document_name>PÓLIZA DE SEGURO MARÍTIMO,AEREO Y DE TRÁNSITO TERRESTRE</Attached_document_name>
-        <Attached_document_from_rule>
-          <null/>
-        </Attached_document_from_rule>
-        <Attached_document_date>03/31/2022</Attached_document_date>
-        <Temp_attached_document_item>1</Temp_attached_document_item>
-        <Attached_document_reference>PRUEBA-POLIZADELSEGURO</Attached_document_reference>
-        <Attached_document_date_expiration>05/10/2022</Attached_document_date_expiration>
-        <Attached_document_country_code>
-          <null/>
-        </Attached_document_country_code>
-        <Attached_document_entity_code>
-          <null/>
-        </Attached_document_entity_code>
-        <Attached_document_entity_name>
-          <null/>
-        </Attached_document_entity_name>
-        <Attached_document_entity_other>
-          <null/>
-        </Attached_document_entity_other>
-        <Attached_document_amount>0.00</Attached_document_amount>
-      </Attached_document>
-    </Attached_documents>
+    <Attached_documents/>
   </Item>
   <Temp>
-    <Scanned_Documents_CDATA></Scanned_Documents_CDATA>
+    <Scanned_Documents_CDATA><![CDATA[]]></Scanned_Documents_CDATA>
   </Temp>
   <Container>
     <Item>
-      <Item_Number>1</Item_Number>
+      <Item_Number>
+        <null/>
+      </Item_Number>
     </Item>
     <Equipment_type>36</Equipment_type>
     <Equipment_size>0</Equipment_size>

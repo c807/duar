@@ -4,6 +4,7 @@ class Crear extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+        $this->config->load('global');
         if (login()) {
             $modelos = array(
                 'crearpoliza/Crearpoliza_model',
@@ -210,8 +211,9 @@ class Crear extends CI_Controller
             'presentacion'           =>  $_POST['presentacion'],
             'info_adicional'         =>  $_POST['info_adicional'],
             'pais_reg_tm'            =>  $_POST['pais_reg_tm'],
-            'registro_nac_medio'     =>  $_POST['registro_nac_medio']
-
+            'registro_nac_medio'     =>  $_POST['registro_nac_medio'],
+            'banco'                  =>  "00",
+            'agencia'                =>  "000"
         );
 
         $data['c807_file'] =  $_SESSION['numero_file'];
@@ -294,12 +296,12 @@ class Crear extends CI_Controller
         $num = 0 - $t;
         $rest = substr($cadena, $num, -4); // devuelve "de"
         $nombre = $rest;
-       
+
         move_uploaded_file($_FILES['file']['tmp_name'], $ubicacion);
-       
+
         $encode = chunk_split(base64_encode(file_get_contents($ubicacion)));
-        $size=  filesize($ubicacion) ;
-         
+        $size =  filesize($ubicacion);
+
         $data = array(
             'item'                          =>  $item,
             'duaduana'                      =>  $id_dua,
@@ -317,7 +319,7 @@ class Crear extends CI_Controller
 
         );
         $id = $_POST['id_doc'];
-       $dua_id = $this->Crearpoliza_model->guardar_adjunto($id, $data);
+        $dua_id = $this->Crearpoliza_model->guardar_adjunto($id, $data);
     }
 
 
@@ -372,14 +374,18 @@ class Crear extends CI_Controller
             $cadena = $row->documento_escaneado;
         }
 
+        $ref = str_replace("%20"," ",$ref);
+        
         $archivo = getcwd() . "/" . $ref . ".pdf";
 
         $pdf_decoded = base64_decode($cadena);
-        //Write data back to pdf file
+       
         $pdf = fopen($archivo, 'w');
+       
         fwrite($pdf, $pdf_decoded);
-        //close output file
+        
         fclose($pdf);
+
         $mi_pdf =  $archivo;
 
         $file = $getcwd() . "/" . $mi_pdf;
@@ -411,7 +417,7 @@ class Crear extends CI_Controller
         if (isset($_POST['tipo_contenedor'])) {
             $container = $_POST['tipo_contenedor'];
         }
-        echo "fffffffffffffffffffffffffffffffffffffffffffffffffff" . $container;
+      //  echo "fffffffffffffffffffffffffffffffffffffffffffffffffff" . $container;
         // echo $encode;
         $data = array(
             'item'                    =>  $_POST['item_eq'],
@@ -488,32 +494,26 @@ class Crear extends CI_Controller
     }
 
 
-
-
-
     public function generar_xml($id, $ref_duca)
     {
-        ini_set('display_startup_errors', 1);
-        ini_set('display_errors', 1);
-        error_reporting(-1);
 
 
 
-
-          date_default_timezone_set('America/Guatemala');
+        ini_set('memory_limit', '-1'); // enabled the full memory available.
+        ini_set('max_execution_time', 480);
+        date_default_timezone_set('America/Guatemala');
 
         header('Content-Type: application/json'); //cabecera json
         $data = array("ATTACHED_DOCUMENTS_LIST" => array());
         $general   = $this->Crearpoliza_model->generar_xml($id);
-        // echo var_dump($general);
+        //  echo var_dump($general);
+
         $datos_items['items']    = $this->Crearpoliza_model->lista_items($id);
         $datos_docs['doc']    = $this->Crearpoliza_model->listado_adjuntos($id);
 
         $datos_eq['eq']    = $this->Crearpoliza_model->lista_equipamiento($id);
         $doc_scaneado = "";
-        $hijos = "";
-        $document_name = "APPLICATION/PDF";
-        $padre = '{' . '"ATTACHED_DOCUMENTS_LIST"' . ":" . "[";
+
 
         foreach ($datos_docs['doc']  as  $adjunto) {
 
@@ -537,29 +537,19 @@ class Crear extends CI_Controller
 
         $str = str_replace(array("\r\n", "\r", "\n"), '', $data);
 
+        $alias = $this->config->item('adjuntos_aduana');
+      
+         $url = "{$alias}/aduana_sv/adjunto.php";
 
-        $json = json_encode($data);
-
-
-        $api_key = "WSAA.08071107520015:RFi1esgCqjHFkQG"; //produccion
-        // $password = "4iqdMuStIt0Ww9h";
-        $key = base64_encode($api_key);
-        //  echo phpinfo(INFO_MODULES);
-        // echo phpinfo();
-
-
-        $ch = curl_init();
-
-        //  curl_setopt($ch, CURLOPT_URL, "https://swtest.aduana.gob.sv/WSWebInterface/REST/encodeAttachedDocuments"); //servidor  pruebas
-        curl_setopt($ch, CURLOPT_URL, "https://siduneaworld.aduana.gob.sv/WSWebInterface/REST/encodeAttachedDocuments"); // servidor producccion
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 120);
+        /** Llamada a servidor virtual */
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 480);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+        curl_setopt($ch, CURLOPT_POSTFIELDS,   json_encode($data));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_USERPWD, $api_key);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
 
         curl_setopt(
             $ch,
@@ -573,7 +563,7 @@ class Crear extends CI_Controller
         );
 
         if (curl_exec($ch) === false) {
-            //  echo 'Curl error: ' . curl_error($ch);
+            echo 'Curl error: ' . curl_error($ch);
         }
 
         $errors = curl_error($ch);  //retorna errores                                                                                                          
@@ -581,17 +571,20 @@ class Crear extends CI_Controller
         $returnCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE); //retorna el codigo de respuesta
         curl_close($ch);
 
-        $rsl = json_decode($result);
+       
+      //  $rsl = json_decode($result);
 
-        $doc_scaneado = $rsl->ENCODED_ATTACHED_DOCUMENTS;
-
-        $respuesta = "";
-        if ($rsl->errorCode == 0) {
-            $respuesta = "DOCUMENTOS ADJUNTOS PROCESADOS CORRECTAMENTE";
-        } else {
-            $respuesta = "ERROR, NO HA SIFO POSIBLE PROCESAR DOCUMENTOS ADJUNTOS";
-        }
-
+        //$doc_scaneado = $rsl->ENCODED_ATTACHED_DOCUMENTS;
+         $doc_scaneado = $result;
+        //echo $doc_scaneado;
+        //$respuesta = "";
+        //if ($rsl->errorCode == 0) {
+          //  $respuesta = "DOCUMENTOS ADJUNTOS PROCESADOS CORRECTAMENTE";
+        //} else {
+          //  $respuesta = "ERROR, NO HA SIFO POSIBLE PROCESAR DOCUMENTOS ADJUNTOS";
+       // }
+      
+    /** aqui bloque aduana originalmente */
 
         $date_of_exit                   = null;
         $time_of_exit                   = null;
@@ -716,7 +709,8 @@ class Crear extends CI_Controller
         $seguro                         = null;
         $otros_costos                   = null;
         $deducciones                    = null;
-
+        $identity_arrival_information_identity = null;
+        $border_information_identity = null;
 
 
         //$amount_foreign_currency        = null;
@@ -770,9 +764,9 @@ class Crear extends CI_Controller
         $seguro = $general->seguro;
         $otros_costos  = $general->otros;
         $deducciones = $general->deducciones;
-
-
-
+        $manifest_reference_number = $general->manifiesto;
+        $identity_arrival_information_identity = $general->registro_transportista;
+        $border_information_identity = $general->registro_transportista;
 
         $doc = new DOMDocument('1.0', 'UTF-8');
         $doc->xmlStandalone = false;
@@ -1642,39 +1636,39 @@ class Crear extends CI_Controller
         $root28 = $doc->createElement('Departure_arrival_information');
         $root27->appendChild($root28);
 
-        if ($identity_arrival_information == null) {
+        if ($identity_arrival_information_identity == null) {
             $root28_1 = $doc->createElement('Identity');
             $root28->appendChild($root28_1);
             $root28_2 = $doc->createElement('null');
             $root28_1->appendChild($root28_2);
         } else {
             $root28_1 = $doc->createElement('Identity');
-            $root28_1->nodeValue = $identity_arrival_information;
+            $root28_1->nodeValue = $identity_arrival_information_identity;
             $root28->appendChild($root28_1);
         }
 
         if ($nationality_arrival_information == null) {
-            $root28_1 = $doc->createElement('Nationality');
-            $root28->appendChild($root28_1);
-            $root28_2 = $doc->createElement('null');
-            $root28_1->appendChild($root28_2);
+            $root281_1 = $doc->createElement('Nationality');
+            $root28->appendChild($root281_1);
+            $root281_2 = $doc->createElement('null');
+            $root281_1->appendChild($root281_2);
         } else {
-            $root28_1 = $doc->createElement('Nationality');
-            $root28_1->nodeValue = $nationality_arrival_information;
-            $root28->appendChild($root28_1);
+            $root281_1 = $doc->createElement('Nationality');
+            $root281_1->nodeValue = $nationality_arrival_information;
+            $root28->appendChild($root281_1);
         }
 
         $root29 = $doc->createElement('Border_information');
         $root27->appendChild($root29);
 
-        if ($identity == null) {
+        if ($border_information_identity == null) {
             $root29_1 = $doc->createElement('Identity');
             $root29->appendChild($root29_1);
             $root29_2 = $doc->createElement('null');
             $root29_1->appendChild($root29_2);
         } else {
             $root29_1 = $doc->createElement('Identity');
-            $root29_1->nodeValue = $identity;
+            $root29_1->nodeValue = $border_information_identity;
             $root29->appendChild($root29_1);
         }
 
@@ -2796,14 +2790,14 @@ class Crear extends CI_Controller
             $commodity_code = $item->partida;
             $commodity_code = substr($commodity_code, 0, 8);
             $precision_1 = substr($item->partida, 8, 3);
-            $suppplementary_unit_quantity = $item->no_bultos;
+            $suppplementary_unit_quantity = $item->u_suplementarias;
             $item_price = $item->precio_item;
             $country_of_origin_code = $item->origen;
             $dato_partida = $this->Crearpoliza_model->consulta_producto($item->partida);
 
-            $commercial_description = $dato_partida->descripcion;
+            $commercial_description = utf8_decode($dato_partida->descripcion_generica);
             $commercial_description = substr($commercial_description, 0, 44);
-            
+
 
             $summary_declaration = $item->doc_transp;
             $amount_deducted_from_licence = "0.0";
@@ -3153,12 +3147,12 @@ class Crear extends CI_Controller
                 $root79_2 = $doc->createElement('null');
                 $root79_1->appendChild($root79_2);
             } else {
-              //  $dom->createElement(Commercial_Description, htmlentities($text_value))
+                //  $dom->createElement(Commercial_Description, htmlentities($text_value))
                 $root79_1 = $doc->createElement('Commercial_Description');
                 $root79_1->nodeValue = htmlentities($commercial_description);
                 $root79->appendChild($root79_1);
             }
-           
+
             $root80 = $doc->createElement('Previous_doc');
             $root66->appendChild($root80);
 
@@ -3873,15 +3867,11 @@ class Crear extends CI_Controller
 
                 $attached_document_date = date("m/d/Y", strtotime($adjunto->fecha_documento));
 
-                //$attached_document_date = new DateTime($adjunto->fecha_documento);
-               // $attached_document_date->format('m/d/Y');
 
-                if ($adjunto->fecha_expiracion) {
-                    $attached_document_date_expiration = date("m/d/Y", strtotime($adjunto->fecha_expiracion));
-                 //   $attached_document_date_expiration = new DateTime($adjunto->fecha_expiracion);
-                  //  $attached_document_date_expiration->format('m/d/Y');
-                } else {
+                if ($adjunto->fecha_expiracion == "0000-00-00") {
                     $attached_document_date_expiration = null;
+                } else {
+                    $attached_document_date_expiration = date("m/d/Y", strtotime($adjunto->fecha_expiracion));
                 }
 
                 $temp_attached_document_item = $adjunto->item;

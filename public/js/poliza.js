@@ -642,11 +642,13 @@ function limpiar_input_item() {
 }
 
 function dowload_adjunto(pdf, ref) {
+
     var doc = ref + ".pdf";
 
     var url = base_url(
-        "index.php/poliza/crear/dowload_adjunto/" + pdf + "/" + ref
+        "index.php/poliza/crear/dowload_adjunto/" + pdf + "/" + encodeURI(ref)
     );
+
     ver_url_tramite_aduana(doc);
     $.getJSON(url, {
         producto: pdf.value
@@ -656,7 +658,7 @@ function dowload_adjunto(pdf, ref) {
 function ver_url_tramite_aduana(doc) {
     var url = doc;
     window.open(
-        base_url(url),
+        base_url(url.replace(/%20/g, " ")),
         "ventana1",
         "width=600,height=600,scrollbars=no,toolbar=no, titlebar=no, menubar=no"
     );

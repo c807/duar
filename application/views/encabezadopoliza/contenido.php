@@ -1437,7 +1437,7 @@
                 var partida = $("#codigo_mercancia").val();
                 var url = base_url("index.php/poliza/crear/consulta_producto/" + partida);
                 $.getJSON(url, {}, function(data) {
-                    $("#descripcion_comercial").val(data.descripcion);
+                    $("#descripcion_comercial").val(data.descripcion_generica);
                 });
             });
         });

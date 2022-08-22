@@ -22,7 +22,7 @@
 
     <td>
 
-    <button class="btn btn-default btn-xs" onclick="dowload_adjunto(<?php echo  $row->documento; ?> , <?php echo $referencia ; ?>)"><i
+    <button class="btn btn-default btn-xs" onclick="dowload_adjunto(<?php echo str_replace('%20',' ', $row->documento); ?> , <?php echo $referencia ; ?>)"><i
                 title="Ver documento adjunto" class="glyphicon glyphicon-arrow-down"></i></button>
                 <!--
         <button class="btn btn-default btn-xs" onclick="dowload_adjunto(<?php echo $row->documento; ?> , <?php echo $row->referencia; ?>)"><i
