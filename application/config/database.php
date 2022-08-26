@@ -1,14 +1,16 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+require dirname(dirname(dirname(FCPATH))) . '/entorno.php';
 
 $active_group = 'default';
 $query_builder = TRUE;
 
 $db['default'] = array(
-	'dsn'	=> '',
-	'hostname' => '138.117.143.27',
-	'username' => 'elmersv',
-	'password' => '3lm3r.19',
+	'dsn'	   => '',
+	'port'     => $DB_PORT,
+	'hostname' => $DB_HOSTNAME,
+	'password' => $DB_PASSWORD,
+	'username' => $DB_USERNAME,
 	'database' => 'duarx',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
