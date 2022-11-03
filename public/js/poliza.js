@@ -287,9 +287,9 @@ function guardar_items() {
     });
 }
 
-function add_adjunto(id, dua) {
+function add_adjunto(id, dua, num_item) {
     var formData;
-    url_destino = "index.php/poliza/crear/guardar_adjunto/" + id + "/" + dua;
+    url_destino = "index.php/poliza/crear/guardar_adjunto/" + id + "/" + dua + "/" + num_item;
     formData = new FormData($(".form_adjunto")[0]);
     $.ajax({
         url: base_url(url_destino),
@@ -322,7 +322,7 @@ function reload(item, dua) {
 function guardar_adjunto() {
     op = $("#id_opc").val();
     if (op == 1) {
-        add_adjunto(0, 0);
+        add_adjunto(0, 0, 0);
 
     } else {
 
@@ -340,7 +340,7 @@ function guardar_adjunto() {
 
             if ($("#chk" + opc).is(":checked")) {
 
-                add_adjunto(id_item, id_dua);
+                add_adjunto(id_item, id_dua, opc);
             } else {}
             opc = opc + 1;
         }
@@ -576,11 +576,12 @@ function detalle_poliza() {
     $.getJSON(url, {
         producto: dua.value
     }, function(data) {
+
         $("#aduana_registro").val(data.aduana_registro);
         $("#manifiesto").val(data.manifiesto);
         $("#aduana_entrada_salida").val(data.aduana_entrada_salida);
         $("#selectmod").val(data.modelo);
-        $("#reg_extendido").val(data.regimen);
+        $("#selectmod").trigger('change');
         $("#nombre_exportador").val(data.nombre_exportador);
         $("#nit_consignatario").val(data.nit_consignatario);
         $("#nit_consignatario").blur();
@@ -606,11 +607,28 @@ function detalle_poliza() {
         $("#info_adicional").val(data.info_adicional);
         $("#pais_reg_tm").val(data.pais_reg_tm);
         $("#registro_nac_medio").val(data.registro_nac_medio);
+
         $("select").trigger("chosen:updated");
 
+        regimen(data.modelo, data.reg_extendido, data.reg_adicional);
         lista_items(dua);
         lista_equipamiento(dua);
     });
+}
+
+function regimen(modelo, reg_e, reg_a) {
+
+
+    var url = base_url("index.php/poliza/crear/get_regimen/" + modelo + "/" + reg_e + "/" + reg_a);
+
+    $.get(url, function(data) {
+        $("#selectregext").val(805);
+
+        $("#selectregext").trigger('change');
+        $("select").trigger("chosen:updated");
+    });
+
+
 }
 
 function limpiar_input_item() {

@@ -140,14 +140,14 @@
                                     </div>
 
                                     <div class="row">
-
+                                   
                                         <div class="col">
                                             <div class="form-group form-group-sm">
                                                 <div class="col-md-3 text-left size">
                                                     <label for="reg_extendido" class="control-label">Régimen</label>
                                                 </div>
                                                 <div class="col-md-6 ">
-                                                    <select name="reg_extendido" id="selectregext" class="chosen" data-placeholder="Seleccione..." onchange="dependencia(2, this.value, 'selectregadi',1)">
+                                                <select name="reg_extendido" id="selectregext" class="chosen" data-placeholder="Seleccione..." >
                                                         <option value=""></option>
                                                     </select>
                                                 </div>
@@ -1445,6 +1445,7 @@
         $('#selectregext').on('change', function(e) {
 
             var id = $('select[name="reg_extendido"] option:selected').text();
+          
             const onlyNumbers = id.replace(/[^0-9]+/g, ""); 
             id = onlyNumbers.substr(-3);
             $("#regimen_id").val(id);
@@ -1465,6 +1466,7 @@
 
                     $('#nit_consignatario').val("");
                     $('#consignatario').val("");
+                    $('#nit_consignatario').prop("disabled", true)
 
                 } else {
                     $('#nit_exportador').prop("disabled", true);

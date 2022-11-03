@@ -14,13 +14,11 @@ function dependencia(opc, val, id, selec) {
         opcion.value = '';
         opcion.innerHTML = 'Seleccione...';
         document.getElementById(id).appendChild(opcion);
-
         data.forEach(function(arg) {
             var opcion = document.createElement('option');
-            opcion.value = arg.codigo;
+            opcion.value = arg.reg_ext;
             opcion.innerHTML = arg.codigo + ' - ' + arg.codigo_adicional + ' ' + arg.descripcion_adicional;
             document.getElementById(id).appendChild(opcion);
-
 
         })
 

@@ -102,7 +102,12 @@ class Crear extends CI_Controller
                 break;
         }
     }
-
+    public function get_regimen($modelo,$reg_e, $reg_a){
+        $cadena = str_replace("%20", " ", $modelo);
+        $modelo = $cadena;
+        $rsl=$this->Crearpoliza_model->get_regimen($modelo,$reg_e,$reg_a);
+        echo json_encode($rsl);
+    }
     public function encabezado()
     {
         $reg = new Crearpoliza_model($_POST);
@@ -269,7 +274,7 @@ class Crear extends CI_Controller
     }
 
 
-    public function guardar_adjunto($id, $dua)
+    public function guardar_adjunto($id, $dua,$num_item)
     {
         header('Content-Type: application/json; charset=utf-8');
         $nombre = $_FILES["file"]["name"];
@@ -280,6 +285,7 @@ class Crear extends CI_Controller
                 die('Fallo al crear las carpeta de archivos...');
             }
         }
+
         $ubicacion .= "/" . $nombre;
         if ($id == 0) {
 
@@ -292,11 +298,14 @@ class Crear extends CI_Controller
         }
 
         $cadena = $nombre;
+        
         $t = strlen($cadena);
         $num = 0 - $t;
         $rest = substr($cadena, $num, -4); // devuelve "de"
         $nombre = $rest;
-
+        if ($num_item >0 ){
+            $nombre=$nombre."-0".$num_item;
+        }
         move_uploaded_file($_FILES['file']['tmp_name'], $ubicacion);
 
         $encode = chunk_split(base64_encode(file_get_contents($ubicacion)));
@@ -502,7 +511,7 @@ class Crear extends CI_Controller
         ini_set('memory_limit', '-1'); // enabled the full memory available.
         ini_set('max_execution_time', 480);
         date_default_timezone_set('America/Guatemala');
-
+        ini_set('memory_limit', '1024M');
         header('Content-Type: application/json'); //cabecera json
         $data = array("ATTACHED_DOCUMENTS_LIST" => array());
         $general   = $this->Crearpoliza_model->generar_xml($id);
@@ -543,7 +552,7 @@ class Crear extends CI_Controller
 
         /** Llamada a servidor virtual */
         $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 480);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 960);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS,   json_encode($data));

@@ -987,7 +987,9 @@
     <Attached_documents/>
   </Item>
   <Temp>
-    <Scanned_Documents_CDATA><![CDATA[]]></Scanned_Documents_CDATA>
+    <Scanned_Documents_CDATA><![CDATA[<br />
+<b>Notice</b>:  Undefined property: stdClass::$ENCODED_ATTACHED_DOCUMENTS in <b>C:\Users\Desarrollo\Documents\xampp\htdocs\aduana_sv\adjunto.php</b> on line <b>47</b><br />
+]]></Scanned_Documents_CDATA>
   </Temp>
   <Container>
     <Item>

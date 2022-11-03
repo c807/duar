@@ -1,5 +1,5 @@
 <?php
-    ini_set('memory_limit', '80M');
+    ini_set('memory_limit', '280M');
 
     $json = file_get_contents("php://input");
  
