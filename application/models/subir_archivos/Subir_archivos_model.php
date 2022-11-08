@@ -15,36 +15,42 @@ class Subir_archivos_model extends CI_Model
       
         if (isset($no_identificacion)) {
             if ($opcion == 1) {
+              
                 $query = $this->db
                                       ->select("d.id , d.codigo_producto, d.descripcion,   d.num_factura , d.tlc , d.cuantia")
                                       ->join('duarx.dpr as d', 'd.id_file =  f.id', 'inner')
-                                      ->join('duarx.producto_importador as du', "du.codproducto = d.codigo_producto and du.importador = '$no_identificacion'", 'left')
-                                      ->where('du.partida IS  NULL')
+                                      ->join('duarx.producto_importador as du', "du.codproducto = d.codigo_producto ")
+                                      ->where('d.partida IS  NULL')
                                       ->where('f.id', $id_file)
+                                      ->where('du.importador', $no_identificacion)
                                       ->where('d.pais_id',  $_SESSION['pais_id'])
                                       ->order_by('d.num_factura, d.id')
                                       ->get('gacela.file as f')
                                      ->result();
             } elseif ($opcion == 2) {
+               
                 /* d.num_factura as 'Numero Factura' , d.tlc as TLC, f.c807_file as 'File' , d.cuantia, d.proveedor ")*/
                 $query = $this->db
-                                      ->select("d.id as Id , d.codigo_producto as 'Codigo Producto' , d.descripcion as Descripcion, du.partida as 'Partida Arancelaria', 
-                                       d.num_factura as 'Numero Factura' , d.tlc as TLC, f.c807_file as 'File' , d.cuantia ")
+                                      ->select("d.id as Id , d.codigo_producto as 'Codigo Producto' , d.descripcion as Descripcion, d.partida as 'Partida Arancelaria', 
+                                       d.num_factura as 'Numero Factura' , d.tlc as TLC, f.c807_file as 'File' , d.cuantia")
                                       ->join('duarx.dpr as d', 'd.id_file =  f.id', 'inner')
-                                      ->join('duarx.producto_importador as du', "du.codproducto = d.codigo_producto and du.importador = '$no_identificacion'", 'left')
+                                      ->join('duarx.producto_importador as du', "du.codproducto = d.codigo_producto and d.pais_origen=du.paisorigen ",'left')
                                       ->where('f.id', $id_file)
-                                      ->where('d.pais_id',  $_SESSION['pais_id'])    
+                                      ->where('d.pais_id',  $_SESSION['pais_id'] )    
+                                      ->where("(du.importador='$no_identificacion' OR d.partida is null)")
                                       ->order_by('d.id')
                                       ->get('gacela.file as f')
                                       ->result();
             } else {
+              
                 //Verificar si archivo que se subio tiene productos SIN CLASIFICAR
                 $query = $this->db
                                ->select("count(*) as cantidad")
                                ->join('duarx.dpr as d', 'd.id_file =  f.id', 'inner')
-                               ->join('duarx.producto_importador as du', "du.codproducto = d.codigo_producto and du.importador = '$no_identificacion'", 'left')
-                               ->where('du.partida IS  NULL')
+                               ->join('duarx.producto_importador as du', "du.codproducto = d.codigo_producto ")
+                                ->where('d.partida IS  NULL')
                                ->where('f.id', $id_file)
+                               ->where('du.importador', $no_identificacion)
                                ->where('d.pais_id',  $_SESSION['pais_id']) 
                                ->order_by('d.descripcion')
                                ->get('gacela.file as f')
@@ -425,13 +431,14 @@ class Subir_archivos_model extends CI_Model
         return $query;
     }
 
-    public function verificar_partida($codigo, $importador, $pais_id)
+    public function verificar_partida($codigo, $importador, $pais_id, $origen)
     {
         $query = $this->db
         ->select('partida, tlc, permiso, descripcion_generica, idestado, idunidad, fito, pais_adquisicion, pais_procedencia')
         ->where('codproducto', $codigo)
         ->where('importador', $importador)
         ->where('pais_id', $pais_id)
+        ->where('paisorigen', $origen)
         ->get('duarx.producto_importador')
         ->result();
         return $query;
