@@ -19,7 +19,7 @@ class Subir_archivos_model extends CI_Model
                 ->select("d.id , d.codigo_producto, d.descripcion,   d.num_factura , d.tlc , d.cuantia")
                 ->join('duarx.dpr as d', 'd.id_file =  f.id', 'inner')
                 ->join('duarx.producto_importador as du', "du.codproducto = d.codigo_producto and du.importador = '$no_identificacion'", 'left')
-                ->where('du.partida IS  NULL')
+                ->where('d.partida IS  NULL')
                 ->where('f.id', $id_file)
                 ->where('d.pais_id',  $_SESSION['pais_id'])
                 ->order_by('d.num_factura, d.id')
