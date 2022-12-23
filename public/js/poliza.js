@@ -698,6 +698,7 @@ function generar_xml_original() {
 
 
 function download_xml() {
+
     var dataObj = {
         somekey: "someValue"
     }

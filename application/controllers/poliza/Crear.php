@@ -506,10 +506,8 @@ class Crear extends CI_Controller
     public function generar_xml($id, $ref_duca)
     {
 
-
-
         ini_set('memory_limit', '-1'); // enabled the full memory available.
-        ini_set('max_execution_time', 480);
+        ini_set('max_execution_time', 880);
         date_default_timezone_set('America/Guatemala');
         ini_set('memory_limit', '1024M');
         header('Content-Type: application/json'); //cabecera json
@@ -4220,6 +4218,10 @@ class Crear extends CI_Controller
     }
     public function download_xml($filename)
     {
+      //  ini_set('memory_limit', '-1');
+//ini_set('max_execution_time', '10000');
+//	error_reporting(E_ALL);
+ //   ini_set("display_errors", 1);
         $this->load->helper('download');
         $data = file_get_contents(base_url('/public/xml/' . $filename));
         force_download($filename, $data);
