@@ -21,6 +21,7 @@ class Crearpoliza_model extends CI_Model
                 ->get('encabezado a')
                 ->row();
         }
+       
     }
 
     public function modelos($mod = "")
@@ -285,9 +286,12 @@ class Crearpoliza_model extends CI_Model
 
 
 
-    public function consulta_producto($item)
+    public function consulta_producto($item,$nit,$origen)
     {
-        $query = $this->db->where('partida', $item)
+        $query = $this->db
+            ->where('partida', $item)
+            ->where('importador', $nit)
+            ->where('paisorigen', $origen)
             ->get('producto_importador')
             ->row();
         return $query;
@@ -297,11 +301,12 @@ class Crearpoliza_model extends CI_Model
     {
 
         $query = $this->db
-            ->select("en.*, ad.nombre aduana_registro_name, ba.descripcion nombre_banco,pr.descripcion nombre_presentacion,zd.descripcion zona_descarga")
+            ->select("en.*, ad.nombre aduana_registro_name, ba.descripcion nombre_banco,pr.descripcion nombre_presentacion,zd.descripcion zona_descarga, re.codigo regimen_extendido")
             ->join('duarx.aduana ad', 'ad.codigo =  en.aduana_registro', 'inner')
             ->join('duarx.presentacion pr', 'pr.codigo =  en.presentacion', 'inner')
             ->join('duarx.banco  ba', 'ba.codigo =  en.banco', 'inner')
             ->join('duarx.zona_descargue  zd', 'zd.codigo =  en.lugar_carga', 'inner')
+            ->join('duarx.reg_extendido  re', 're.reg_ext =  en.reg_extendido', 'inner')
             ->where('en.duaduana', $duaduana)
             ->get('duarx.encabezado en')
             ->row();

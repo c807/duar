@@ -19,6 +19,7 @@
 </head>
 
 <body>
+   
     <!--loader -->
     <div class="loader" id="loader-1" style=" position: absolute; top: 50%; left: 50%;margin: -25px 0 0 -25px; display:none"></div>
     <div class="container">
@@ -650,11 +651,10 @@
                                                 </div>
 
                                                 <div class="form-group row">
-                                                    <label class="col-sm-5 control-label text-left">Descripción
-                                                    </label>
-                                                    <div class="col-sm-7">
-                                                        <input type="text" class="form-control input-sm" id="descripcion_comercial" name="descripcion_comercial">
+                                                <div class="col-sm-12">
+                                                          <textarea class="form-control input-sm" rows="5" id="descripcion_comercial" name="descripcion_comercial"></textarea>     
                                                     </div>
+                                                
                                                 </div>
 
                                             </div>
@@ -1432,13 +1432,23 @@
 
     <script>
         $(document).ready(function() {
+            return false;
             $("#codigo_mercancia").blur(function() {
-                //  $(this).css("background-color", "#FFFFCC");
-                var partida = $("#codigo_mercancia").val();
-                var url = base_url("index.php/poliza/crear/consulta_producto/" + partida);
+
+                file= $("#file_number").val();
+                
+                var url = base_url("index.php/poliza/crear/obtener_datos_file/" + file);
+                
                 $.getJSON(url, {}, function(data) {
-                    $("#descripcion_comercial").val(data.descripcion_generica);
+                     nit=data;
+                     origen=$("#pais_origen_item").val();
+                     var partida = $("#codigo_mercancia").val();
+                     var url = base_url("index.php/poliza/crear/consulta_producto/" + partida + "/"+ nit + "/" + origen);
+                     $.getJSON(url, {}, function(data) {
+                        $("#descripcion_comercial").val(data.descripcion_generica);
+                    });
                 });
+
             });
         });
 

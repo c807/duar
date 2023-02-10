@@ -1542,7 +1542,7 @@ class Subir_Archivo extends CI_Controller
                     'duaduana'                =>  $_SESSION['dua'],
                     'no_bultos'               =>  $row->bultos,
                     'partida'                 =>  $row->partida,
-                    'descripcion'             =>  $row->descripcion,
+                    'descripcion'             =>  $row->nombre,
                     'peso_bruto'              =>  $row->peso_bruto,
                     'peso_neto'               =>  $row->peso_neto,
                     'u_suplementarias'        =>  $row->cuantia,
@@ -1573,7 +1573,9 @@ class Subir_Archivo extends CI_Controller
 
     public function get_id_file($id)
     {
+       
         $file = $this->Subir_archivos_model->get_id_file($id);
+       
         if ($file) {
             echo json_encode($file);
         }

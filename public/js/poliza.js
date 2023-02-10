@@ -54,6 +54,8 @@ function cargarvistas(ptn, opc = "") {
 }
 
 function empresanit(ars) {
+
+    alert(ars);
     /*var url = base_url('index.php/poliza/crear/empresanit/');
     var datos = {nit:ars.value};
 
@@ -244,8 +246,11 @@ function enviarXls(form) {
 }
 
 function guardar_seg_general(file) {
+ //   alert($("#selectregext").val());
+
     var formData;
     url_destino = "index.php/poliza/crear/guardar_seg_general/";
+    
     formData = new FormData($(".form_sg")[0]);
     $.ajax({
         url: base_url(url_destino),
@@ -255,6 +260,7 @@ function guardar_seg_general(file) {
         contentType: false,
         processData: false,
         success: function(data) {
+        
             get_dua(file);
             $.notify("Encabezado de poliza  ha sido guardada con exito", "success");
         },
@@ -429,7 +435,8 @@ function consulta_item(doc) {
         $("#numero_paquetes").val(data.no_bultos);
         $("#embalaje").val(data.tipo_bulto);
         $("#codigo_mercancia").val(data.partida);
-        $("#codigo_mercancia").blur();
+        $("#descripcion_comercial").val(data.descripcion);
+       // $("#codigo_mercancia").blur();
         $("#pais_origen_item").val(data.origen);
         $("#peso_bruto").val(data.peso_bruto);
         $("#peso_neto").val(data.peso_neto);
@@ -585,6 +592,11 @@ function detalle_poliza() {
         $("#nombre_exportador").val(data.nombre_exportador);
         $("#nit_consignatario").val(data.nit_consignatario);
         $("#nit_consignatario").blur();
+
+        $("#nit_exportador").val(data.nit_exportador);
+        $("#nit_exportador").blur();
+        $("#consignatario").val(data.consignatario);
+
         $("#declarante").val(data.declarante);
         $("#pais_export").val(data.pais_export);
         $("#registro_transportista").val(data.registro_transportista);
@@ -618,11 +630,11 @@ function detalle_poliza() {
 
 function regimen(modelo, reg_e, reg_a) {
 
-
+  //  alert(reg_e);
     var url = base_url("index.php/poliza/crear/get_regimen/" + modelo + "/" + reg_e + "/" + reg_a);
 
     $.get(url, function(data) {
-        $("#selectregext").val(805);
+        $("#selectregext").val(reg_e);
 
         $("#selectregext").trigger('change');
         $("select").trigger("chosen:updated");

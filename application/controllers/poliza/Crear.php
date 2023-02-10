@@ -12,6 +12,7 @@ class Crear extends CI_Controller
                 'Conf_model'
             );
             $this->load->model($modelos);
+            $this->load->model('subir_archivos/Subir_archivos_model');
             $datos   = $this->Conf_model->info_accesos_pa($_SESSION['UserID']);
             $_SESSION['roll'] = $datos->ROLL;
             $_SESSION['add'] = $datos->AGREGAR;
@@ -32,8 +33,7 @@ class Crear extends CI_Controller
     public function declaracion($file)
     {
         $cre = new Crearpoliza_model(array('file' => $file));
-
-
+      
         $this->datos['navtext'] = "Póliza File # {$file}";
         $this->datos['modelos'] = $cre->modelos();
         $this->datos['aduanas'] = $cre->Conf_model->aduanas();
@@ -53,7 +53,6 @@ class Crear extends CI_Controller
         $this->datos['tipocarga'] = $cre->Conf_model->tipocarga();
 
 
-        //var_dump($cre);
 
         $existef  = 0;
         $duaduana = 0;
@@ -73,6 +72,8 @@ class Crear extends CI_Controller
         $this->datos['file']     = $xfile;
         $this->datos['duaduana'] = $iddua;
         $this->datos['duaduana'] = $iddua;
+        
+       
         $this->datos['vista']    = "encabezadopoliza/contenido";
         $this->datos['soli']     = true;
         $conf = new Conf_model();
@@ -494,9 +495,9 @@ class Crear extends CI_Controller
     }
 
 
-    public function consulta_producto($id)
+    public function consulta_producto($id, $nit, $origen)
     {
-        $dato = $this->Crearpoliza_model->consulta_producto($id);
+        $dato = $this->Crearpoliza_model->consulta_producto($id,$nit,$origen);
         if ($dato) {
             echo json_encode($dato);
         }
@@ -513,8 +514,7 @@ class Crear extends CI_Controller
         header('Content-Type: application/json'); //cabecera json
         $data = array("ATTACHED_DOCUMENTS_LIST" => array());
         $general   = $this->Crearpoliza_model->generar_xml($id);
-        //  echo var_dump($general);
-
+       
         $datos_items['items']    = $this->Crearpoliza_model->lista_items($id);
         $datos_docs['doc']    = $this->Crearpoliza_model->listado_adjuntos($id);
 
@@ -730,6 +730,7 @@ class Crear extends CI_Controller
 
             $i = $i + 1;
         }
+       
         $customs_clearance_office_code = $general->aduana_entrada_salida;
         $type_of_declaration = substr($general->modelo, 0, 2);
         $declaration_gen_procedure_code = substr($general->modelo, 3, 1);
@@ -986,7 +987,7 @@ class Crear extends CI_Controller
         }
         // fin Assessment_notice
 
-
+        
         //Inicio Global_taxes
         $root3 = $doc->createElement('Global_taxes');
         $root->appendChild($root3);
@@ -1863,7 +1864,7 @@ class Crear extends CI_Controller
         }
 
 
-
+       
         $root38 = $doc->createElement('Bank');
         $root36->appendChild($root38);
 
@@ -2784,25 +2785,41 @@ class Crear extends CI_Controller
         $root64_1->appendChild($root64_2);
 
 
-
+       
         foreach ($datos_items['items']  as $item) {
+           
             $datos_docs['doc']    = $this->Crearpoliza_model->listado_adjuntos_item($id, $item->item);
+         //  var_dump($datos_docs['doc'] ); 
+         
             $temp_item_number = $item->item;
             $number_of_packages = $item->no_bultos;
 
             $marks1_of_packages = $item->marcas_uno;
             $marks2_of_packages = $item->marcas_dos;
-
+          
             $kind_of_packages_code = $item->tipo_bulto;
             $commodity_code = $item->partida;
             $commodity_code = substr($commodity_code, 0, 8);
             $precision_1 = substr($item->partida, 8, 3);
+           
             $suppplementary_unit_quantity = $item->u_suplementarias;
             $item_price = $item->precio_item;
             $country_of_origin_code = $item->origen;
-            $dato_partida = $this->Crearpoliza_model->consulta_producto($item->partida);
+         
+           // $dato_partida = $this->Crearpoliza_model->consulta_producto($item->partida);
+          //  echo " estoy en items 2809";
+           // var_dump($dato_partida );
 
-            $commercial_description = utf8_decode($dato_partida->descripcion_generica);
+            //$commercial_description = utf8_decode($dato_partida->descripcion_generica);
+            
+            $commercial_description = utf8_decode(trim($item->descripcion));
+            $str = str_replace(array("\r\n", "\r", "\n"), '', $commercial_description);
+           
+           
+           $str=$this->eliminar_tildes($str);
+            $commercial_description= $str;
+
+           
             $commercial_description = substr($commercial_description, 0, 44);
 
 
@@ -2937,7 +2954,7 @@ class Crear extends CI_Controller
                 $root68->appendChild($root70_1);
             }
 
-            $extended_customs_procedure = $general->reg_extendido;
+            $extended_customs_procedure = $general->regimen_extendido;
             if ($extended_customs_procedure == null) {
                 $root71_1 = $doc->createElement('Extended_customs_procedure');
                 $root68->appendChild($root71_1);
@@ -3866,7 +3883,7 @@ class Crear extends CI_Controller
             $root104 = $doc->createElement('Attached_documents');
             $root66->appendChild($root104);
 
-            echo var_dump($datos_docs['doc']);
+         //   echo var_dump($datos_docs['doc']);
             foreach ($datos_docs['doc'] as $adjunto) {
 
                 $attached_document_code = $adjunto->tipodocumento;
@@ -3882,7 +3899,7 @@ class Crear extends CI_Controller
                 }
 
                 $temp_attached_document_item = $adjunto->item;
-                $attached_document_reference = $adjunto->referencia;
+                $attached_document_reference = trim($adjunto->referencia);
 
                 $attached_document_amount = $adjunto->monto_autorizado;
 
@@ -4022,7 +4039,7 @@ class Crear extends CI_Controller
             } //fin adjuntos
 
         } // fin items
-
+      
         $root106 = $doc->createElement('Temp');
         $root->appendChild($root106);
 
@@ -4220,8 +4237,8 @@ class Crear extends CI_Controller
     {
       //  ini_set('memory_limit', '-1');
 //ini_set('max_execution_time', '10000');
-//	error_reporting(E_ALL);
- //   ini_set("display_errors", 1);
+	error_reporting(E_ALL);
+    ini_set("display_errors", 1);
         $this->load->helper('download');
         $data = file_get_contents(base_url('/public/xml/' . $filename));
         force_download($filename, $data);
@@ -4241,5 +4258,52 @@ class Crear extends CI_Controller
         $ubicacion .= "/" . $nombre;
         move_uploaded_file($_FILES['file_up']['tmp_name'], $ubicacion);
         $encode = chunk_split(base64_encode(file_get_contents($ubicacion)));
+    }
+
+    public function obtener_datos_file($numero_file){
+        $result = $this->Subir_archivos_model->obtener_datos_file($numero_file); 
+        echo json_encode($result->no_identificacion);
+
+    }
+
+    function eliminar_tildes($cadena){
+
+        //Codificamos la cadena en formato utf8 en caso de que nos de errores
+        $cadena = utf8_encode($cadena);
+    
+        //Ahora reemplazamos las letras
+        $cadena = str_replace(
+            array('á', 'à', 'ä', 'â', 'ª', 'Á', 'À', 'Â', 'Ä'),
+            array('a', 'a', 'a', 'a', 'a', 'A', 'A', 'A', 'A'),
+            $cadena
+        );
+    
+        $cadena = str_replace(
+            array('é', 'è', 'ë', 'ê', 'É', 'È', 'Ê', 'Ë'),
+            array('e', 'e', 'e', 'e', 'E', 'E', 'E', 'E'),
+            $cadena );
+    
+        $cadena = str_replace(
+            array('í', 'ì', 'ï', 'î', 'Í', 'Ì', 'Ï', 'Î'),
+            array('i', 'i', 'i', 'i', 'I', 'I', 'I', 'I'),
+            $cadena );
+    
+        $cadena = str_replace(
+            array('ó', 'ò', 'ö', 'ô', 'Ó', 'Ò', 'Ö', 'Ô'),
+            array('o', 'o', 'o', 'o', 'O', 'O', 'O', 'O'),
+            $cadena );
+    
+        $cadena = str_replace(
+            array('ú', 'ù', 'ü', 'û', 'Ú', 'Ù', 'Û', 'Ü'),
+            array('u', 'u', 'u', 'u', 'U', 'U', 'U', 'U'),
+            $cadena );
+    
+        $cadena = str_replace(
+            array('ñ', 'Ñ', 'ç', 'Ç'),
+            array('n', 'N', 'c', 'C'),
+            $cadena
+        );
+    
+        return $cadena;
     }
 }
