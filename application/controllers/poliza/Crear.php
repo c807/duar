@@ -731,7 +731,9 @@ class Crear extends CI_Controller
             $i = $i + 1;
         }
        
-        $customs_clearance_office_code = $general->aduana_entrada_salida;
+        //$customs_clearance_office_code = $general->aduana_entrada_salida;
+        $customs_clearance_office_code = $general->aduana_registro;
+        
         $type_of_declaration = substr($general->modelo, 0, 2);
         $declaration_gen_procedure_code = substr($general->modelo, 3, 1);
 
@@ -753,8 +755,11 @@ class Crear extends CI_Controller
         $container_flag = "false";
         $inco_term = $general->incoterm;
         $exporter_code = "N/A";
-        $aduana_registro_code = $general->aduana_registro;
+       // $aduana_registro_code = $general->aduana_registro;
+        $aduana_registro_code =  $general->aduana_entrada_salida;
+       
         $aduana_registro_name = $general->aduana_registro_name;
+        
         $lugar_carga = $general->lugar_carga;
         $name_carga = $general->zona_descarga;
         $location_of_goods = $general->localizacion_mercancia;
@@ -2589,12 +2594,14 @@ class Crear extends CI_Controller
             $root61_2 = $doc->createElement('null');
             $root61_1->appendChild($root61_2);
         } else {
-            $n = $otros_costos;
-            $aux = (string) $n;
-            $decimal = substr($aux, strpos($aux, "."));
-            if ($decimal == "0.00") {
+           
+        //    $n = $otros_costos;
+          //  $aux = (string) $n;
+            //$decimal = substr($aux, strpos($aux, "."));
+            if ($otros_costos == 0) {
                 $otros_costos = "0.0";
             }
+            
             $root61_1 = $doc->createElement('Amount_foreign_currency');
             $root61_1->nodeValue = $otros_costos;
             $root61->appendChild($root61_1);
@@ -2658,10 +2665,10 @@ class Crear extends CI_Controller
             $root62_2 = $doc->createElement('null');
             $root62_1->appendChild($root62_2);
         } else {
-            $n = $deducciones;
-            $aux = (string) $n;
-            $decimal = substr($aux, strpos($aux, "."));
-            if ($decimal == "0.00") {
+           // $n = $deducciones;
+            //$aux = (string) $n;
+            //$decimal = substr($aux, strpos($aux, "."));
+            if ($deducciones == 0) {
                 $deducciones = "0.0";
             }
             $root62_1 = $doc->createElement('Amount_foreign_currency');

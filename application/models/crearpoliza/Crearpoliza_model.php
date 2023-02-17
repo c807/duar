@@ -284,8 +284,6 @@ class Crearpoliza_model extends CI_Model
         return $query;
     }
 
-
-
     public function consulta_producto($item,$nit,$origen)
     {
         $query = $this->db
@@ -302,7 +300,7 @@ class Crearpoliza_model extends CI_Model
 
         $query = $this->db
             ->select("en.*, ad.nombre aduana_registro_name, ba.descripcion nombre_banco,pr.descripcion nombre_presentacion,zd.descripcion zona_descarga, re.codigo regimen_extendido")
-            ->join('duarx.aduana ad', 'ad.codigo =  en.aduana_registro', 'inner')
+            ->join('duarx.aduana ad', 'ad.codigo =  en.aduana_entrada_salida', 'inner')
             ->join('duarx.presentacion pr', 'pr.codigo =  en.presentacion', 'inner')
             ->join('duarx.banco  ba', 'ba.codigo =  en.banco', 'inner')
             ->join('duarx.zona_descargue  zd', 'zd.codigo =  en.lugar_carga', 'inner')
