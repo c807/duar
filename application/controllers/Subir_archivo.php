@@ -1554,7 +1554,7 @@ class Subir_Archivo extends CI_Controller
                     'doc_transp'              =>  $row->documento_transporte,
                     'tipo_bulto'              =>  $row->embalaje,
                     'codigo_preferencia'      =>  $row->ref_tlc,
-                    'marcas_uno'              =>  $row->marcas_uno,
+                    'marcas_uno'              =>  $row->marcas_uno ." ". $row->marcauno,
                     'marcas_dos'              =>  $row->marcas_dos,
                     'u_suplementarias_uno'    =>  $row->u_suplementarias_uno,
                     'u_suplementarias_dos'    =>  $row->u_suplementarias_dos,
