@@ -577,9 +577,9 @@ function eliminar_equipamiento(doc) {
     });
 }
 
-function detalle_poliza() {
+function detalle_poliza(file) {
     var dua = document.getElementById("id_dua").value;
-    var url = base_url("index.php/poliza/crear/consulta_dm/" + dua);
+    var url = base_url("index.php/poliza/crear/consulta_dm/" + file + "/" + dua);
     $.getJSON(url, {
         producto: dua.value
     }, function(data) {
@@ -622,7 +622,9 @@ function detalle_poliza() {
 
         $("select").trigger("chosen:updated");
 
-        regimen(data.modelo, data.reg_extendido, data.reg_adicional);
+        if (data.modelo && data.reg_extendido && data.reg_adicional) {
+            regimen(data.modelo, data.reg_extendido, data.reg_adicional);
+        }
         lista_items(dua);
         lista_equipamiento(dua);
     });

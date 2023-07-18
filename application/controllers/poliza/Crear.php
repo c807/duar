@@ -64,7 +64,7 @@ class Crear extends CI_Controller
             $xfile   = $cre->duar->c807_file;
             $iddua   = $cre->duar->duaduana;
         }
-        echo "<br>";
+
         $_SESSION['numero_file'] = $file;
         $_SESSION['dua'] = $iddua;
 
@@ -228,6 +228,13 @@ class Crear extends CI_Controller
         $dua_id = $this->Crearpoliza_model->guardar_seg_general($id_dua, $data);
         $data['duaduana'] = $dua_id;
         $_SESSION['dua'] = $dua_id;
+
+        if ($id_dua) {
+            $this->Crearpoliza_model->set_contenedores(array(
+                "id" => $dua_id,
+                "c807_file" => $data['c807_file']
+            ));
+        }
     }
 
     public function guardar_items()
@@ -486,9 +493,34 @@ class Crear extends CI_Controller
         }
     }
 
-    public function consulta_dm($id)
+    public function consulta_dm($file, $id)
     {
         $dato = $this->Crearpoliza_model->consulta_dm($id);
+
+        if (!$dato) {
+            $tmpFile = $this->Crearpoliza_model->getFile($file);
+
+            $paOrigen = $this->Conf_model->getPais([
+                "id" => $tmpFile->origen_id,
+                "_uno" => true
+            ]);
+
+            $paDestino = $this->Conf_model->getPais([
+                "id" => $tmpFile->destino_id,
+                "_uno" => true
+            ]);
+
+            $dato = array(
+                "manifiesto" => $tmpFile->numero,
+                "nit_consignatario" => $tmpFile->nit,
+                "incoterm" => $tmpFile->incoterm,
+                "aduana_registro" => $tmpFile->aduana_in,
+                "aduana_entrada_salida" => $tmpFile->aduana_in,
+                "pais_proc" => $paOrigen ? $paOrigen->iso2 : "",
+                "pais_destino" => $paDestino ? $paDestino->iso2 : "",
+                "pais_transporte" => $paDestino ? $paDestino->iso2 : ""
+            );  
+        }
 
         if ($dato) {
             echo json_encode($dato);

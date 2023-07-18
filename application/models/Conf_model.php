@@ -348,5 +348,20 @@ class Conf_model extends CI_Model
         ->get('gacela.usuariorol')
         ->row();
     }
-	
+    
+    public function getPais($args=[])
+    {
+        if (isset($args["id"])) {
+            $this->db->where('id', $args["id"]);
+        }
+        
+        $tmp = $this->db
+        ->get("gacela.pais");
+
+        if (isset($args["_uno"])) {
+            return $tmp->row();
+        }
+
+        return $tmp->result();
+    }	
 }

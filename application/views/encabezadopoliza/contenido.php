@@ -1401,11 +1401,13 @@
             $("#nit_consignatario").blur(function() {
                 //  $(this).css("background-color", "#FFFFCC");
                 var nit = $("#nit_consignatario").val();
-                var url = base_url("index.php/poliza/crear/consulta_consignatario/" + nit);
-                $.getJSON(url, {}, function(data) {
-                    //  alert(data.nombre);
-                    $("#consignatario").val(data.nombre);
-                });
+                if (nit) {
+                    var url = base_url("index.php/poliza/crear/consulta_consignatario/" + nit);
+                    $.getJSON(url, {}, function(data) {
+                        //  alert(data.nombre);
+                        $("#consignatario").val(data.nombre);
+                    });
+                }
             });
         });
     </script>
@@ -1416,18 +1418,20 @@
             $("#nit_exportador").blur(function() {
                 //  $(this).css("background-color", "#FFFFCC");
                 var nit = $("#nit_exportador").val();
-                var url = base_url("index.php/poliza/crear/consulta_consignatario/" + nit);
-                $.getJSON(url, {}, function(data) {
-                    //  alert(data.nombre);
-                    $("#nombre_exportador").val(data.nombre);
-                });
+                if (nit) {
+                    var url = base_url("index.php/poliza/crear/consulta_consignatario/" + nit);
+                    $.getJSON(url, {}, function(data) {
+                        //  alert(data.nombre);
+                        $("#nombre_exportador").val(data.nombre);
+                    });
+                }
             });
         });
     </script>
 
 
     <script>
-        detalle_poliza();
+        detalle_poliza('<?php echo $file; ?>');
     </script>
 
     <script>
