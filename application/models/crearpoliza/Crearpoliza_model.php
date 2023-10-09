@@ -311,26 +311,20 @@ class Crearpoliza_model extends CI_Model
         return $query;
     }
 
-    public function getFile($numero)
-    {
-        return $this->db
-        ->select("
-            a.numero,
-            a.incoterm,
-            b.origen_id,
-            b.destino_id,
-            c.aduana_in,
-            d.nit")
-        ->join("gacela.master b", "b.id = a.master_id")
-        ->join("gacela.file_aduana c", "c.file_id = a.id")
-        ->join("csd.cliente d", "d.cliente = a.cliente")
-        ->where("a.c807_file", $numero)
-        ->get("gacela.file a")
-        ->row();
-    }
 
-    public function set_contenedores($args=array())
+    public function obtener_datos_file_gacela($numero_file)
     {
-        
+        if ($_SESSION['pais_id'] == 2) //El Salvador
+        {
+            return $this->db
+                ->select('f.*, c.*')
+                ->where('f.c807_file', $numero_file)
+                ->join('csd.cliente as c', 'c.cliente = f.cliente', 'inner')
+                ->get('gacela.file  as f')
+                ->row();
+        }
+
+
+       
     }
 }

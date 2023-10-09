@@ -32,6 +32,7 @@ class Crear extends CI_Controller
 
     public function declaracion($file)
     {
+
         $cre = new Crearpoliza_model(array('file' => $file));
 
         $this->datos['navtext'] = "Póliza File # {$file}";
@@ -64,7 +65,7 @@ class Crear extends CI_Controller
             $xfile   = $cre->duar->c807_file;
             $iddua   = $cre->duar->duaduana;
         }
-
+        echo "<br>";
         $_SESSION['numero_file'] = $file;
         $_SESSION['dua'] = $iddua;
 
@@ -73,6 +74,8 @@ class Crear extends CI_Controller
         $this->datos['duaduana'] = $iddua;
         $this->datos['duaduana'] = $iddua;
 
+      // $datos_file_gacela=$this->obtener_datos_file_gacela($file);
+       //$this->datos['file_gacela'] = $datos_file_gacela;
 
         $this->datos['vista']    = "encabezadopoliza/contenido";
         $this->datos['soli']     = true;
@@ -128,6 +131,7 @@ class Crear extends CI_Controller
             $xdec = array('imp_exp' => $mod->imp_exp);
             $form->set_declaracion(array_merge($xdec, $_POST));
         }
+       
         # Para iniciar los catalogos
         $form->set_select(
             array(
@@ -228,13 +232,6 @@ class Crear extends CI_Controller
         $dua_id = $this->Crearpoliza_model->guardar_seg_general($id_dua, $data);
         $data['duaduana'] = $dua_id;
         $_SESSION['dua'] = $dua_id;
-
-        if ($id_dua) {
-            $this->Crearpoliza_model->set_contenedores(array(
-                "id" => $dua_id,
-                "c807_file" => $data['c807_file']
-            ));
-        }
     }
 
     public function guardar_items()
@@ -493,34 +490,9 @@ class Crear extends CI_Controller
         }
     }
 
-    public function consulta_dm($file, $id)
+    public function consulta_dm($id)
     {
         $dato = $this->Crearpoliza_model->consulta_dm($id);
-
-        if (!$dato) {
-            $tmpFile = $this->Crearpoliza_model->getFile($file);
-
-            $paOrigen = $this->Conf_model->getPais([
-                "id" => $tmpFile->origen_id,
-                "_uno" => true
-            ]);
-
-            $paDestino = $this->Conf_model->getPais([
-                "id" => $tmpFile->destino_id,
-                "_uno" => true
-            ]);
-
-            $dato = array(
-                "manifiesto" => $tmpFile->numero,
-                "nit_consignatario" => $tmpFile->nit,
-                "incoterm" => $tmpFile->incoterm,
-                "aduana_registro" => $tmpFile->aduana_in,
-                "aduana_entrada_salida" => $tmpFile->aduana_in,
-                "pais_proc" => $paOrigen ? $paOrigen->iso2 : "",
-                "pais_destino" => $paDestino ? $paDestino->iso2 : "",
-                "pais_transporte" => $paDestino ? $paDestino->iso2 : ""
-            );  
-        }
 
         if ($dato) {
             echo json_encode($dato);
@@ -4376,5 +4348,13 @@ class Crear extends CI_Controller
         );
 
         return $cadena;
+    }
+
+     public function obtener_datos_file_gacela($numero_file)
+    {
+        $result = $this->Crearpoliza_model->obtener_datos_file_gacela($numero_file);
+      //  echo $numero_file;
+        echo json_encode($result );
+       // echo json_encode($result->no_identificacion);
     }
 }

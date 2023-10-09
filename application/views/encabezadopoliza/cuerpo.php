@@ -8,10 +8,13 @@ if (isset($l_items)) {
             <td><?php echo $row->tipo_bulto; ?></td>
             <td><?php echo $row->no_bultos; ?></td>
             <td><?php echo $row->precio_item; ?></td>
-            <td><?php echo $row->flete_interno; ?></td>
-            <td><?php echo $row->flete_externo; ?></td>
+            <td><?php echo $row->origen; ?></td>
+            <td><?php echo $row->peso_bruto; ?></td>
+            <td><?php echo $row->peso_neto; ?></td>
+            <td><?php echo $row->codigo_preferencia; ?></td>
             <td><?php echo $row->descripcion; ?></td>
             <td><?php echo $row->marcas_uno; ?></td>
+            <td><?php echo $row->doc_transp; ?></td>
             <th scope="row">
                 <div class="custom-control custom-checkbox">
                     <input type="checkbox" class="custom-control-input" id="<?php echo 'chk' . $c ?>">

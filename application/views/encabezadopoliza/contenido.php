@@ -850,15 +850,18 @@
                                             <thead>
 
                                                 <tr>
-                                                    <th>Número Item</th>
+                                                    <th>#Número Item</th>
                                                     <th>Embalaje</th>
-                                                    <th>Items</th>
+                                                    <th>Paquete</th>
                                                     <th>Precio</th>
-                                                    <th>Flete Interno</th>
-                                                    <th>Flete externo</th>
-                                                    <th>Marca y No. de Paquete</th>
+                                                    <th>Origen</th>
+                                                    <th>Peso Bruto</th>
+                                                    <th>Peso Neto</th>
+                                                    <th>Preferencia</th>
+                                                    <th>Descripción Comercial</th>
                                                     <th>Marca</th>
-                                                    <th colspan="3">Acciones</th>
+                                                    <th>Doc Transporte</th>
+                                                    <th colspan="4">Acciones</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="contenidoLista">
@@ -1401,13 +1404,11 @@
             $("#nit_consignatario").blur(function() {
                 //  $(this).css("background-color", "#FFFFCC");
                 var nit = $("#nit_consignatario").val();
-                if (nit) {
-                    var url = base_url("index.php/poliza/crear/consulta_consignatario/" + nit);
-                    $.getJSON(url, {}, function(data) {
-                        //  alert(data.nombre);
-                        $("#consignatario").val(data.nombre);
-                    });
-                }
+                var url = base_url("index.php/poliza/crear/consulta_consignatario/" + nit);
+                $.getJSON(url, {}, function(data) {
+                    //  alert(data.nombre);
+                    $("#consignatario").val(data.nombre);
+                });
             });
         });
     </script>
@@ -1418,20 +1419,18 @@
             $("#nit_exportador").blur(function() {
                 //  $(this).css("background-color", "#FFFFCC");
                 var nit = $("#nit_exportador").val();
-                if (nit) {
-                    var url = base_url("index.php/poliza/crear/consulta_consignatario/" + nit);
-                    $.getJSON(url, {}, function(data) {
-                        //  alert(data.nombre);
-                        $("#nombre_exportador").val(data.nombre);
-                    });
-                }
+                var url = base_url("index.php/poliza/crear/consulta_consignatario/" + nit);
+                $.getJSON(url, {}, function(data) {
+                    //  alert(data.nombre);
+                    $("#nombre_exportador").val(data.nombre);
+                });
             });
         });
     </script>
 
 
     <script>
-        detalle_poliza('<?php echo $file; ?>');
+        detalle_poliza();
     </script>
 
     <script>

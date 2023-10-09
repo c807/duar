@@ -157,9 +157,7 @@ class Subir_Archivo extends CI_Controller
                             $us1             = $worksheet->getCellByColumnAndRow(45, $row)->getValue(); //unidades suplementarias 1
                             $us2             = $worksheet->getCellByColumnAndRow(46, $row)->getValue(); //unidades suplementarias 2
                             $ref_licencia    = $worksheet->getCellByColumnAndRow(47, $row)->getValue();
-
-
-
+                            
 
                             $codigo = trim($codigo);
 

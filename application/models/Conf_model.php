@@ -4,7 +4,7 @@ class Conf_model extends CI_Model
     public function __construct()
     {
         parent :: __construct();
-       //  $_SESSION['pais_id']=2; //El Salvador
+      //   $_SESSION['pais_id']=2; //El Salvador
        //  $_SESSION['pais_id']=3;  //Honduras
         if (isset($_SESSION['pais_id'])) {
             $this->pais = $_SESSION['pais_id'];
@@ -348,20 +348,5 @@ class Conf_model extends CI_Model
         ->get('gacela.usuariorol')
         ->row();
     }
-    
-    public function getPais($args=[])
-    {
-        if (isset($args["id"])) {
-            $this->db->where('id', $args["id"]);
-        }
-        
-        $tmp = $this->db
-        ->get("gacela.pais");
-
-        if (isset($args["_uno"])) {
-            return $tmp->row();
-        }
-
-        return $tmp->result();
-    }	
+	
 }
